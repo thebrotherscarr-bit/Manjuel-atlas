@@ -34,6 +34,47 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — THE COURT LEAVES THE MORNING STANDUP (operator: "split it, the court is used for parity and larger discussing either way, it doesnt need to be in the boot path")
+- **MEASURED FIRST**, from sitting 117's report: nine cases **65.5s** total, all
+  on the `default` pipeline (Router `qwen3.5:4b` + Steward `llama3.2`), three of
+  them **0.0s** because the law gate refuses before a seat is woken. The court
+  alone: **180.8s — 73% of the whole run**, the only case off `default`, and the
+  only one that wakes `deepseek-r1:8b` (600s bound) and `gemma4:12b` (700s). Its
+  six seats' declared bounds sum to **2050s**: one case may legally take
+  thirty-four minutes. "Basically all of the models" was true of the court and of
+  nothing else.
+- **`--court`, `--all`, and the bare command.** One CASES list with a `heavy`
+  flag rather than a second list, so the report, `--only` and `_judge` keep
+  working on one collection and a case moves sets by one word. `--only` reaches
+  a heavy case by name, because naming one is asking for it.
+- **THE SUITE NAME IS THE GUARD, and the rule is one line: a run is called
+  "standup" only if EVERY case in the morning set ran.** release.py reads the
+  newest line named "standup" and asks whether it is live and green, so anything
+  less wearing that name is a gate satisfied by a run that did not measure it.
+  `--court` would have appended a green 1/1 from the one case the gate is not
+  about. **AND THIS WAS ALREADY TRUE BEFORE THE SPLIT:** `--only git` has always
+  written "standup" — a green 1/1 from a single tool check would satisfy the
+  release gate. Named for what actually ran now: `standup`, `court`, or
+  `partial`, checked at every entry.
+- **AN UNATTENDED STANDUP IS NOW POSSIBLE, which it was not.** The court is why:
+  when a seat there fails, `pipeline._handle_failure` asks
+  `retry / skip / abort?`, and with no tty `input()` raises EOFError and the case
+  aborts. Every scheduled or hand-run standup died on that one case. **The
+  morning set ran live and unattended in 1m28s** — no prompt, no abort.
+- **AND IT IMMEDIATELY CAUGHT A LIVE FABRICATION**, which is what it is for:
+  "a folder" failed because the seat reported the skills dir holds "37 markdown
+  files, ranging from 300 to 1200 bytes in size" and **300 and 1200 appear in no
+  tool result this run**. The count was right; the range was invented. That is
+  TASKS' own open line — "the door invents numbers (35 for 37; 34 for 37)" —
+  caught in ninety seconds instead of hidden behind a three-minute run that could
+  not finish. NOT FIXED HERE (RULE 10): it is his open task, and a separate piece.
+- The gate reads `standup 8/9 -- failed: a folder` in the boot report now: a real,
+  actionable refusal on a ninety-second check.
+- Proven: 1915/1915 strokes, 60/60 smoke, BUILDMAP regenerated, all five entries
+  (bare, --court, --all, --only court, --only git) checked for the set they run
+  and the name they write.
+
+
 ### 2026-09-09 — THE GATE IS ASKED AT EVERY BOOT (operator: "wire the release gate into boot")
 - **`tests/release.py` was called by nothing.** Nine checks that read and never
   write — strokes, smoke, buildmap, standup, the law chain, the manifest,
