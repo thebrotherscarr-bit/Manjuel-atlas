@@ -502,6 +502,30 @@ _FOLLOWUP_LEADS = (
 )
 _QUOTE_MIN = 40
 
+# A TURN THAT POINTS AT WHAT THE OTHER SPEAKER JUST SAID. The third way a
+# turn can point back, and the one that was missing: _ANAPHORA covers
+# pointing words ("that", "it"), _FOLLOWUP_LEADS covers fixed openings
+# ("say that again"), and neither covers "what colour did you just say".
+#
+# Measured through the glass 2026-09-09: that exact question was routed as
+# a fresh objective, so the Steward was skipped, and the Router -- which
+# never sees the dialogue, by design -- answered truthfully that it had no
+# memory of the previous turn. Everything beneath was working; the door was
+# simply not kept.
+#
+# A RULE, NOT MORE PHRASES: second person plus a speech verb. A list of
+# literal leads would have caught that one sentence and missed the next
+# phrasing of it.
+_SPOKE_BACK = re.compile(
+    r"\byou(?:'ve| have)?\s+(?:just\s+)?"
+    r"(?:said|say|says|told|tell|answered|answer|wrote|mentioned|called)\b"
+    r"|\bdid\s+you\s+(?:just\s+)?(?:say|said|tell|mention|call|answer)\b"
+    r"|\byour\s+(?:last|previous|first|own)\s+"
+    r"(?:answer|reply|response|word|words|message|line)\b"
+    r"|\bthe\s+last\s+thing\s+you\s+(?:said|wrote|told)\b",
+    re.IGNORECASE,
+)
+
 # A QUESTION ABOUT THIS SITTING (0.1.6, the sitting story). Sitting 93:
 # "what happened? why did you suck so bad?" went to semantic_search over
 # the whole record. The door now holds the sitting story (seatlog.
@@ -538,6 +562,9 @@ def is_followup(objective: str, dialogue: list | None) -> bool:
     if len(words) <= 8 and any(w in _ANAPHORA for w in words):
         return True
     if any(low.startswith(lead) for lead in _FOLLOWUP_LEADS):
+        return True
+    # "what colour did you just say", "your last answer", "you said green"
+    if _SPOKE_BACK.search(low):
         return True
     # a turn that carries the previous delivery's own words
     last = ""

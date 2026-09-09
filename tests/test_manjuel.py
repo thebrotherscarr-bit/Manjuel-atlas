@@ -1620,6 +1620,37 @@ def test_sitting_87_the_thread_the_scaffold_and_the_mention(reg, lib, book):
     check("with no dialogue nothing is a follow-up",
           not intent.is_followup("what does that mean?", []))
 
+    #    A TURN THAT POINTS AT WHAT THE OTHER SPEAKER JUST SAID. The third
+    #    way back, and the one that was missing until 2026-09-09. Measured
+    #    through the glass: "Say the single word GREEN" -> GREEN, then
+    #    "What colour did you just say?" was routed as a FRESH objective,
+    #    so the Steward was skipped and the Router -- which never sees the
+    #    dialogue, by design -- answered truthfully that it had no memory
+    #    of the previous turn. The dialogue was on disk the whole time.
+    for said in ("What colour did you just say?",
+                 "what did you just say",
+                 "and what colour did you just say?",
+                 "you said green, right?",
+                 "did you say green",
+                 "your last answer",
+                 "the last thing you said"):
+        check(f"pointing at what the seat said is a follow-up: {said!r}",
+              intent.is_followup(said, thread), said)
+
+    #    ...AND IT MUST NOT FIRE ON A FRESH OBJECTIVE. This rule KEEPS THE
+    #    DOOR: a turn it fires on goes to the Steward instead of being
+    #    routed, so a false positive stops his work reaching the Router.
+    for said in ("Say the single word GREEN and nothing else.",
+                 "read pipelines.md",
+                 "what is in the skills dir",
+                 "git status",
+                 "what models are on the rack?",
+                 "say what you see in the ground"):
+        check(f"a fresh objective is not a follow-up: {said!r}",
+              not intent.is_followup(said, thread), said)
+    check("and it cannot fire on a first turn -- there is nothing to point at",
+          not intent.is_followup("what did you just say", []))
+
     g = Path(tempfile.mkdtemp())
     seen_seats = []
     def door_answers(a):

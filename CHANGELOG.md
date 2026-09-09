@@ -34,7 +34,43 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
-Nothing yet.
+
+### 2026-09-09 — THE CONVERSATIONAL LOOP: a turn that points at what the seat just said (operator: "i want the actual conversational loop first"; "review the REPL, the cause may be in there, may need some tuning on it")
+- **Measured through the glass, not guessed.** Turn one: "Say the single word
+  GREEN and nothing else." -> GREEN. Turn two: "What colour did you just say?"
+  -> the Router answered, truthfully, that it "has no memory of previous
+  responses". Every layer beneath was working: serve.py appends both turns to
+  `sess.dialogue` and saves the thread (both were on disk); `detect_shift`
+  returned False; `select_dialogue` kept both entries. The context was there
+  the whole time.
+- **Where it was lost.** pipeline.py's own comment says it: "the Router never
+  sees the dialogue", by design, and the STEWARD is the one seat that can answer
+  from the conversation. The door is kept for a turn `intent.is_followup`
+  recognises. It caught "say that again" (a lead) and "what colour was that"
+  (the anaphor), and missed "what colour did you just say" -- which is how a
+  person actually asks.
+- **A third rule, not more phrases.** `_ANAPHORA` covers pointing words;
+  `_FOLLOWUP_LEADS` covers fixed openings; neither covered a reference to the
+  OTHER SPEAKER'S last turn. `_SPOKE_BACK` does: second person plus a speech
+  verb -- "you just said", "did you say", "your last answer", "the last thing
+  you said". A list of literal leads would have caught that one sentence and
+  missed the next phrasing of it.
+- **Fourteen strokes, and the false positives are the point.** This rule KEEPS
+  THE DOOR: a turn it fires on goes to the Steward instead of being routed, so
+  a false positive would stop his work reaching the Router. Six fresh
+  objectives are asserted NOT to fire it, and it cannot fire on a first turn --
+  there is nothing to point at.
+- **The dashboard holds the conversation now**, not one answer that the next
+  turn replaced. It renders the tail of the same thread Chat holds -- one
+  array, so the two views cannot show different conversations. Failures ride on
+  the face of the answer they belong to; the seats, tools and trace stay on
+  Evals.
+- Fixed while testing: `Home.onRun` still guarded on `#home-out`, the element
+  the thread replaced, so every event returned early and no finished turn was
+  ever attached -- the bubbles rendered empty while the answers streamed past.
+- Proven live: GREEN in 0.4s, then "The colour I just said is green" in 0.7s.
+  1884/1884 strokes, 60/60 smoke.
+
 
 ---
 
