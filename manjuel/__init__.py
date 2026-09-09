@@ -1,6 +1,6 @@
 """manjuel -- local multi-agent pipeline driven by agents.md."""
 
-__version__ = "0.1.4"
+__version__ = "0.1.6"
 
 # THE OLD DIALS STILL TURN. Renamed from chainkit 2026-09-09 at the
 # operator's word. Twenty-two CHAINKIT_* names are documented in RUNBOOK's

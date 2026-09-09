@@ -32,7 +32,23 @@ hand that iterates without updating this file is out of line.
 
 ---
 
-## Unreleased — since v0.1.4 (63fab9e, 2026-09-04 08:21)
+## Unreleased — since 0.1.6 (23a6a38, 2026-09-09 12:00)
+
+Nothing yet.
+
+---
+
+## 0.1.6 — 2026-09-09 12:00 (tag on 23a6a38)
+
+THE FRONTEND. The operator, on cutting this: "we have a working frontend
+now." atlas's glass reaches the council over the engine's own wire -- an
+objective goes into the world's Manjuel process, so the sealed law gate
+stamps it before any model reads a word, the one Router executes the
+tools, the dedup refuses a repeat and the recompose puts every failure in
+the delivery. Chat is the conversation; Evals is the run, whole. The vibe
+coding loop landed the same day: a `run` node drives a Manjuel turn inside
+a flow, a rendered gate holds it, and he walks away and comes back to the
+question. Manjuel itself was not touched for any of it.
 
 ### 2026-09-09 — THE CHAT IS A CONVERSATION; THE RUN IS ON EVALS (operator: "this looks like the evals loops. lets put it there, rebuild the chat page clean"). atlas only; Manjuel untouched.
 - **The split.** Chat shows what he said, what came back, and ONE line of what
