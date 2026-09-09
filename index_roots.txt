@@ -84,3 +84,45 @@ DESIGN.md
 # it could not be listed. The folder is flat now (law/*.md); the collision is
 # gone, and listing `law` is the operator's call, not made here. 05_THE_LAW.md
 # is indexed via foundation/.
+
+# ---------------------------------------------------------------------------
+# THE DOCS THE ESTATE IS BOUND BY AND JUDGED AGAINST. Added 2026-09-09 on the
+# operator's word: "index everything the embedding model is already there".
+#
+# Measured before this line was written: 11 of 24 root documents were in NO
+# root -- SPEC.md among them, so a seat asked what DONE means could not
+# retrieve the file that says. Seven more were IN the index while declared
+# nowhere, which a rebuild would not refresh and a prune would evict.
+#
+# Named one by one rather than by listing the ground root: `.` would sweep
+# worlds/ in by inheritance, and this list is the FIRST line of the vault
+# shield (the vault rule in vectors.py is the second) -- the same reasoning
+# this file already gives for never listing bare `worlds`.
+BUILDMAP.md
+BUILDPATH.md
+CHANGELOG.md
+CLAUDE.md
+CONTRIBUTING.md
+DAYBOOK.md
+HANDOFF.md
+QUICKSTART.md
+README.md
+REFUSALS.md
+RUNBOOK.md
+SPEC.md
+SPEC_CONTROL_CENTER.md
+SYSTEM_DESIGN.md
+TASKS.md
+TESTING.md
+commands.md
+
+# THE LAW. The note above left listing it as the operator's call; he made it
+# the same day. Five FILES, not the folder: TEXT_SUFFIXES takes .jsonl and
+# .py, so declaring `law` would index chain.jsonl -- hundreds of hash lines --
+# and law.py as retrievable prose. The laws are documents; the chain is a
+# ledger, and it is proved by law.py --prove, not retrieved.
+law/ESTATE_LAWS.md
+law/LAW_001_FOUNDING.md
+law/LAW_002_THE_TWELVE.md
+law/SITTING_LAWS.md
+law/SITTING_LAWS_2.md
