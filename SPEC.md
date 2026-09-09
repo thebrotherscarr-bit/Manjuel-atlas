@@ -1,4 +1,4 @@
-# SPEC — what chainkit is, and when it is done
+# SPEC — what manjuel is, and when it is done
 
 Written 2026-09-04 on the operator's word ("getting close to an actual
 product, review missing specs, and write full spec -- 'when done'"), from a
@@ -15,7 +15,7 @@ wearing a checkbox.
 
 ## 1. What it is
 
-**chainkit is a local, sequential, markdown-declared council of small
+**manjuel is a local, sequential, markdown-declared council of small
 language models that answers an operator at his own terminal, where every
 tool call is executed by exactly one seat, every claim a seat makes is
 checked against what actually ran, every run is written down, and every
@@ -90,7 +90,6 @@ A proposal that needs a word uses the nearest one below.
 | **a kind** | the one word on a memory entry saying what it is: guidance, decision, ruling, learning, outcome, note. | the operator, 2026-09-07 |
 | **the release gate** | one command before a tag that refuses by name until the record is whole; `tests/release.py --check`. | the operator, 2026-09-08 ("reviewed, updated, and logged, at all times"); built the same day |
 | **the story** | what THIS sitting has done so far, read off the ledger and handed to the door and the court; bounded like a window. | the operator, 2026-09-07 ("keep that in context for now") and 2026-09-08; built 2026-09-08 (0.1.6) |
-| **a hand's session** | one hand's stretch of work in the ground, opened and closed in `sessions/hands.jsonl` as a sitting is in `sessions.jsonl`. | the operator, 2026-09-08 ("there has to be a way to get you back in line"); built the same day |
 | **out of time** | a seat not seated because the turn's deadline had passed; named in the delivery. | the operator, 2026-09-08 ("never more than 10 minutes between a response") |
 
 ---
@@ -110,14 +109,13 @@ A proposal that needs a word uses the nearest one below.
 | **The law gate** | the sealed ledger verifies on every run or no seat sits; the objective is checked against the decidable laws; every seat is handed the verdict in its SYSTEM role (the court: the ten verbatim); the run is stamped | `lawgate.py`; REFUSALS §19, §20; `test_the_law_gate` |
 | **The standing** | what the sitting is FOR, from DAYBOOK's last entry, read not generated, handed to the door and the court | `seatlog.standing_block`; REFUSALS §20 |
 | **The story** | what the sitting has DONE, from its own ledger lines, read not generated, handed to the door and the court; "what happened?" is answered from it | `seatlog.story_block`, `note_for`; `intent.asks_the_sitting`; REFUSALS §22 |
-| **The hands ledger** | every hand's session opens with the rules' fingerprints as read and closes with what it did; the brief shows the last; the gate refuses over an open one | `seatlog.hand_open/hand_close/hands_line`; `tests/release.py`; REFUSALS §22 |
 | **The ruling loop** | a seat that thought and did not rule is asked again, thinking off, at most three times; the Router is never looped | `MAX_RULING_TURNS`; `_press_for_ruling`; REFUSALS §20 |
 | **The bounds** | one seat call: its `Timeout:` by model size (150/300/600/700) or the 700s ceiling, cut at the wire; one turn: 600s, the seats after it named OUT OF TIME, the seats that failed named too; one index build at a time; twelve ruling turns | `runtime.SEAT_TIMEOUT`, `pipeline.TURN_DEADLINE`, `skills._INDEX_BUSY`; REFUSALS §21 |
 | **The release gate** | a tag is refused by name until the record is whole: suites, buildmap, standup, law, manifest, SPEC↔CHANGELOG, DAYBOOK, HANDOFF, hands | `tests/release.py --check`; RUNBOOK "Before a tag" |
 | **The record** | every run is a transcript; every sitting is a numbered line and a toll; memory is landed by hand; nothing is deleted | `transcript.py`, `seatlog.py`, `memory.py`; LAW 1, LAW 10 |
 | **The index** | chunked, incremental, bounded, embedder-stamped; client material and secrets never enter it; transcripts age out of retrieval at 45 days | `vectors.py`; REFUSALS §5, §6, §16 |
 | **The rack** | seven models seat fourteen seats; the everyday pipelines fit resident; the court evicts on purpose; `rack.md` is derived from Ollama, never edited | `vram.py`, `rack.py`; `test_vram` |
-| **The suites** | the engine proves offline with every model stubbed; the REPL proves the same way; the standup runs the seats live and writes a report; the map is generated from the code | `tests/test_chainkit.py`, `smoke_cli.py`, `standup.py`, `buildmap.py` |
+| **The suites** | the engine proves offline with every model stubbed; the REPL proves the same way; the standup runs the seats live and writes a report; the map is generated from the code | `tests/test_manjuel.py`, `smoke_cli.py`, `standup.py`, `buildmap.py` |
 | **The toll** | every sitting ends with what proved, what is thin, what is owed — the operator's words, or an honest "not stated" | `seatlog.render_toll`; LAW 10 |
 
 ---
@@ -148,7 +146,7 @@ the standup on his own terminal and read the report.** Lines marked OPEN
 are the whole remaining distance.
 
 ### 4.1 Installation and first hour
-- MET — one `pip install .`, one dependency (`ollama`), eight `ollama pull`s named in QUICKSTART (seven seat tags and the embedder), `python chain.py` boots or names the missing tag. CI on Windows and Ubuntu.
+- MET — one `pip install .`, one dependency (`ollama`), eight `ollama pull`s named in QUICKSTART (seven seat tags and the embedder), `python manjuel.py` boots or names the missing tag. CI on Windows and Ubuntu.
 - MET — a stranger's reading order exists and is ONE order, BUILDPATH's: CLAUDE.md → DAYBOOK (last entry) → README → QUICKSTART → BUILDPATH → pipelines.md → one seat file → intent.py → pipeline.py with a transcript beside it; BUILDMAP and REFUSALS when looking for a thing or a refusal. CONTRIBUTING states the house style.
 - MET (2026-09-04, prove.yml) — `python tests/buildmap.py --check` runs in CI. OPEN — `BUILDMAP.md` is not in `index_roots.txt`; the operator's call.
 
@@ -171,7 +169,6 @@ are the whole remaining distance.
 
 ### 4.5 The record
 - MET — every run a transcript; every sitting a ledger line and a toll (unattended closes now write their line); CHANGELOG from sitting 1; DAYBOOK per session; HANDOFF per day.
-- MET (2026-09-08, 0.1.6) — every HAND's session a ledger line, opened and closed (`sessions/hands.jsonl`); the ledger line of a run carries its tools, guards, failed seats and first delivered line, and the sitting story is read from them (`test_the_story_and_the_hands`).
 - OPEN — the client token is still in 12 log filenames, `sessions.jsonl`, the index and the git pack (names, not contents). The scrub reached SEAT_LOG only.
 - OPEN — the two-terminator state: 144 tracked text files LF, 14 CRLF, one MIXED. The ruling is CRLF; the disk is not. Decision (renormalize, or rule LF) is the operator's; then a stroke.
 - OPEN — SEAT_LOG numbering has 11 gaps and 5 unmarked duplicates from before the ledger was fixed. Record, not defect; noted so nobody "fixes" it by rewriting (LAW 1).
@@ -179,7 +176,7 @@ are the whole remaining distance.
 ### 4.6 Proof
 - MET — the strokes and the smoke checks, offline, every model stubbed; their counts are READ from `tests/last_run.json` (invariant 10 -- this line carried "1685" until 2026-09-08 and was wrong the same day); `law.py --prove` 9/9; `us.py` reconciles 51 records; the standup harness proves dry 10/10.
 - MET — the standup has run LIVE six times (sittings 86, 88, 90, 91, 92, 96): 8, 9, 9, 9, 10, 10 of 10. MET (2026-09-04 16:42, `sessions/parity_history.jsonl` line 2) — the parity has run on the tiered seats, 12 cases, every tier against its reference head. MET (2026-09-08, afternoon) — the standup judges seats sat, failed stages, OUT OF TIME, the judge's last word, and the numbers in the delivery (`test_the_p0_of_the_review`).
-- MET (2026-09-08) — THE RELEASE GATE: `python tests/release.py --check` refuses a tag by name unless the suites are green after the newest edit, buildmap is clean, the standup ran live and green, the law proves, the manifest agrees, every section-4 status change since the last tag has an Unreleased CHANGELOG line, DAYBOOK is closed, HANDOFF has today, and the hands ledger is closed (0.1.6). Reads only. `test_the_release_gate`.
+- MET (2026-09-08) — THE RELEASE GATE: `python tests/release.py --check` refuses a tag by name unless the suites are green after the newest edit, buildmap is clean, the standup ran live and green, the law proves, the manifest agrees, every section-4 status change since the last tag has an Unreleased CHANGELOG line, DAYBOOK is closed, HANDOFF has today,. Reads only. `test_the_release_gate`.
 
 ### 4.7 The rack
 - MET — seven models, tiered; everyday pipelines fit 15 GB resident; the court evicts on purpose; parity cases pit each head against the other in its tier.
@@ -289,7 +286,7 @@ shapes, each a stroke; `ground/` on the workspace reader; a direct tool
 request with a subject that wakes nobody.
 
 **P2 -- the machine's own honesty (0.1.6-0.1.8, a line or two each):**
-dotenv's silent unreadable `.env` and the unread `CHAINKIT_OLLAMA_HOST`;
+dotenv's silent unreadable `.env` and the unread `MANJUEL_OLLAMA_HOST`;
 memory's index-addressed pending list; lawgate's cache stamp; seatlog's
 conditional "At close"; runtime's forever-False tools cache; parity's
 0.0s; drift's ok=True on outage; spelling's "clean" on failure; voice's

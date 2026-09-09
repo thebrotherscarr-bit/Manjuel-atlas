@@ -3,7 +3,7 @@
 ## Run the suites first
 
     pip install .
-    python tests/test_chainkit.py && python tests/smoke_cli.py
+    python tests/test_manjuel.py && python tests/smoke_cli.py
     python law/law.py verify
     python tests/buildmap.py            regenerate BUILDMAP.md after a code change
     python tests/standup.py             the seats, live -- read the report
@@ -42,15 +42,15 @@ standard:
   ruling reversed and the guard survived.
 - **Report over gate, for anything that reads the corpus.** `logs/` grows
   every sitting, so an assertion over it goes red because someone used the
-  CLI. `audit_record.py` and `chainkit/us.py` both report and exit 0.
+  CLI. `audit_record.py` and `manjuel/us.py` both report and exit 0.
 
 ## Adding a skill
 
 1. `skills/<name>.md` — Action Keyword, Description, Parameters Needed.
-2. A handler in `chainkit/skills.py`, registered with `@skill("<name>")`.
-3. **A record in `us/chainkit.us`** declaring what it may reach: `wall`,
+2. A handler in `manjuel/skills.py`, registered with `@skill("<name>")`.
+3. **A record in `us/manjuel.us`** declaring what it may reach: `wall`,
    `writes`, `remote`. Write `wall` by reading your own handler; do not
-   infer it. `python -m chainkit.us` will tell you if you skipped this.
+   infer it. `python -m manjuel.us` will tell you if you skipped this.
 4. A stroke that executes it.
 
 Startup refuses, by name, a skill file with no handler and a pipeline
@@ -82,7 +82,7 @@ something to say; the record is worth more when it is not padded.
 
 ## Platform
 
-Windows-first. `chainkit/voice.py` (SAPI out, whisper.cpp in) and parts of
+Windows-first. `manjuel/voice.py` (SAPI out, whisper.cpp in) and parts of
 `registry.py` are Windows-bound, and `bin/` carries Windows binaries.
 
 **Voice degrades alone.** `boot.py` reports GROUND / RACK / RECORD / GATE /

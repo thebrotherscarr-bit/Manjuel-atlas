@@ -12,14 +12,14 @@ and two habits; a habit is a rule that has not failed yet.
 WHAT IT READS (nothing it decides is generated -- LAW 1 for the hands):
 
     strokes    tests/last_run.json  -- green, finished, and stamped AFTER the
-               newest edit under chainkit/ agents/ skills/ tests/ (a green
+               newest edit under manjuel/ agents/ skills/ tests/ (a green
                older than the code is not a green; boot.suite_tally's rule)
     smoke      the same file, the same rule
     buildmap   tests/buildmap.py --check, run here
     standup    tests/run_history.jsonl's newest "standup" line -- LIVE (dry
                runs never write it), green, and after the newest edit
     law        law/law.py --prove, run here, exit 0
-    manifest   chainkit.us.report(): 0 undeclared, 0 drifted (the rack is
+    manifest   manjuel.us.report(): 0 undeclared, 0 drifted (the rack is
                asked; if it cannot be, that one line is reported, not failed)
     spec       every SPEC.md section-4 line whose MET/OPEN/RULED OUT status
                differs from the last tag's copy has a CHANGELOG entry under
@@ -27,8 +27,6 @@ WHAT IT READS (nothing it decides is generated -- LAW 1 for the hands):
                tag with a SPEC, counted and passed
     daybook    DAYBOOK.md's last entry carries **At close**
     handoff    HANDOFF.md has "## HANDOFF FOR <today>"
-    hands      sessions/hands.jsonl's last line is a close -- KEPT FROM 0.1.6;
-               until the file exists this reports "not yet kept" and passes
 
 THE OPERATOR'S TERMINAL IS THE PROOF. A hand runs this on a mirror as its
 own check (CLAUDE.md's rule); last_run.json there is the mirror's stamp,
@@ -47,7 +45,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-CODE_DIRS = ("chainkit", "agents", "skills", "tests")
+CODE_DIRS = ("manjuel", "agents", "skills", "tests")
 # What the suites write into tests/ as they run. Counting these as edits
 # made the strokes STALE the moment smoke finished after them.
 STAMPS = {"last_run.md", "last_run.json", "run_history.jsonl", "last_audit.md"}
@@ -154,9 +152,9 @@ def law(root: Path = ROOT) -> Check:
 
 def manifest(root: Path = ROOT) -> Check:
     try:
-        from chainkit import us
-        from chainkit.registry import AgentRegistry
-        from chainkit.skills import SkillLibrary
+        from manjuel import us
+        from manjuel.registry import AgentRegistry
+        from manjuel.skills import SkillLibrary
         installed, why = us.rack_tags()
         text = us.report(root, AgentRegistry.load(root / "agents"),
                          SkillLibrary.load(root / "skills"), installed)
@@ -270,30 +268,6 @@ def handoff(root: Path = ROOT, today: str | None = None) -> Check:
     return Check("handoff", ok, f"HANDOFF FOR {today}" + ("" if ok else " -- missing"))
 
 
-def hands(root: Path = ROOT) -> Check:
-    ledger = root / "sessions" / "hands.jsonl"
-    if not ledger.exists():
-        return Check("hands", True, "not yet kept (the hands ledger is 0.1.6)")
-    last = None
-    try:
-        for line in ledger.read_text(encoding="utf-8").splitlines():
-            if line.strip():
-                last = json.loads(line)
-    except Exception as exc:
-        return Check("hands", False, f"hands.jsonl unreadable ({exc})")
-    if last is None:
-        return Check("hands", True, "empty")
-    try:
-        from chainkit import seatlog as _sl
-        still = _sl.open_hands(root)
-    except Exception:
-        still = [] if last.get("closed") else [last]
-    if still:
-        return Check("hands", False, "open hand session(s): "
-                     + ", ".join(f"{l.get('hand')} {l.get('id')}" for l in still))
-    return Check("hands", True, "every hand closed")
-
-
 # ---- the gate ----------------------------------------------------------
 
 def checks(root: Path = ROOT, tag: str | None = None) -> list[Check]:
@@ -307,7 +281,6 @@ def checks(root: Path = ROOT, tag: str | None = None) -> list[Check]:
     out.append(spec(root, tag))
     out.append(daybook(root))
     out.append(handoff(root))
-    out.append(hands(root))
     return out
 
 

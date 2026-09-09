@@ -37,7 +37,7 @@ tag you have — `agents/*.md`, one line, then `/reload`.
 **Something else, at import.** Run the strokes: they need no model and no
 network, and a parse error or a bad seat file shows up there in a second.
 
-    python tests/test_chainkit.py
+    python tests/test_manjuel.py
 
 ---
 
@@ -57,8 +57,19 @@ files it cannot unlink, so a failed commit leaves exactly this lock behind and
 blocks yours. Commits are the operator's act anyway (RULE 6).
 
 **`remote operations are off`** on pull or push — that is not a fault. Remote
-git is gated behind `CHAINKIT_GIT_REMOTE=1`; a push cannot be recalled once
+git is gated behind `MANJUEL_GIT_REMOTE=1`; a push cannot be recalled once
 fetched, so it is yours to make, not a seat's.
+
+**`git rev-parse timed out` from the headless door, on a ground that is
+plainly a repository.** Fixed 2026-09-09; if it ever returns, this is why.
+`subprocess.run()` with no `stdin` hands the child the PARENT's stdin. In the
+REPL that is a console and harmless. Under `manjuel.py --headless` it is the
+pipe `serve.Inbox` has a thread permanently blocked reading, and git never
+returns — every call dies on its timeout, and `git_commit`/`git_push` then
+refuse with "this ground is not a git repository" about a repository. Every
+git call in `gitstate.py` now passes `stdin=DEVNULL`; two strokes hold it
+there. Measured: 0.12s with no such thread, 5.02s with one, 0.02s with the
+fix.
 
 ---
 
@@ -157,7 +168,7 @@ Then read the failing line — it names what broke, in its own words. Then:
 3. **Run both suites.** The smoke suite sat RED for days once while the
    strokes stayed green, because a fixture had not moved with the code:
 
-       python tests/test_chainkit.py && python tests/smoke_cli.py
+       python tests/test_manjuel.py && python tests/smoke_cli.py
 
 ---
 
@@ -188,8 +199,8 @@ Two bounds, both the operator's (2026-09-08): ONE CALL to a seat may take
 at most its own `Timeout:` (agents/*.md, by the model's size -- his
 words: steward-sized 150-300, router-sized up to 600, the biggest 700:
 llama3.2 150, phi4-mini 300, qwen3.5:4b 300, the 7-9b seats 600,
-gemma4:12b 700) or the ceiling `CHAINKIT_SEAT_TIMEOUT` (700); ONE TURN may take at most
-`CHAINKIT_TURN_DEADLINE` (600) -- a seat whose turn comes after that is
+gemma4:12b 700) or the ceiling `MANJUEL_SEAT_TIMEOUT` (700); ONE TURN may take at most
+`MANJUEL_TURN_DEADLINE` (600) -- a seat whose turn comes after that is
 not seated and is NAMED in the delivery, and a seat seated just before it
 is cut to what is left. Both are dials, neither is a fault: the seat that
 hung is the fault, and its name is in the record. Raise the dial only for
@@ -200,148 +211,40 @@ its own deadline; it needs nothing raised).
 
 ## The dials, in one place
 
-Every `CHAINKIT_*` the code reads, with its default. Set in `.env` (the
+Every `MANJUEL_*` the code reads, with its default. Set in `.env` (the
 boot report says which took effect) or the shell. Nothing else is a dial.
 
-    CHAINKIT_SEAT_TIMEOUT    700    the most one seat call may take (runtime.py)
-    CHAINKIT_TURN_DEADLINE   600    the most one turn may take (pipeline.py)
-    CHAINKIT_SKILL_TIMEOUT   300    the most one skill call is waited for (skills.py)
-    CHAINKIT_GIT_REMOTE      off    1 allows pull/push/rack_pull (gitstate.py)
-    CHAINKIT_RACK_PULL       off    1 allows `ollama pull` from a seat (skills.py)
-    CHAINKIT_KEEP_ALIVE      30m    how long Ollama holds a model after a call (runtime.py)
-    CHAINKIT_NO_WARM         off    1 skips warming the spine at boot (cli.py)
-    CHAINKIT_VRAM_GB         card   the budget the VRAM plan reasons against (vram.py)
-    CHAINKIT_LOG_HORIZON_DAYS 45    transcripts older than this leave retrieval; 0 = never (vectors.py)
-    CHAINKIT_NO_COLOR        off    1 turns the ink off (ink.py)
-    CHAINKIT_WHISPER_MODEL / _DIR / _CLI / _GGML   where speech-in looks (voice.py)
+    MANJUEL_SEAT_TIMEOUT    700    the most one seat call may take (runtime.py)
+    MANJUEL_TURN_DEADLINE   600    the most one turn may take (pipeline.py)
+    MANJUEL_SKILL_TIMEOUT   300    the most one skill call is waited for (skills.py)
+    MANJUEL_GIT_REMOTE      off    1 allows pull/push/rack_pull (gitstate.py)
+    MANJUEL_RACK_PULL       off    1 allows `ollama pull` from a seat (skills.py)
+    MANJUEL_KEEP_ALIVE      30m    how long Ollama holds a model after a call (runtime.py)
+    MANJUEL_NO_WARM         off    1 skips warming the spine at boot (cli.py)
+    MANJUEL_VRAM_GB         card   the budget the VRAM plan reasons against (vram.py)
+    MANJUEL_LOG_HORIZON_DAYS 45    transcripts older than this leave retrieval; 0 = never (vectors.py)
+    MANJUEL_NO_COLOR        off    1 turns the ink off (ink.py)
+    MANJUEL_WHISPER_MODEL / _DIR / _CLI / _GGML   where speech-in looks (voice.py)
 
-`CHAINKIT_OLLAMA_HOST` is named in dotenv.py's docstring and READ NOWHERE
+`MANJUEL_OLLAMA_HOST` is named in dotenv.py's docstring and READ NOWHERE
 -- the runtime binds 127.0.0.1:11434 (runtime.py). Setting it does
 nothing; TASKS (the review of 2026-09-08) carries it.
 
 ---
 
-## A hand's session: open it, close it
+## The hands ledger is gone (2026-09-09)
 
-    python -m chainkit.seatlog hand-open  --hand claude --note "what for"
-    python -m chainkit.seatlog hand-close --edited a.py,b.md --strokes 1825/1825 --restart
-    python -m chainkit.seatlog hand-close                  # no --edited: see below
-    python -m chainkit.seatlog hands
+refusal over an open hand were removed at the operator's word: "we didnt
+have it 3 days ago". It cost a ritual at both ends of every stretch of work
+and bought a line nobody read.
 
-The first act of any hand in this ground, before a command: read CLAUDE.md
-and the sitting laws, then `hand-open` -- it writes their fingerprints AS
-READ, HEAD, the DAYBOOK entry and HANDOFF block it found, and the newest
-sitting, to `sessions/hands.jsonl`. The last act: `hand-close`, with what
-was edited and what the mirror proved. The brief shows the last hand beside
-the last sitting; `!! OPEN since` means a hand never closed and its work
-is unrecorded. The release gate refuses a tag over an open hand.
-
-**A close with no `--edited` no longer records nothing** (0.1.6+, 2026-09-09).
-It reads the ground's mtimes since the open — no git, so no `.git/index.lock`
-is ever left — and stamps `edited_by: observed`. A named `--edited` stamps
-`named` and always wins. mtimes cannot see WHO changed a file, so a file you
-edited while a hand was open lands in the hand's line: that is a deliberate
-over-report you can discount, chosen over a silent empty list. Derived trees
-(`logs/`, `sessions/`, `index/`, `worlds/`, `bin/`, the suites' own stamps)
-are never attributed to a hand.
-
-**"what happened?" at the door.** The door holds THE SITTING STORY -- every
-run of this sitting so far, off the ledger -- and answers from it, naming
-the run; no search is dispatched. Older runs past the window are folded
-into a count; `/find` or `semantic_search` reaches their transcripts.
+The file itself STAYS on disk, unwritten -- LAW 1, nothing in the record is
+deleted. `law/SITTING_LAWS_2.md` still carries SITTING LAW 6, whose second
+half tells a hand to open a line that no longer exists; striking it is the
+operator's act, not a hand's.
 
 ---
 
-## The record: what gets written down, and by whom
-
-*Ruled 2026-09-09: "atlas needs to first and foremost document and record
-everything. do not make changes without reviewing all the docs and make sure
-every step taken is recorded in the logs ... keep everything on record and
-usable by the next agent/operator."*
-
-The next hand begins with **total amnesia**. Everything below exists so that
-what was decided, what was built, and what was believed at the time can be
-rebuilt from files alone. Testimony is never fact (LAW 5); the disk is.
-
-### The loop, every time
-
-```
-  1  READ   CLAUDE.md, every file in law/, DAYBOOK last entry,
-            HANDOFF newest block, CHANGELOG Unreleased, TASKS open, SPEC
-  2  OPEN   hand-open  -- no command comes before it (SITTING LAW 6)
-  3  SUM    say what the disk says. "Nothing to build" is a legal answer
-            |
-            +-- he named no piece --> answer in words, write no file (RULE 5b)
-            |
-  4  ASK    is a sitting open? then ask, and wait (RULE 9)
-  5  BUILD  the piece he named. Mirror-prove it. Keep the terminators
-  6  WRITE  one CHANGELOG entry: what, why, who asked. Plus the doc lines
-            the piece changed. "restart required" in the same sentence
-            if chainkit/ moved
-  7  CLOSE  hand-close --edited ... --strokes ... [--restart].  STOP
-```
-
-### Who owns which line
-
-| the line | who writes it | who owns it |
-|---|---|---|
-| `sessions/hands.jsonl` | the hand, at open and close | the operator |
-| `sessions/sessions.jsonl` | the engine, per sitting and run | the engine |
-| `SEAT_LOG.md` — observed half | the engine | the engine |
-| `SEAT_LOG.md` — proved / thin / owed | **the operator, never generated** | the operator |
-| `logs/` + `logs/_prompts/` | the engine, per run | the engine |
-| `CHANGELOG.md` | the hand, one entry per edit | the operator |
-| `DAYBOOK.md` | the hand at his word — the only file carrying INTENT | the operator |
-| `HANDOFF.md` | the hand — the day's state and open findings | the operator |
-| `TASKS.md` | **the operator only.** A hand does not mine work into it | the operator |
-| an ADR (`SPEC_CONTROL_CENTER.md`) | the hand, whenever a choice is made or reversed | the operator |
-| a tag | **the operator**, after the release gate passes | the operator |
-
-### A decision is not a chat message
-
-A choice made in conversation and not written down did not happen. It goes
-into the governing document as an ADR — status, date, decider, the options,
-and *why* — and **the rejected option's text is kept and folded, never
-deleted** (LAW 1). `SPEC_CONTROL_CENTER.md` §11 (ADR-001) is the pattern: the
-withdrawn stone's wording is still there at P1-6, struck, because it was the
-plan of record for a day and the record should show what was believed.
-
-### What is still missing, named so nobody assumes otherwise
-
-- **atlas has no enforcement.** It keeps `SEAT_LOG.md` and
-  `STATE_OF_BUILD.md` by charter, but has no release gate, no record audit
-  and no hands ledger — and its record has already failed: `THE_ROAD.md`'s
-  B1 row reads "16/19 tools real" while its code carries 62, and the N1–N6
-  stones are on no road at all. The check worth porting first is
-  **road-versus-code**: it would have caught that drift the day it happened.
-- **No cross-ground reconciliation.** Two SEAT_LOGs, two CHANGELOGs, two
-  HANDOFFs, nothing joining them — which is how `ATLAS_PRODUCT_PLAN.md` came
-  to be written against a stale reading of atlas's own code. Once atlas
-  lands in Research (ADR-001, and his ruling that the product lands here),
-  one index covers both records and this stops being a manual step.
-
-### Exceptions
-
-| situation | what to do |
-|---|---|
-| A sitting is open and he says "go" | Write — and **record in the CHANGELOG that a hand wrote against an open line**, and why |
-| Reading would cross into `Archive` or a world | Ask, for that act, every time (RULES 1–3). Name the yes in the entry |
-| A doc line contradicts the disk | The disk wins. Fix the line in the same pass. Never edit the disk to match a doc |
-| The record itself is wrong | Append a correction. Never rewrite (LAW 1). The SEAT_LOG gaps and `(re-tolled)` stand as record |
-| Nothing was decided or built | Say so and close. An empty entry beats an invented one — the toll's own principle |
-| A hand is interrupted | Its line stays open; the release gate refuses a tag over it; close it by `--id` |
-
-### Whether it is working
-
-| measure | target | where to look |
-|---|---|---|
-| hand sessions closed | 100% | `hands.jsonl` — no line without `closed` |
-| closes that say what they did | 100% | `hands.jsonl` — `edited_by` on every close |
-| edits carrying a CHANGELOG entry | 100% | the release gate already refuses otherwise |
-| road rows matching code | 100% | chain passes today; **atlas fails** |
-| faults found by reading transcripts afterwards | 0 | `SPEC.md` §7.2 |
-
----
 ## Before a tag: the release gate
 
     python tests\release.py --check v0.1.5
@@ -351,8 +254,7 @@ the suites green and stamped after the newest edit; buildmap clean; the
 standup run LIVE and green after the newest edit; the law proves; the
 manifest agrees with the disk; every SPEC section-4 line whose status
 changed since the last tag has an Unreleased CHANGELOG line naming it;
-DAYBOOK's last entry closed; a HANDOFF block for today; the hands ledger
-closed (from 0.1.6). It reads; it never writes. A REFUSED line is the
+DAYBOOK's last entry closed; a HANDOFF block for today; It reads; it never writes. A REFUSED line is the
 thing to do next, not a thing to argue with. PASSED means the tag may be
 cut -- by you (RULE 6).
 

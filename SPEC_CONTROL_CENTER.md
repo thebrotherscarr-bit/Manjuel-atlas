@@ -6,7 +6,7 @@ a whole UX/frontend that I can use for running the system, so I don't have
 to keep running terminals … a modern webapp that can spin up multiple
 virtual environments to query different workflows and pipelines for
 different sets of agents and models … basically a custom agentic routing
-harness." Ruled 2026-09-08: atlas absorbs chain.py's verbs; Python retires.
+harness." Ruled 2026-09-08: atlas absorbs manjuel.py's verbs; Python retires.
 **SUPERSEDED 2026-09-09 by ADR-001 (§11), ACCEPTED: chain is the permanent
 engine and atlas is the control plane above it. Python does not retire. The
 verbs still move to atlas's surface; the ENGINE does not.**
@@ -20,7 +20,7 @@ piece. Every number is read from the two records as of 2026-09-08; the
 source is named where it is load-bearing.*
 
 *THE GOVERNING DOCUMENT — amended 2026-09-09 on the operator's word: "we
-are reconciling the atlas MCP and the chain.py work so that the chain.py
+are reconciling the atlas MCP and the manjuel.py work so that the manjuel.py
 has a whole frontend, the atlas system is essentially ready to host the
 chain ... implement the full reconciliation plan to make this have parity
 with the current market offerings." Four plans described this one system
@@ -36,7 +36,7 @@ GOVERNS:*
 
 *Read in full for this amendment (2026-09-09): this file, `SYSTEM_DESIGN.md`,
 `SPEC.md`, `worlds\atlas\LAUNCH_PLAN.md`, DAYBOOK's last entry, HANDOFF's
-newest block, CHANGELOG's Unreleased, TASKS' open lines, `chainkit/serve.py`;
+newest block, CHANGELOG's Unreleased, TASKS' open lines, `manjuel/serve.py`;
 and in `Desktop\Archive\atlas` at his word — `CHARTER.md`, `THE_ROAD.md`,
 `ATLAS_PRODUCT_PLAN.md`, `docs/GUI_GAP_ANALYSIS.md`, and in `line/`:
 `cmd/atlas-mcp/main.go`, `cmd/atlas-mcp/prove.go`, `internal/protocol`,
@@ -55,7 +55,7 @@ Nothing in `Archive\atlas` is written by a hand (ESTATE LAW 2).*
 
 ## 0. The two systems, in one paragraph each
 
-**chain** (`Desktop\Research`, `chain.py` → `chainkit/`, 27 modules,
+**chain** (`Desktop\Research`, `manjuel.py` → `manjuel/`, 27 modules,
 14,718 lines, one dependency: `ollama`). A sequential, markdown-declared
 council of 14 small local models over 37 skills and 5 pipelines. Every run
 passes a sealed law gate first, every tool runs through exactly one seat
@@ -165,7 +165,7 @@ shown all three as they happened.
   0.1.6 story → 0.1.7 door/court → 0.1.8 seal) is its own and reaches DONE
   on its own terms. The one chain change this spec needs — the headless
   driver, §6 P0-1 — was named by the operator 2026-09-08 ("build it now")
-  and is one piece under RULE 10; nothing else in `chainkit/` moves for the
+  and is one piece under RULE 10; nothing else in `manjuel/` moves for the
   control center until he names it.
 
 - **Not the LLM bridge (refused 2026-09-09).** `ATLAS_PRODUCT_PLAN.md`
@@ -213,7 +213,7 @@ shown all three as they happened.
 │  tenant = world · 62 tools + the env_* / run_* / route_* families        │
 ├─────────────────────────┬────────────────────────┬───────────────────────┤
 │  THE ROUTER (Go)        │  THE ENGINE            │  THE RACK (Go)        │
-│  rule table → env +     │  Phase 1: chain.py     │  Ollama 127.0.0.1:    │
+│  rule table → env +     │  Phase 1: manjuel.py     │  Ollama 127.0.0.1:    │
 │  pipeline; intent port; │   --headless (stdio)   │  11434 · VRAM planner │
 │  model last, as         │  Phase 2: Go port,     │  · one GPU scheduler  │
 │  testimony              │   golden-master parity │  · tiers              │
@@ -237,7 +237,7 @@ socket" and atlas's "every hash in one place" at the same time.
 ### 4.2 An environment
 
 An **environment** is a ground: a directory carrying exactly what
-`chainkit` reads at `Session()` today (`cli.py:45`), and nothing else.
+`manjuel` reads at `Session()` today (`cli.py:45`), and nothing else.
 Ruled 2026-09-08, twice: **the origin is `Desktop\Research` itself;
 environments live at `worlds/<name>/`, with the same provenance as
 `worlds/manjuel` — read-only by position, never an index root for the
@@ -311,7 +311,7 @@ isolated in hardware. One Radeon RX 6800 XT, 16 GB, `OLLAMA_NUM_PARALLEL=1`
 
 - THE RACK is one Go scheduler over Ollama. It owns the VRAM plan (port of
   `vram.py`: `KV_BYTES_PER_TOKEN`, `GRAPH_OVERHEAD`, 15 GB budget via
-  `CHAINKIT_VRAM_GB`), the tier table (llama3.2/phi4-mini → qwen3.5 4b/9b
+  `MANJUEL_VRAM_GB`), the tier table (llama3.2/phi4-mini → qwen3.5 4b/9b
   → coder 7b/14b → gemma4 e4b/12b → deepseek-r1 8b/qwen3-vl 8b), and a
   **seat-call queue**. Concurrent environments interleave at seat-call
   granularity; a run never sees another run's output; the queue is visible
@@ -320,7 +320,7 @@ isolated in hardware. One Radeon RX 6800 XT, 16 GB, `OLLAMA_NUM_PARALLEL=1`
   700; turn ceiling 600 — chain CHANGELOG 2026-09-08). An environment that
   would exceed the card's budget for its pipeline is told so before it runs
   (`vram.render`), not after.
-- `rack_pull` and any download stay behind `CHAINKIT_RACK_PULL` and an
+- `rack_pull` and any download stay behind `MANJUEL_RACK_PULL` and an
   operator confirm.
 
 ### 4.4 The routing harness
@@ -359,7 +359,7 @@ never a page store.
 | **Seats** | the 14 (+40 atlas) declarations; per-seat: model, timeouts, may-call, wake flags; its runs, its failure rate, its OUT OF TIME count; `@seat` playground | `agents/*.md`, `.us`, traces |
 | **Evals** | parity cases as datasets; standup as a suite; drift as a score; run an eval on an env; compare two runs of one objective (same env, two model overrides) side by side | `parity.md`, `parity_history.jsonl`, `standup_*.md`, `tests/last_run.json` |
 | **Rack** | installed, resident, foreign, sizes, the queue, tiers, warm/unload; pull behind confirm | Ollama live; `rack.md` is the fold |
-| **Record** | sittings, the toll, the story, memory landed and pending (land/drop = operator's click), git state (suggested command, never run), hands ledger | `SEAT_LOG.md`, `sessions.jsonl`, `memory.md`, `memory/pending.jsonl`, `hands.jsonl`, `gitstate.read` |
+| **Record** | sittings, the toll, the story, memory landed and pending (land/drop = operator's click), git state (suggested command, never run), hands ledger | `SEAT_LOG.md`, `sessions.jsonl`, `memory.md`, `memory/pending.jsonl`, `gitstate.read` |
 | **Alerts** | live: a seat over its timeout, a turn near 600 s, index rebuild refused, law gate refusal, a claim-check hit, VRAM over budget, `FLIP`/`TAMPER` on any chain | engine events + `watch.py` drain + `verify_chain` |
 | **Law** | the sealed laws, the covenant hashes (`65118a147dd49ed9` chain; `1512741580b7239b` atlas HOUSE), verify buttons, the four gate checks per run | `law/chain.jsonl`, `atlas covenant` |
 
@@ -373,12 +373,12 @@ that goes first.
 The seam is no longer a design problem. It is an adapter, and both halves
 are built and proved:
 
-- **`chainkit/serve.py`** (PROTOCOL 1, landed 2026-09-08) takes four
+- **`manjuel/serve.py`** (PROTOCOL 1, landed 2026-09-08) takes four
   commands on stdin — `objective`, `answer`, `cancel`, `close` — and emits
   seventeen events on stdout: `opened · text · run · report · seat · token ·
   tool · tool_result · needs_answer · delivery · refused · aborted ·
   cancelled · unreachable · error · note · closed`.
-- **`chain.py --ground <path>`** (landed 2026-09-09; 1872/1872 and smoke
+- **`manjuel.py --ground <path>`** (landed 2026-09-09; 1872/1872 and smoke
   60/60 on the operator's terminal) sits that door inside a world, with the
   world's own `sessions/`, `logs/`, `SEAT_LOG.md` and `index/`.
 
@@ -387,14 +387,14 @@ semantics. This is the whole reconciliation, in one table:
 
 | THE LINE tool | the wire | what it buys |
 |---|---|---|
-| `env_open {project}` | spawn `chain.py --headless --ground worlds\<w>`, wait for `opened` | that one event carries sitting, session, git stamp, `rack_ok`, pipeline, pipelines, seats — the Environments page needs no second call |
+| `env_open {project}` | spawn `manjuel.py --headless --ground worlds\<w>`, wait for `opened` | that one event carries sitting, session, git stamp, `rack_ok`, pipeline, pipelines, seats — the Environments page needs no second call |
 | `run_start {project, objective, feed?, method?}` | `{"cmd":"objective", ...}`; the run id and transcript path come off the `run` event | `transcript.name_for` is known before stage 1, which is exactly what P0-5 requires |
 | `run_answer {project, text}` | `{"cmd":"answer"}` | **the gate, on the wire.** Landing a memory, paying an attended toll and confirming a commit are all `input()` sites; none resolves without this call |
 | `run_cancel {project}` | `{"cmd":"cancel"}` | mid-run this is `interrupt_main` (the REPL's Ctrl-C); at a pending question it is Ctrl-C at that prompt |
 | `run_events {project}` | the event stream, SSE over the existing `--http` | the events are already JSON objects, one per line; SSE is a re-frame, not a translation |
 | `env_close {project}` | `{"cmd":"close"}`, wait for `closed` | the toll is paid unattended if runs happened, as on exit |
 
-Nothing in `chainkit/` moves for any of this. The engine is reached through
+Nothing in `manjuel/` moves for any of this. The engine is reached through
 `cli.py`'s own functions, so a transcript written through THE LINE is the
 transcript the REPL would have written — which is what makes P0-1's
 byte-compare acceptance meaningful and what keeps H6's golden-master port
@@ -406,10 +406,9 @@ convenience, it is the single point of failure for the whole estate, and it
 is the least-proved thing in either codebase — zero strokes today. It gets
 the same stroke discipline the engine got. See P0-15.*
 
-
 1. **Process lifecycle.** One long-lived Python process per OPEN world —
    not one per call. THE LINE spawns it, holds the pipes, and reaps it on
-   `closed`. On its own restart it must reap orphans: a `chain.py` left
+   `closed`. On its own restart it must reap orphans: a `manjuel.py` left
    running holds that world's sitting open, and an open sitting is what
    RULE 9 forbids editing under and what `tests/release.py` refuses a tag
    over. An orphan here is a stuck estate, not a leaked process.
@@ -519,7 +518,6 @@ that surface was easier to reach that afternoon.
 
 **A seat (an agent, human or model, working a ground)**
 
-- As a hand, I want `hand-open` / `hand-close` and the rules' fingerprints
   in the glass, so that SITTING LAW 6 is one click and cannot be skipped.
 - As a seat, I want my declaration, may-call list and timeouts shown as the
   engine reads them, so that a doc never lies about me (chain agents.md:
@@ -546,8 +544,8 @@ starts (`_INDEX_BUSY`: queue, don't interleave).
 ### P0 — must have (the control center does not exist without these)
 
 **P0-1 · A headless engine driver (chain, one piece — ORDERED 2026-09-08,
-built as `chainkit/serve.py`; see CHANGELOG Unreleased).** `python chain.py
---headless` (or `python -m chainkit.serve`): reads JSON lines on stdin
+built as `manjuel/serve.py`; see CHANGELOG Unreleased).** `python manjuel.py
+--headless` (or `python -m manjuel.serve`): reads JSON lines on stdin
 (`open`, `objective`, `answer`, `cancel`, `close`), writes JSON events on
 stdout (`opened`, `law`, `seat`, `token`, `tool`, `verdict`, `needs_answer`,
 `delivery`, `refused`, `closed`), stderr for humans. Replaces the ten
@@ -597,7 +595,7 @@ file; `route_dry_run` reproduces every vector; an input that matches no
 rule lands on default and the transcript says so.
 
 **P0-4 · Intent port with golden-master parity.** `intent.py` → Go
-(`line/internal/intent`), vectors cut from chain's own `test_chainkit.py`
+(`line/internal/intent`), vectors cut from chain's own `test_manjuel.py`
 intent cases and from 100 transcripts' `named_tool/named_by` headers.
 *Acceptance:* `atl gm run --stone H2` zero mismatches; the ALIASES table
 and every skill's `**Says:**` phrases load from the environment's
@@ -627,7 +625,6 @@ receipts reproduce under `atlas chain verify`.
 toll = three answers in a form, then `render_toll` + `pay`), story, memory
 pending → land/drop as explicit clicks with the entry text shown, git state
 and `suggest_commit` text — displayed, never executed; hands ledger with
-`hand-open`/`hand-close`.
 *Acceptance:* no route in THE LINE contains commit, push, approve, land,
 merge, delete, promote, reject, ascend; a static test asserts it; landing a
 memory writes exactly what chain's `memory.land` writes (byte-compare on a
@@ -635,7 +632,7 @@ mirror).
 
 **P0-8 · The Rack page and scheduler.** Installed/resident/foreign/sizes,
 tiers, the seat-call queue with VRAM cost, warm/unload, per-model timeouts
-as declared; pull behind `CHAINKIT_RACK_PULL` + confirm; the plan refuses a
+as declared; pull behind `MANJUEL_RACK_PULL` + confirm; the plan refuses a
 pipeline that cannot fit unless the operator overrides (recorded).
 *Acceptance:* the queue serializes seat calls across two environments with
 no interleaved output in either transcript; `vram.render` parity with
@@ -742,7 +739,7 @@ should show what was believed. The engine stays Python; the intent port
 
 **P0-15 · The engine supervisor (promoted by ADR-001, §11).** THE LINE owns
 one long-lived engine process per open world: spawn, pipes, health, reap on
-`closed`, and orphan reaping on its OWN restart — an orphaned `chain.py`
+`closed`, and orphan reaping on its OWN restart — an orphaned `manjuel.py`
 holds that world's sitting open, which is what RULE 9 forbids editing under
 and what `tests/release.py` refuses a tag over. Plus SSE fan-out with a slow
 viewer dropped rather than allowed to block the engine's pipe, and the
@@ -751,7 +748,7 @@ per-world ask lock of §4.6.
 leaves no engine running and no sitting open; a viewer that stops reading is
 dropped and the run completes; two worlds run two objectives with no
 cross-talk and neither blocks the other. This package carries the same
-stroke discipline as `chainkit/` because ADR-001 makes it load-bearing.
+stroke discipline as `manjuel/` because ADR-001 makes it load-bearing.
 
 ### P2 — future considerations (design for, don't build)
 
@@ -893,7 +890,7 @@ database to be the truth and a tier to be the business.
 1. Git in `Archive\atlas` — *"my hand, get over it."* Closed. Archive is an
    artifact now; its `.git` is his.
 2. The headless driver — *"im ok with that, build it now and get it out of
-   the way."* Closed: one piece, `chainkit/serve.py`, on a mirror, restart
+   the way."* Closed: one piece, `manjuel/serve.py`, on a mirror, restart
    required.
 3. Where atlas lives — *"everything moved over to the research folder on
    the desktop, pulled out of the archive as needed. stale dir for atlas
@@ -928,7 +925,7 @@ witness, each a gate he holds. Proposed as H-stones on THE ROAD.
 | stone | name | what lands | gate |
 |---|---|---|---|
 | **H0** | the first pulls | `atlas` (Rust spine) and THE LINE pulled into Research at places he names; Research's `.gitattributes` covers them; `atlas-tui` off `curl`; `webapp/db` retired | prove green in Research; Archive untouched. **BLOCKED 2026-09-09 on one thing only: the places have not been named** (RULE 8 / SITTING LAW 4). Everything downstream waits on that sentence. |
-| **H1** | the driver | chain `--headless` — **in hand 2026-09-08** (`chainkit/serve.py`, mirror-proved, restart required) | 60/60 smoke byte-equal transcripts |
+| **H1** | the driver | chain `--headless` — **in hand 2026-09-08** (`manjuel/serve.py`, mirror-proved, restart required) | 60/60 smoke byte-equal transcripts |
 | **H2** | the line carries worlds | the per-world ask lock (§4.6) **first**, then P0-12/13/14, then `env_*`, `run_*`, `route_*`; ROUTES.md; intent port | `--prove` + `atl gm run --stone H2` zero mismatches; a `run_start` on one world does not block a tool on another |
 | **H3** | the glass, P0 pages | Run, Traces, Waterfall, Seats, Rack, Record, Alerts, Law, Environments | a sitting start-to-finish with no terminal; standup 10/10 live from the glass |
 | **H4** | the TUI | `atlas tui`, same pages | every page stroked |
@@ -957,7 +954,7 @@ decider:  the operator
 ### Context
 
 Two rulings collided. The ruling of record (§0, 2026-09-08) was *"atlas
-absorbs chain.py's verbs; Python retires,"* carried as H6 (port
+absorbs manjuel.py's verbs; Python retires,"* carried as H6 (port
 `run_pipeline` to Go) and H7 (retire chain). The operator, 2026-09-09: *"use
 the chain as the underpinning of the atlas system, the actual harnessing that
 it runs"* — and, on accepting: *"I like the idea of keeping the chained core
@@ -1009,7 +1006,7 @@ H7 is redefined; Python does not retire.**
 
 | Unix | here |
 |---|---|
-| a filter: stdin → stdout, text protocol | `chain.py --headless` — four commands in, seventeen events out |
+| a filter: stdin → stdout, text protocol | `manjuel.py --headless` — four commands in, seventeen events out |
 | a filter: argv → one object | `atlas` (Rust), exec'd through the seam |
 | init / the shell | THE LINE — spawns, wires pipes, supervises, reaps |
 | the filesystem; everything is a file | the record: plain files, append-only, hashed |
@@ -1056,6 +1053,180 @@ withdrawn and folded) · §10 (H6 struck, H7 redefined, the dependency graph
 redrawn) · this section.
 
 ---
+## 12. THE STACK — the CLI and the GUI over one engine
+
+*Written 2026-09-09 at the operator's word: "this is the reconciliation of
+the CLI and the GUI control plane don't forget how this stacks up. we are
+working to bring the atlas system online as a control plane for the chain."*
+
+### 12.1 The five layers
+
+```
+  FACES      the REPL (CLI)   ·   the glass :8091   ·   atlas-tui
+             python manjuel.py      webapp, 10 pages      subcommand CLI
+                   │                     │                   │
+  ─────────────────┴─────────────────────┴───────────────────┴─────────
+  THE LINE   atlas-mcp :8090 — JSON-RPC 2.0 + SSE — 62 tools
+             tenant = world (wire field `project`)
+                   │
+  ─────────────────┼───────────────────────────────────────────────────
+  THE ENGINE manjuel.py --headless --ground worlds\<w>   one per open world
+             PROTOCOL 1: 4 commands in, 17 events out
+                   │
+  ─────────────────┼───────────────────────────────────────────────────
+  THE SPINE  atlas (Rust) — sha256 · canon · chain verdicts · merkle
+             exec'd with an argv array; never reimplemented in Go
+                   │
+  ─────────────────┼───────────────────────────────────────────────────
+  THE RECORD worlds/<w>/ — plain files, append-only, hashed
+```
+
+Two seams, both the same shape and both already built: Go execs the Rust
+spine and reads one JSON object (`SPEC_SEAM`, the rule of one computer);
+THE LINE execs the engine and reads JSON lines on its pipes (`serve.py`).
+**Neither seam is a socket.** The only listening socket in the estate is
+atlas's, and that is the point of the layering: chain's "no listening
+socket" is chain's position, and atlas is where the socket belongs.
+
+### 12.2 The CLI and the GUI are peers, not predecessor and successor
+
+This is the reconciliation, and the documents did not say it plainly before
+today. The REPL is not a legacy path being replaced by the glass. They are
+**two faces over one engine, one record and one law gate.** H7 says the
+glass becomes the front door and the terminal becomes optional; optional is
+not deprecated. `CONTRIBUTING.md` already promises the REPL proves under the
+same suites, and ADR-001 keeps the engine they both drive.
+
+What differs is only how each reaches the engine:
+
+| | the REPL | the glass |
+|---|---|---|
+| reaches the engine by | being it — `input()` and `print()` in-process | THE LINE, which execs it and speaks JSON lines |
+| the gate | he types the answer | `run_answer` carries it |
+| what it is good for | one ground, full attention, no supervision to fail | many worlds, watching, comparing, a phone on the LAN |
+| proved by | `smoke_cli.py`, 60 cases | `--prove` on temp grounds |
+
+### 12.3 THE RULING THIS NEEDED: the sitting line is the lock
+
+One writer per world; one engine process per world (§4.2). So **the REPL and
+the glass cannot drive the same world at the same time.** Open the REPL on a
+world and then open it in the glass, and two engines number the same ledger
+— the fault `worlds/manjuel/AGENTS.md` has warned about since it was
+inherited. Nothing in the record answered this until now.
+
+**The answer costs no new mechanism, because the lock already exists.**
+`sessions/sessions.jsonl`'s last line with no `ended` is precisely the signal
+RULE 9 and SITTING LAW 5 already use to mean *hands off, someone is sitting*.
+THE LINE reads that line and refuses that world BY NAME — the estate's own
+idiom — and the glass shows who holds it and since when.
+
+    env_open worlds\TBC
+      -> refused: TBC has an open sitting (97, opened 09:41). One engine per
+         world. Close it in the REPL, or open a different world.
+
+*Acceptance:* a stroke opens a sitting by hand, then `env_open` on that world
+is refused naming the sitting number; after a close it succeeds. The reverse
+too: with the glass holding a world, the REPL says so at boot rather than
+forking the ledger.
+
+Later, if he wants both faces live on one world at once, the REPL becomes a
+CLIENT of THE LINE rather than a process that boots its own engine. That is
+a larger change, it is not needed to come online, and it is not on the road.
+
+### 12.4 H0 — LANDED 2026-09-09
+
+The operator: *"take what you need and bring it over"*, *"moved into the root
+dir. go for it."* atlas lives at **`Desktop\Research\atlas`**, beside
+`manjuel/` — the layer it actually occupies, and inside the repo so it is
+versioned and reaches CI. `worlds/` was considered and rejected: `worlds/` is
+gitignored, so the control plane would never have been versioned, and a
+control plane nested inside the tree it controls inverts §12.1.
+
+**What came (ESTATE LAW 3 — live organs imported):** the Rust workspace
+(`core`, `store`, `apps`), `line/` (62 Go files — mcp, door, town, tui, vc),
+`webapp/`, `specs/`, `docs/`, `agents/` (85 `.us`), `skills/`, `tools/`,
+`atl/`, `tests/` (168 fixtures and goldens), the build scripts, and the
+charter-and-road documents. **497 files, 4.5 MB** out of an artifact of
+**562 MB**.
+
+**What did not:** `target/` (456 MB of build cache), `bin/` and every `.exe`
+(rebuildable), `.git` (his history stays with the artifact), `.venv`,
+`node_modules`, `shdbg.obj`, the C++ `kernels/`, `faces/`, `ide/`, `sdk/` —
+capability not required by the mission stays unloaded (LAW 7). Say the word
+and any of it follows.
+
+**And one thing deliberately excluded that had to come back.** `data/master.db`,
+`SEAT_LOG.md` and `STATE_OF_BUILD.md` were left behind under "records are
+referenced, state starts fresh" — and the spine's prover failed on exactly
+those three (`enroll-dry: data/master.db absent`; `orient-pack: LOG=false
+STATE=false`). They are not state; they are read at runtime to build the
+orientation pack a seat is handed and to answer enrolment. They came, and the
+prover went green. Recorded because the first judgment was wrong and the
+prover is what caught it.
+
+**Proved in Research, which is H0's own gate:**
+
+| | result |
+|---|---|
+| `go vet ./...` (line) | clean |
+| `go build` × 5 commands | all built |
+| `cargo build --release` | built, 4.9s |
+| `atlas --prove` (spine) | **PROVEN, full battery** |
+| `atlas-mcp --prove` (THE LINE) | **125/125 PROVEN** |
+
+Built with `CARGO_TARGET_DIR` pointed at scratch, so no 456 MB `target/`
+touched the ground; `.gitignore` now carries `atlas/target/` and `*.exe` for
+the first in-place build. **Archive was read and never written** (ESTATE LAW
+2); it remains the artifact and the golden source.
+
+**Not brought, on purpose, and worth naming:** `atlas/docs/SPEC_CONTROL_CENTER.md`
+is a second copy of THIS document — 644 lines, pre-amendment, still carrying
+*"atlas absorbs manjuel.py's verbs; Python retires"*, the ruling ADR-001
+superseded. A contradicting copy of the governing spec inside the ground is a
+trap for the next hand. It stays in the artifact. Likewise `atlas/CLAUDE.md`:
+a second CLAUDE.md inside the ground would be read as the standing rules by a
+hand and as a ground marker by `ground.Detect`.
+
+### 12.5 What "online" now requires, in order
+
+| # | piece | state |
+|---|---|---|
+| 1 | ~~the place~~ | **DONE — H0, above** |
+| 2 | the ask lock becomes per-world (§4.6) | precondition of anything multi-world |
+| 3 | P0-12 schema · P0-13 RBAC · P0-14 absence test | three live faults, found 2026-09-09 |
+| 4 | `env_*` / `run_*` — `line/internal/engine`, one Go package over `serve.py`'s wire (§4.6) | **DONE 2026-09-09.** `env_open` · `env_close` · `env_list` · `run_start` · `run_answer` · `run_cancel`, 68 tools on the surface, `--prove` 125/125. A turn runs through the council with the law gate stamped and the transcript written. `route_*` is not built. |
+| 5 | the sitting-line refusal (§12.3) | **DONE 2026-09-09**, and proved live: `env_open research` is refused by name -- *"research has an open sitting (99, opened 2026-09-09T06:36:55)"* -- while `env_list` reports it *sat in elsewhere*. |
+| 6 | the Run page — the glass has ten pages and none watches a run | prototyped |
+
+Everything beneath that list already works and is proved: the wire (a commit
+and a push driven through the headless door, 2026-09-09), `--ground`, the
+spine, the 62 tools, the webapp shell, and an SSE fan-out in `webapp/handlers/
+ws.go` that already drops slow clients — the backpressure discipline §4.6
+asks for, written before it was asked for.
+
+### 12.6 Trade-offs this layering accepts
+
+| decision | over | why | what it costs |
+|---|---|---|---|
+| two faces, one engine | one face | the REPL is proved, offline, and needs no supervisor; the glass is what he watches | two clients to keep honest against one wire |
+| exec + pipes between layers | a socket in the engine | keeps chain's position and atlas's rule of one computer at once | THE LINE must supervise processes (P0-15) |
+| one engine per world | one engine, many worlds | one writer per record, by construction rather than by discipline | a process and a model warm per open world |
+| the ledger line as the lock | a lock file, a mutex, a daemon | it already exists and already means this | a crashed REPL leaves a world locked until the line is closed |
+| atlas at the root | atlas under worlds/ | versioned, in CI, at its own layer | the ground grows by 4.5 MB and a second language |
+
+### 12.7 What to revisit as it grows
+
+- **The REPL as a client of THE LINE** — only if he wants both faces on one
+  world at once. Until then the lock is enough.
+- **A crashed REPL holding a world.** The ledger line is the lock, so an
+  needs the same escape hatch before this bites.
+- **Two provers, two languages, one gate.** `tests/release.py` refuses a
+  chain tag today. Nothing refuses an atlas tag. When atlas ships from
+  Research, the release gate should read both batteries.
+- **`atlas/docs/` and `Research/` will drift**, as `SPEC_CONTROL_CENTER.md`
+  already did. One governing copy, cross-referenced, is the rule (§0).
+
+---
 ## Appendix A — verb map, chain → atlas (names keep their verbs)
 
 | chain (`/` palette) | atlas verb (THE LINE tool · glass page) | note |
@@ -1078,7 +1249,6 @@ redrawn) · this section.
 | `/reload` | `env_reload` · Environments | turn boundary only |
 | `/help`, `commands.md` | `route_table`, `route_dry_run` · Run autocomplete | commands become routes |
 | `/exit` | `env_close` | toll on close if runs happened |
-| `hand-open` / `hand-close` | `hand_open`, `hand_close` · Record | SITTING LAW 6 |
 
 ## Appendix B — the record, mapped to the spine
 
@@ -1089,8 +1259,8 @@ redrawn) · this section.
 | `logs/*.md` + `_prompts/*.md` | one transcript + one prompt file per run, CRLF | hashed by `atlas`; receipt stored beside the sitting line |
 | `memory.md`, `memory/pending.jsonl` | landed / staged | landed lines imported; pending shown, never auto-landed |
 | `law/chain.jsonl` | sealed law chain (4 links; 5–6 drafted) | verified by `atlas chain verify` **and** by chain's `law.py` — both must agree (differential stroke) |
-| `us/*.us` | capability manifest (14 seats + chainkit) | enrolled into `master.db` beside atlas's 40; `can_approve` absent/false asserted |
-| `rack.md`, `parity_history.jsonl`, `hands.jsonl` | derived / append-only | read; `rack.md` regenerated only by `rack_sync` |
+| `us/*.us` | capability manifest (14 seats + manjuel) | enrolled into `master.db` beside atlas's 40; `can_approve` absent/false asserted |
+| `rack.md`, `parity_history.jsonl` | derived / append-only | read; `rack.md` regenerated only by `rack_sync` |
 | `index/vectors.db` | SQLite, WAL, schema 2 | per environment; never shared |
 
 ## Appendix C — laws carried across the seam, by name
@@ -1100,7 +1270,6 @@ silent · LAW 1 fold never delete · LAW 5 testimony is never fact · LAW 8
 one write-path, jails · SITTING LAW 1 read in full · SITTING LAW 2 client
 material sealed · SITTING LAW 3 start small · SITTING LAW 4 no folder
 unasked · SITTING LAW 5 nothing edited while a sitting is open · SITTING
-LAW 6 hand-open first · chain SPEC §3 invariants 1–11 · atlas CHARTER §2
 rulings 1–4 and §4 standing laws · atlas working laws 1–9 · SPEC_SEAM ·
 SPEC_COMMANDS rules 1–4.
 
@@ -1108,14 +1277,14 @@ SPEC_COMMANDS rules 1–4.
 `THE_ROAD.md`, `SEAT_LOG.md` tail, `STATE_OF_BUILD.md` tail, `DELIVERABLE.md`,
 `CHANGELOG.md`, `HANDOFF.md`, `docs/GUI_GAP_ANALYSIS.md`,
 `docs/PLAN_GUI_IDE.md`, `docs/CLI_REFERENCE.md`, `specs/SPEC_COMMANDS.md`,
-`line/cmd/atlas-tui/main.go`, `webapp/db/db.go`; chain `chain.py`,
+`line/cmd/atlas-tui/main.go`, `webapp/db/db.go`; chain `manjuel.py`,
 `CLAUDE.md`, `law/*`, `SPEC.md`, `DAYBOOK.md` (last entry), `HANDOFF.md`
 (newest block), `CHANGELOG.md` (Unreleased), `TASKS.md` (open lines),
 `README.md`, `QUICKSTART.md`, `rack.md`, `agents.md`, `memory.md`,
 `pipelines.md`, `DESIGN.md`, `REFUSALS.md`, `BUILDPATH.md`, `parity.md`,
-`index_roots.txt`, `pyproject.toml`, and every module under `chainkit/`.
+`index_roots.txt`, `pyproject.toml`, and every module under `manjuel/`.
 Drafted under hand line `H20260908-133137` (nothing in Research written);
-amended and placed at the root, with `chainkit/serve.py`, under
+amended and placed at the root, with `manjuel/serve.py`, under
 `H20260908-142045`.*
 
 ---
@@ -1138,7 +1307,7 @@ shows what was believed and when (LAW 1).
 | D8 | **Config grammar.** `atlas.yaml`. | **Refused** (§3). Markdown declarations only. |
 | D9 | **"We don't do X" vs. X is built.** `ATLAS_PRODUCT_PLAN.md` says no playground, no workflow builder, no model hosting; `prompt_*`, `flow_*` and `rack_pull` exist. | The built tools stand and are folded into the surface. A plan does not refuse what the code carries. |
 | D10 | **The surface work.** `ATLAS_PRODUCT_PLAN.md` Phase 2 (plain-English labels, modal forms, empty states, human durations, Technical Mode, mobile). | **Harvested whole** into §4.7 as H3 acceptance. It is the only part of that plan compatible with both charters, and it is the part that decides whether the thing is usable. |
-| D11 | **Where environments live.** `chainkit/serve.py`'s docstring still says "grounds under `agent_workspace/`". | Stale by one afternoon: the ruling of 2026-09-08 moved them to `worlds/<name>/` (§4.2, §9 ruling 4). A doc line to fix when `serve.py` is next touched; no code depends on it. |
+| D11 | **Where environments live.** `manjuel/serve.py`'s docstring still says "grounds under `agent_workspace/`". | Stale by one afternoon: the ruling of 2026-09-08 moved them to `worlds/<name>/` (§4.2, §9 ruling 4). A doc line to fix when `serve.py` is next touched; no code depends on it. |
 | D12 | **Where atlas lives.** atlas `CHARTER.md` §1 and §3 name `Desktop\Archive\atlas` as the project's ground and its wall. | His ruling of 2026-09-09 stands: **the finished product lands in `Desktop\Research`**; Archive stays the artifact and golden source, never written. Moving it is a charter amendment on the atlas side, and it is his to make — named here so the move does not happen silently against atlas's own §3. |
 
 **What is NOT in dispute, and is the reason this reconciles at all.** Both

@@ -37,7 +37,7 @@ the point of the estate and is the hardest one to get back once given up.
 ## 1. What was wrong with the first build — all fixed
 
 Kept as the record of why the rewrite happened. Every row below is closed;
-`chain.py` is now a thin entrypoint into `chainkit/`.
+`manjuel.py` is now a thin entrypoint into `manjuel/`.
 
 | # | Issue | Consequence |
 |---|---|---|
@@ -50,7 +50,7 @@ Kept as the record of why the rewrite happened. Every row below is closed;
 | 7 | Each stage receives only the previous stage's string | The chain is a telephone game. By step 4 the original topic is gone — the delivery agent formats a 0.5b model's rewrite of a 0.5b model's summary. |
 | 8 | Inner `except` catches only connection errors | A missing model tag or a malformed response dict kills the whole REPL instead of the run. |
 | 9 | Pipeline runs entirely on 0.5b–1.5b models while 4b/7b/9b/14b tags sit unused locally | Every tag resolves, so nothing crashes — but the quality ceiling is set by the smallest model in the chain. See §9. |
-| 10 | `logs/` exists and holds a prior transcript, but nothing in `chain.py` writes to it | Runs are unreproducible. |
+| 10 | `logs/` exists and holds a prior transcript, but nothing in `manjuel.py` writes to it | Runs are unreproducible. |
 | 11 | No streaming | Dead terminal for the duration of every generation. |
 
 Worth keeping: `get_safe_workspace_path` — `os.path.basename` is a sound jail against `../` traversal. Don't lose it in the rewrite.
@@ -60,7 +60,7 @@ Worth keeping: `get_safe_workspace_path` — `os.path.basename` is a sound jail 
 ## 2. Module layout
 
 ```
-chainkit/
+manjuel/
   cli.py         # REPL loop, slash commands, rendering
   boot.py        # startup report: GROUND / RACK / RECORD / GATE / VOICE
 
@@ -92,7 +92,7 @@ chainkit/
   spelling.py    # deterministic correction of the delivery     (§13.2)
   ink.py         # per-seat colour, spinner; no-ops when not a tty
   dotenv.py      # .env loading; returns key NAMES, never values
-chain.py         # thin entrypoint -> chainkit.cli:main
+manjuel.py         # thin entrypoint -> manjuel.cli:main
 ```
 
 **The containment rule, and it has held.** `registry.py` and `skills.py` know
@@ -294,7 +294,7 @@ This makes **file size useless as a memory budget.** Two consequences:
 
 ### LANDED — aligned to two tags
 
-Measured with `chainkit/vram.py`. Before: `default` paid **6 model loads across
+Measured with `manjuel/vram.py`. Before: `default` paid **6 model loads across
 5 tags**. After: 2 tags, 3 loads, ~8.5GB if both stay resident — and `estate`
 and `court` collapse to **one model, one load, ~3.6GB**.
 
@@ -348,7 +348,7 @@ it). Everything below the line was added after this doc was written.
 
 | # | Step | State |
 |---|---|---|
-| 1 | Unbreak it | **landed** — `chainkit/` package, `chain.py` entrypoint |
+| 1 | Unbreak it | **landed** — `manjuel/` package, `manjuel.py` entrypoint |
 | 2 | `registry.py` from `agents.md` | **landed** — now `agents/`, one seat per file; prompts are `role: system` |
 | 3 | `RunContext` | **landed** — objective and feed reach the final stage |
 | 4 | `skills.py` decorator + binding validation | **landed** — md↔handler drift is a startup refusal |
@@ -387,7 +387,7 @@ owed were never stated, rather than inventing them.
 **Git is a skill, split by reversibility.** `git_status` reads. `git_init` and
 `git_commit` write locally — additive, confined to this ground, recoverable, so
 a seat may do it; commits carry the sitting id. `git_pull` and `git_push` reach
-a remote and are refused unless `CHAINKIT_GIT_REMOTE=1` is set: a push leaves
+a remote and are refused unless `MANJUEL_GIT_REMOTE=1` is set: a push leaves
 the machine and cannot be recalled once fetched, which under LAW 6 is the
 operator's act. The capability exists and is off by default.
 
@@ -411,7 +411,7 @@ What you *can* legitimately do is **ensemble the scores**: embed a pair with two
 
 **Suggested pick:** `nomic-embed-text` (274 MB) — small enough to keep resident permanently at negligible cost. Move to `qwen3-embedding:4b` only if retrieval quality measurably disappoints.
 
-**LANDED.** The drift check is live in `chainkit/drift.py`: the source is
+**LANDED.** The drift check is live in `manjuel/drift.py`: the source is
 embedded once per run, every transform/gate/deliver stage is scored against it
 by cosine, and below 0.55 the stage is reported DRIFTED and raises the
 `drifted` flag. Advisory — nothing is rewritten on a low score.
@@ -445,7 +445,7 @@ by cosine, and below 0.55 the stage is reported DRIFTED and raises the
 > Open in TASKS as **THE DRIFT METRIC HAS NEVER PRODUCED A NUMBER**. Kept
 > here rather than rewritten above, per LAW 1.
 
-The arithmetic runs on `chainkit/mathkit.py`, a zero-dependency numeric core (cosine,
+The arithmetic runs on `manjuel/mathkit.py`, a zero-dependency numeric core (cosine,
 dispersion with explicit `ddof`, covariance, OLS, small matrix helpers),
 checked against Python's `statistics` module. numpy stays optional and is still
 used for the index hot path, where pure Python genuinely loses.
@@ -655,7 +655,7 @@ be able to shape the record either.**
 
 ### 13.7 The index reads Research, and only Research
 
-`index_roots.txt` now includes `chainkit/` and `tests/`, so the chain can read
+`index_roots.txt` now includes `manjuel/` and `tests/`, so the chain can read
 *how it works* and not merely *how it is configured* — the strokes are the
 most precise statement of intended behaviour in the ground.
 
@@ -705,7 +705,7 @@ was bought at their expense.
   dominated by turns where the right answer was *no tool at all*. An embedder
   would hand noise a plausible tool. Re-measure before building it.
 - ~~**`logs/` age horizon.**~~ BUILT 2026-09-02: transcripts leave retrieval
-  at 45 days (`CHAINKIT_LOG_HORIZON_DAYS`, 0 disables). Standing documents
+  at 45 days (`MANJUEL_LOG_HORIZON_DAYS`, 0 disables). Standing documents
   never age out — the doctrine is old by nature. Nothing is deleted, and
   `sitting`/`when` read logs/ directly, outside the index entirely.
 
@@ -966,7 +966,7 @@ The guards do not change; only their brittleness does.
 
 **3. Semantic slicing. BUILT 2026-09-03.** `windowed()` cuts a big file by character range —
 part 3 of 7. For a `.py` file the right slice is a FUNCTION. Asking for
-`chainkit/skills.py:_commit_subject` and getting exactly that definition is
+`manjuel/skills.py:_commit_subject` and getting exactly that definition is
 a better window than a character offset that lands mid-expression.
 
 **Not on the list: complexity metrics.** Nobody has asked what the
@@ -1104,7 +1104,7 @@ GATE, not a prompt line, because the estate already knew what a prompt
 line is worth (sitting 46: instructions in a prompt are parrot food) and
 what a gate is worth (§14.5, the shield; §14.10, the AST).*
 
-`chainkit/lawgate.py`, first in `run_pipeline`. Four acts: the chain is
+`manjuel/lawgate.py`, first in `run_pipeline`. Four acts: the chain is
 walked with the pen and every sealed law's fingerprint checked (a tampered
 law refuses every run -- LAW 4's rule for a red suite, applied to the law
 itself); the objective is checked against the laws a regex can decide

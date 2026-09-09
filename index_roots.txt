@@ -19,8 +19,8 @@
 # logs/_prompts is skipped -- prompts repeat the feed once per stage.
 
 # what the chain IS
-chainkit
-chain.py
+manjuel
+manjuel.py
 tests
 
 # what the chain is CONFIGURED as

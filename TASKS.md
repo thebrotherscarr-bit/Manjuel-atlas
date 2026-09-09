@@ -33,7 +33,6 @@ when a seat says so.
          was still his to do. The evidence was on disk the whole time. That
          is the failure LAW 3 was written for.
 
-
     [x]  PRUNE DROPS UNDECLARED ROOTS — ruled (c) and built 2026-09-03.
          prune() now asks TWO questions, not one: is the file gone, and is
          its root still declared. Matches on the PATH against live roots,
@@ -573,7 +572,6 @@ when a seat says so.
          his rebuild had not happened while it had. First line now reads
          REBUILT or Refreshed, and the banner explains why `unchanged` is 0.
 
-
     [ ]  phi4-mini AT THE FRONT DOOR is unsettled either way. SEAT_LOG
          2026-09-01: it hallucinated an eight-turn steward:/operator:
          dialogue and refused a benign read; s58 showed it reporting
@@ -684,7 +682,7 @@ when a seat says so.
               malformed block is a finding, never a silence. Stroked on a
               good file and a broken one.
 
-    [x]  8.3  THE RECONCILER — landed 2026-09-03. `python -m chainkit.us`.
+    [x]  8.3  THE RECONCILER — landed 2026-09-03. `python -m manjuel.us`.
               Compares every record to the thing it names and REPORTS;
               exit 0 always, for audit_record.py's reason and not a weaker
               one — the manifest describes a ground the operator edits by
@@ -736,7 +734,7 @@ when a seat says so.
 ## Layer 9 — a stranger's first hour
 
     [x]  9.1  pyproject.toml — landed 2026-09-03. Wheel builds; the
-              `chainkit` entry point resolves to cli:main; ONE dependency.
+              `manjuel` entry point resolves to cli:main; ONE dependency.
               Verified the package does NOT carry the record: 31 files,
               engine only — no SEAT_LOG, no memory, no logs, no sessions,
               no .env, no bin/ binaries. `law/` is unpackaged too: it is a
@@ -789,7 +787,7 @@ when a seat says so.
          LISTENING SOCKET. This ground binds nothing and serves nothing.
          Later, if ever, and behind `.us` records declaring remote: true —
          the shape git_push already uses, off unless the operator sets
-         CHAINKIT_GIT_REMOTE=1.
+         MANJUEL_GIT_REMOTE=1.
 
     [-]  THE C++ / HIP SUBSTRATE. Off the table by the operator's word,
          2026-09-03. Ollama is local, RULE 4 already holds, and a
@@ -911,7 +909,7 @@ Kept so nobody re-derives them and starts.
     [x]  UNATTENDED CLOSE WRITES ITS LEDGER LINE (cli._close). 2026-09-04.
     [x]  `git commit -m X` TAKES X (skills._commit_subject). 2026-09-04.
     [x]  THE SCAFFOLD PARROT REFUSED (pipeline._SCAFFOLD_RE). 2026-09-04.
-    [x]  THE LAW GATE (chainkit/lawgate.py, REFUSALS §19). 2026-09-04.
+    [x]  THE LAW GATE (manjuel/lawgate.py, REFUSALS §19). 2026-09-04.
     [x]  THE DOOR'S TOOL CALL CARRIED, BOTH COSTUMES (REFUSALS §18). 2026-09-04.
 
 ---
@@ -972,7 +970,7 @@ Kept so nobody re-derives them and starts.
          seat is on-fail: skip, so the court went on without the fool
          (972s for the case). LAW 7 bounds skills at 300s and seats at
          nothing. Built: SEAT_TIMEOUT 900 (his number, 2026-09-08),
-         CHAINKIT_SEAT_TIMEOUT to move it, `Timeout:` per seat beneath
+         MANJUEL_SEAT_TIMEOUT to move it, `Timeout:` per seat beneath
          it; the stream is closed at the bound (a kill), the transport's
          read timeout covers a silent call; one named refusal. 1697.
          NOT MEASURED LIVE. logs/2026-09-07_114824_should_a_court_*.md
@@ -1055,7 +1053,6 @@ Kept so nobody re-derives them and starts.
 
     [ ]  the two sitting laws (5: nothing edited while a sitting is open;
          6: the rules and every law, directive and context file read, and
-         hand-open, before the first command) -- written to
          law/SITTING_LAWS_2.md; his seal: python law\law.py direct
     [ ]  the door invents numbers (35 for 37; 34 for 37) -- stamp or reseat
     [ ]  a claim about a tool result with no citation is unchecked (s82)
@@ -1064,7 +1061,7 @@ Kept so nobody re-derives them and starts.
     [ ]  `ground/` on the workspace reader (unjail read_file)
     [ ]  the tool-loop dedup is per Router sitting, not per run
     [ ]  history_block's unused limit; per-turn work that could be once
-    [ ]  small honesty: dotenv unreadable .env; CHAINKIT_OLLAMA_HOST unread;
+    [ ]  small honesty: dotenv unreadable .env; MANJUEL_OLLAMA_HOST unread;
          memory.pending swallows; lawgate cache stamp; seatlog "At close";
          supports_tools cache; parity 0.0s; drift docstring; spelling;
          voice deadline / temp file / `say --`; dead code (can_call,

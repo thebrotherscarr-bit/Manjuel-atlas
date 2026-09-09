@@ -101,7 +101,7 @@ GPU; the software is what this estate already is, finished and joined.
 │  ROUTES.md → intent → Router seat            (deterministic first)  │  │
 ├──────────────┬──────────────────────┬───────────────────────────────┤  │
 │  THE RACK    │  THE ENGINE(S)       │  THE DROP                     │  │
-│  Ollama on   │  one `chain.py       │  SMB share per world:         │◄─┘
+│  Ollama on   │  one `manjuel.py       │  SMB share per world:         │◄─┘
 │  loopback ·  │  --headless --ground │  worlds\<w>\Input\            │  photos,
 │  VRAM plan · │  worlds\<w>` per     │  watcher → hash on arrival →  │  voice notes,
 │  seat-call   │  open world, over    │  entry drafted → his hand     │  scans
@@ -125,8 +125,8 @@ Three rules hold the picture together, and all three already exist:
 1. **Rule of one computer** (atlas `SPEC_SEAM`): every hash, verdict and
    seal is computed by the Rust `atlas` binary; Go and Python exec it with
    an argument array and read one JSON object. The engine is reached the
-   same way — THE LINE execs `chain.py --headless` and speaks JSON lines on
-   its pipes (`chainkit/serve.py`, landed today). No engine socket.
+   same way — THE LINE execs `manjuel.py --headless` and speaks JSON lines on
+   its pipes (`manjuel/serve.py`, landed today). No engine socket.
 2. **The record is the truth; everything else is derived** (atlas
    `SPEC_SQLITE`): the SQLite mirror, the index, the glass's every screen —
    all `fold(record)`, all rebuildable from the files.
@@ -166,8 +166,7 @@ every call naming its world (`project`), unknown worlds refused by name:
 | **environments** | `env_list` · `env_fork <template> <name>` · `env_open` · `env_close` · `env_retire` · `env_reload` | fork copies declarations + `law/` verbatim, never record; retire = rename, never delete |
 | **runs** | `run_start {world, objective, pipeline?, feed?, method?}` → run id + transcript path · `run_answer` · `run_cancel` · `run_events` (SSE) | maps 1:1 onto `serve.py`'s wire: objective / answer / cancel / close in; opened · run · seat · token · tool · needs_answer · delivery · refused · … out |
 | **routing** | `route_table` · `route_dry_run <text>` → `{world, pipeline, rule}` | `ROUTES.md` per world + a global one at the origin |
-| **record** | `sitting_list` · `toll_render` / `toll_pay` · `memory_pending` / `memory_land` / `memory_drop` · `hand_open` / `hand_close` · `git_state` (suggests, never commits) | the gate lives here: land/pay are his click |
-| **rack** | `rack_list` (exists) · `rack_plan` · `rack_override` · `rack_warm` · `rack_unload` · `rack_sync` | pull stays behind `CHAINKIT_RACK_PULL` + confirm |
+| **rack** | `rack_list` (exists) · `rack_plan` · `rack_override` · `rack_warm` · `rack_unload` · `rack_sync` | pull stays behind `MANJUEL_RACK_PULL` + confirm |
 | **drop** | `drop_list <world>` · `drop_ingest <world> <file>` (hash + ledger line + draft) | the watcher calls it; the glass shows it |
 | **world skills (TBC)** | `tbc_estimate`'s verbs as they are: `generate` · `validate` · `next-number` · `list` · `batch` — argv, `--json` stdin/stdout, exit 0/1/2/3/4 | already the seam's shape; wraps as skills without change |
 
@@ -239,7 +238,7 @@ and a stroke proves it.
 
 ### 3.2 The engine per world
 
-`chain.py --headless --ground worlds\TBC` — the piece that unlocks everything
+`manjuel.py --headless --ground worlds\TBC` — the piece that unlocks everything
 (`cli.ROOT` is the one hard-coded layer; every function below it already
 takes a ground). One process per open world, one run at a time per world,
 THE LINE enforcing one writer. A world's `agents/` carries only the seats it
@@ -361,7 +360,7 @@ a second box; the chain verdict on the copy is the proof it is whole.
 
 From the spec, all read off the record: seat over timeout, turn ≥ 80 % of
 budget, gate refusal, claim-check hit, index refused, VRAM over budget,
-FLIP/TAMPER, a hand left open, a sitting left open — shown live, kept as
+FLIP/TAMPER, a sitting left open — shown live, kept as
 `kind: alert` lines. For the business: a visit due and not scheduled, an
 invoice past due, an estimate past its 30 days, a High open item older than
 a visit cycle (the west-wall conduit and the AC wiring are both High and
@@ -404,7 +403,7 @@ world) stand. The business adds these, in dependency order:
 | T8 | **the rulings executed** (Appendix A): tier identity, scope, materials rule, retainer, grandfather, non-compete version — as edits to the templates, by his hand or at his word | one canonical document per kind; the drift folded, not erased |
 
 Each piece: read what it touches whole, build on a mirror, one CHANGELOG
-entry, "restart required" when `chainkit/` moves, stop.
+entry, "restart required" when `manjuel/` moves, stop.
 
 ---
 

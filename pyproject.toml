@@ -1,4 +1,4 @@
-# chainkit — packaging.
+# manjuel — packaging.
 #
 # ONE DEPENDENCY. That is the headline and it is load-bearing: everything
 # else in this ground is the standard library. A safety harness whose own
@@ -6,7 +6,7 @@
 # harness with a node_modules tree cannot.
 #
 # The suites are OFFLINE AND STUBBED BY DESIGN -- no rack, no network, no
-# GPU, no model. `ollama` is imported by chainkit/runtime.py at module load,
+# GPU, no model. `ollama` is imported by manjuel/runtime.py at module load,
 # so CI installs the package; it never reaches a server. See TESTING.md.
 
 [build-system]
@@ -14,7 +14,7 @@ requires = ["setuptools>=68"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "chainkit"
+name = "manjuel"
 version = "0.1.4"
 description = "A local multi-agent harness that refuses to land anything."
 readme = "README.md"
@@ -45,11 +45,11 @@ classifiers = [
 voice = []
 
 [project.urls]
-Homepage = "https://github.com/OWNER/chainkit"
-Documentation = "https://github.com/OWNER/chainkit/blob/master/QUICKSTART.md"
+Homepage = "https://github.com/OWNER/manjuel"
+Documentation = "https://github.com/OWNER/manjuel/blob/master/QUICKSTART.md"
 
 [project.scripts]
-chainkit = "chainkit.cli:main"
+manjuel = "manjuel.cli:main"
 
 [tool.setuptools]
 # The ENGINE ships. The RECORD does not get installed as a package -- it is
@@ -58,4 +58,4 @@ chainkit = "chainkit.cli:main"
 #
 # `law/` is NOT packaged either. It is a ledger bound to this ground by
 # sha256; a copy in site-packages would be a second chain nobody walks.
-packages = ["chainkit"]
+packages = ["manjuel"]

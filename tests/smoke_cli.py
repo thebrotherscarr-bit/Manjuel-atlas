@@ -2,7 +2,7 @@
 
     python tests/smoke_cli.py
 
-The suite in test_chainkit.py proves the engine but never touches cli.py,
+The suite in test_manjuel.py proves the engine but never touches cli.py,
 because the REPL is input()-driven. This drives main() end to end with a
 scripted stdin and a stub model, so the loop, every slash command, the
 confirmations and the shutdown path all actually execute.
@@ -27,14 +27,14 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from chainkit import cli                                    # noqa: E402
-from chainkit.registry import Agent                         # noqa: E402
+from manjuel import cli                                    # noqa: E402
+from manjuel.registry import Agent                         # noqa: E402
 
-from chainkit.registry import AgentRegistry  # noqa: E402
+from manjuel.registry import AgentRegistry  # noqa: E402
 
 SEAT = AgentRegistry.load(ROOT / "agents").get("Steward").model
 # Every tag the ground declares -- a new seat must not fail preflight here.
-from chainkit.skills import SkillLibrary  # noqa: E402
+from manjuel.skills import SkillLibrary  # noqa: E402
 ALL_MODELS = ({a.model for a in AgentRegistry.load(ROOT / "agents").all()}
               | SkillLibrary.load(ROOT / "skills").models()
               | {"nomic-embed-text:latest"})
@@ -187,11 +187,11 @@ def run_repl(script: str, ground: Path, runtime: StubRuntime) -> tuple[int, str]
 
 def main() -> int:
     try:
-        from test_chainkit import begin_run
+        from test_manjuel import begin_run
         begin_run(ROOT, "smoke")     # so a crash cannot leave a green stamp
     except Exception:
         pass
-    ground = Path(tempfile.mkdtemp(prefix="chainkit_smoke_"))
+    ground = Path(tempfile.mkdtemp(prefix="manjuel_smoke_"))
     for item in ("agents", "skills"):
         shutil.copytree(ROOT / item, ground / item)
     shutil.copy(ROOT / "pipelines.md", ground / "pipelines.md")
@@ -295,7 +295,7 @@ def main() -> int:
           any(c.startswith("warm:qwen3.5:9b") for c in rt.calls),
           str([c for c in rt.calls if c.startswith("warm:")]))
 
-    # a second client holding the card must stop chainkit warming over it
+    # a second client holding the card must stop manjuel warming over it
     g3 = Path(tempfile.mkdtemp())
     shutil.copytree(ROOT / "agents", g3 / "agents")
     shutil.copytree(ROOT / "skills", g3 / "skills")
@@ -303,7 +303,7 @@ def main() -> int:
     busy = StubRuntime()
     busy.foreign_models = [("phi4:latest", 13_000_000_000)]
     _, out_busy = run_repl("/exit\n", g3, busy)
-    check("chainkit will not warm over another client's model",
+    check("manjuel will not warm over another client's model",
           "not warming" in out_busy and "another" in out_busy,
           [l for l in out_busy.splitlines() if "warm" in l][:2])
     check("the drift check embedded the source and the stages", rt.embeds >= 2,
@@ -312,7 +312,7 @@ def main() -> int:
     # --- failure paths ---
     class Dead(StubRuntime):
         def health(self):
-            from chainkit.runtime import BackendUnreachable
+            from manjuel.runtime import BackendUnreachable
             raise BackendUnreachable(
                 "Cannot reach Ollama at http://127.0.0.1:11434.\n"
                 "  Start it with:  ollama serve\n  Underlying error: refused")
@@ -335,7 +335,7 @@ def main() -> int:
           "still unreachable" in out2)
 
     # and the REAL runtime says the same thing, not just the stub
-    from chainkit.runtime import BackendUnreachable, OllamaRuntime
+    from manjuel.runtime import BackendUnreachable, OllamaRuntime
     real_msg = ""
     try:
         OllamaRuntime(host="http://127.0.0.1:59599").health()
@@ -366,7 +366,7 @@ def main() -> int:
     width = max(len(n) for n, _, _ in CHECKS)
     passed = sum(1 for _, ok, _ in CHECKS if ok)
     print()
-    print("  chainkit — CLI smoke")
+    print("  manjuel — CLI smoke")
     print()
     for name, ok, detail in CHECKS:
         print(f"    [{'PASS' if ok else 'FAIL'}]  {name:<{width}}  {detail if not ok else ''}")
@@ -379,7 +379,7 @@ def main() -> int:
     # helper lives with the stroke suite; importing it is cheaper than a
     # second copy that could drift (the fixture-drift lesson).
     try:
-        from test_chainkit import REPORT_FILE, record_run
+        from test_manjuel import REPORT_FILE, record_run
         record_run(ROOT, "smoke", CHECKS)
         if passed != len(CHECKS):
             print(f"  the red, on their own: {REPORT_FILE}\n")

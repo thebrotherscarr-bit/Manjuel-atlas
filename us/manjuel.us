@@ -1,0 +1,731 @@
+# MANJUEL - local multi-agent pipeline
+
+A REPL that runs declared seats in order against one objective. Seats live one
+per file in `agents/`; the pipeline order is named in `manjuel/pipeline.py`.
+
+OBSERVED: no seat in this module reaches the filesystem directly. Every stage
+receives a prompt and returns text. Only the Router can cause a write, and only
+by emitting a skill call the harness executes inside `agent_workspace/`.
+
+RESOLVED 2026-09-03 (this paragraph was THIN and said so). Transcripts ARE
+written now, one per run plus a prompts companion. A hash-chained ledger also
+exists, but it is `law/state/law/chain.jsonl` walked by `law.py verify` -- NOT
+`logs/`, and not this module's `ledger` field, which points at
+`sessions/sessions.jsonl` and is an append-only sitting record rather than a
+chain. Two different instruments; the distinction is kept because collapsing
+them would let an append-only file be read as a tamper-evident one.
+
+The rack is reached at 127.0.0.1:11434 by the harness, not by a seat. `net` is
+declared deny on every seat because no seat holds that reach itself.
+
+## Skills
+
+RECONCILED 2026-09-03. The old line here said "most skills run inside
+`agent_workspace/` only". That is FALSE and was false for a long time:
+FOURTEEN of thirty-six reach the whole ground -- every ground_* reader,
+semantic_search, index_ground, sitting, when, remember, rack_sync and the
+five git skills. `safe_path` still reduces a filepath to its basename for
+the workspace skills, so a traversal cannot leave THAT jail; it was never
+the only jail. Each record below now names its own wall.
+
+OBSERVED: `index_ground` and `semantic_search` READ the grounds listed in
+`index_roots.txt` and write nothing but `index/vectors.db` inside this ground.
+Source grounds are never modified (LAW 2). Roots resolve against this ground,
+not the process working directory. `embed_text` indexes one workspace file into
+that same index rather than writing a standalone vector nothing reads.
+
+OBSERVED: the embedder is `nomic-embed-text-v2-moe:latest` (was declared
+`nomic-embed-text:latest` here until 2026-09-03; EMBED_MODEL in skills.py is
+the fact). The index stamps it in `meta` and
+REFUSES to open under a different tag rather than mixing vector spaces that
+cannot be compared. Documents are chunked to passages; files are keyed by
+sha256, so an unchanged file is not re-embedded and a deleted file is pruned.
+Vector data is binary float32 in SQLite and is never evaluated as code.
+
+## The record and the memory
+
+OBSERVED: every run writes two files. `logs/<stamp>_<slug>.md` is the record -
+objective, source, each stage's output, the delivery - and it is indexed.
+`logs/_prompts/<stamp>_<slug>.md` holds the full prompts as sent; `_prompts` is
+excluded from the walk because prompts repeat the objective and feed once per
+stage and would flood retrieval with near-duplicates.
+
+OBSERVED: a REPL launch is a SESSION (`S<date>-<time>`). Runs and memory entries
+carry it, so a retrieved line traces back to the sitting that produced it.
+
+OBSERVED: the `remember` skill does NOT write memory. It STAGES a proposal in
+`memory/pending.jsonl` stamped GENERATED. Only the operator lands it, entry by
+entry, through `/memory` - and a landed proposal is stamped
+`GENERATED (landed by OPERATOR)`, never promoted to the operator's own word.
+`/remember` is the operator's own entry and is shown back for confirmation
+before it lands as OPERATOR. No code path writes memory.md without a person
+(LAW 6: the gate is final; packets prepare, the operator lands).
+
+OBSERVED: `memory.md` is append-only (LAW 1) and chunks ONE PIECE PER ENTRY,
+each carrying its stamp and session, rather than as one growing blob.
+
+## Sittings, the toll, and version
+
+OBSERVED: a SITTING is one REPL launch - numbered monotonically, recorded in
+`sessions/sessions.jsonl` (append-only), stamped with git state at open and at
+close. A session id is a version, not only a timestamp.
+
+OBSERVED: every sitting pays its toll into `SEAT_LOG.md` (LAW 10), appended
+below and never rewritten above. The toll separates what is OBSERVED (runs,
+stages, timings, git) from what is JUDGMENT (what proved, what is thin, what is
+owed). Judgment comes from the operator through `/toll`. A sitting closing
+unattended writes the observed half and states plainly that thin and owed were
+never stated, rather than inventing them.
+
+OBSERVED: version control is a skill, not a side effect. `git_status` reads;
+`git_init` and `git_commit` write LOCALLY - additive, confined to this ground,
+and recoverable, which is what local versioning means. Commits carry the
+sitting id.
+
+OBSERVED: `git_pull` and `git_push` reach a remote and are REFUSED unless the
+operator sets `MANJUEL_GIT_REMOTE=1`. A push leaves this machine and cannot be
+recalled once fetched; that is the operator's act, not a seat's (LAW 6). The
+capability exists and is off by default - a seat that tries is told plainly why.
+
+OBSERVED: the Security Guardian now leads EVERY pipeline. Its verdict is parsed
+FAIL-CLOSED: `SAFE` continues, `UNSAFE: <reason>` ends the run, and anything
+else - rambling, empty, a refusal to answer - is treated as unsafe. A small
+model that cannot hold a two-token format is not a signal to lean on. When the
+guard refuses, no later seat ever sees the input.
+
+## The source of truth
+
+OBSERVED: three markdown grounds define the system and none needs a code change
+to extend. `agents/*.md` declares the seats (model, stage, on-fail, when,
+context, prompt). `pipelines.md` declares the ORDER they run in. `skills/*.md`
+declares the tools. Startup refuses, by name, a pipeline that calls a seat no
+file declares, a skill file with no handler, and a seat defined twice.
+
+OBSERVED: any seat may raise `<flags>name</flags>`; flags gate `When:` steps
+later in the same run. That is how Expert Coder wakes when code is wanted,
+without a branch in Python.
+
+OBSERVED: the routing stage runs a BOUNDED tool loop - at most 5 skill calls
+(raised from 4 with the dedup at sitting 63; identical calls are now refused
+outright, so the extra hop buys different work rather than another duplicate),
+each result fed back before it decides again. A small model handed an open loop
+will spin, so the cap is structural.
+
+## The math core and the drift check
+
+OBSERVED: `mathkit.py` is a zero-dependency numeric core - cosine, dispersion,
+covariance, OLS, small matrix helpers. It is NOT a NumPy replacement and does
+not claim to be: NumPy is ~750k lines of C-optimised ufuncs and broadcasting,
+and a pure-Python rewrite would be SLOWER than what it replaces. Where numpy is
+present it is still used for the index hot path, because scoring thousands of
+768-dim chunks is precisely the case pure Python loses. mathkit covers the
+per-call arithmetic, where the dependency is the thing worth removing.
+
+OBSERVED: `ddof` is explicit throughout. A `std` computed with n and a `var`
+computed with n-1 do not satisfy std**2 == var, and code assuming they do is
+wrong; mathkit is checked against Python's own `statistics` module.
+
+OBSERVED: `linear_regression` and `statistics` SCAN numbers out of text with a
+regex and compute over them. Nothing is interpolated into source and executed.
+A handler that builds a script from model output and runs it is a
+code-injection hole, not a calculator (LAW 5: testimony is never executed as
+instruction). `x` defaults to 0..n-1 and is not assumed to be any fixed length.
+
+OBSERVED: the DRIFT CHECK is tier-1 measurement, not a model judging a model.
+The source is embedded once per run; each transform, gate and deliver stage is
+scored against it by cosine. Below 0.55 the stage is reported DRIFTED and the
+`drifted` flag is raised. It is ADVISORY - nothing is rewritten or discarded on
+a low score, the same principle that stops Manjuel and Jesster rewriting what
+they rule on. A cosine cannot hallucinate; that is the whole point of measuring
+rather than asking. If the embedder is down the check is skipped, never fatal.
+
+## Reconciliation
+
+RECONCILED AGAINST DISK 2026-09-03 (TASKS 8.1). Before this pass the manifest
+declared 15 of 35 skills (36 today; `proved` came later); twenty ran with no declared wall at all. Every record
+below now names what its handler was READ to actually reach -- the mechanical
+fields (writes, remote, model, source) derived from the code, the `wall` prose
+written by hand after reading each handler.
+
+WHAT THE PASS FOUND, worth stating because a manifest that only records wins is
+the thing this ground refuses:
+
+  `speak`     reaches the OS TEMP DIRECTORY and spawns a PowerShell process.
+              It is the widest reach in the library and nothing declared it.
+  `subtask`   opens a NESTED RUN. Its wall is inherited, not fixed -- bounded
+              by depth rather than by path.
+  fourteen    skills read the whole ground, not the workspace jail.
+  five        skills reach the network or the rack; three of those download
+              or push (git_pull, git_push, rack_pull).
+
+NOTHING HERE IS ENFORCED -- BUT IT IS CHECKED. `manjuel/us.py` (TASKS 8.2-8.4,
+landed 2026-09-03) compares every record below to the implementation and
+REPORTS; it never gates. Until that landed these records were a claim like any
+other (LAW 5); now a record that lies is a finding.
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "classify_sentiment",
+  "kind": "skill",
+  "model": "phi4-mini:latest",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/sentiment_classifier.md",
+  "us": 1,
+  "wall": "none - one model call, no filesystem",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "decompose_task",
+  "kind": "skill",
+  "model": "phi4-mini:latest",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/task_decomposer.md",
+  "us": 1,
+  "wall": "none - one model call, no filesystem",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "deep_research",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/deep_research.md",
+  "us": 1,
+  "wall": "none - one call to the Deep Researcher seat",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "embed_text",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/embed_text.md",
+  "us": 1,
+  "wall": "reads agent_workspace/; writes only index/vectors.db",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "extract_facts",
+  "kind": "skill",
+  "model": "phi4-mini:latest",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/fact_extractor.md",
+  "us": 1,
+  "wall": "none - one model call, no filesystem",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "git_commit",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "remote": false,
+  "reports_to": "manjuel",
+  "source": "skills/git_commit.md",
+  "us": 1,
+  "wall": ".git in this ground; stages -A, local only",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "git_init",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "remote": false,
+  "reports_to": "manjuel",
+  "source": "skills/git_init.md",
+  "us": 1,
+  "wall": ".git in this ground",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "git_pull",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "remote": true,
+  "reports_to": "manjuel",
+  "source": "skills/git_pull.md",
+  "us": 1,
+  "wall": ".git in this ground; REACHES A REMOTE",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "git_push",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "remote": true,
+  "reports_to": "manjuel",
+  "source": "skills/git_push.md",
+  "us": 1,
+  "wall": ".git in this ground; REACHES A REMOTE",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "git_status",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "remote": false,
+  "reports_to": "manjuel",
+  "source": "skills/git_status.md",
+  "us": 1,
+  "wall": ".git in this ground, read-only",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "ground_list",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/ground_list.md",
+  "us": 1,
+  "wall": "the whole ground, read-only (NOT the workspace jail)",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "ground_read",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/ground_read.md",
+  "us": 1,
+  "wall": "the whole ground, read-only; refuses .env by name (LAW 9), vault/ and .client. by shield",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "ground_report",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/ground_report.md",
+  "us": 1,
+  "wall": "the whole ground, read-only; reports where the chain stands",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "index_ground",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/index_ground.md",
+  "us": 1,
+  "wall": "reads the roots in index_roots.txt; writes only index/vectors.db",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "inspect",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/inspect.md",
+  "us": 1,
+  "wall": "one file's FACTS, the workspace first then the ground, never its contents; a secret or a client file is named and nothing else about it is read",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "linear_regression",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/linear_regression.md",
+  "us": 1,
+  "wall": "none - pure computation over numbers parsed from text",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "lint_code",
+  "kind": "skill",
+  "model": "qwen2.5-coder:7b",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/syntax_lint.md",
+  "us": 1,
+  "wall": "none - one model call, no filesystem",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "list_directory",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/list_directory.md",
+  "us": 1,
+  "wall": "agent_workspace/",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "proved",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/proved.md",
+  "us": 1,
+  "wall": "reads tests/last_run.json, tests/run_history.jsonl and the us/ manifest, all inside the ground, read-only; writes nothing. Cleared for the table (REVIEW_ONLY_SKILLS) 2026-09-03.",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "rack_list",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/rack_list.md",
+  "us": 1,
+  "wall": "the local rack at 127.0.0.1:11434, read-only",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "rack_load",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/rack_load.md",
+  "us": 1,
+  "wall": "the local rack at 127.0.0.1:11434 - loads VRAM",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "rack_pull",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "remote": true,
+  "reports_to": "manjuel",
+  "source": "skills/rack_pull.md",
+  "us": 1,
+  "wall": "the local rack; DOWNLOADS A MODEL over the network",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "rack_report",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/rack_report.md",
+  "us": 1,
+  "wall": "the local rack at 127.0.0.1:11434, read-only",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "rack_sync",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/rack_sync.md",
+  "us": 1,
+  "wall": "writes rack.md in the ground; reads the rack",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "rack_unload",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/rack_unload.md",
+  "us": 1,
+  "wall": "the local rack at 127.0.0.1:11434 - frees VRAM",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "read_file",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/read_file.md",
+  "us": 1,
+  "wall": "agent_workspace/",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "remember",
+  "kind": "skill",
+  "lands": false,
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/remember.md",
+  "us": 1,
+  "wall": "memory/pending.jsonl ONLY - staging, never memory.md",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "semantic_search",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/semantic_search.md",
+  "us": 1,
+  "wall": "reads the roots in index_roots.txt; writes nothing",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "sitting",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/sitting.md",
+  "us": 1,
+  "wall": "logs/ and sessions/, read-only, by sitting number",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "skill_report",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/skill_report.md",
+  "us": 1,
+  "wall": "none - reads the skill specs already loaded in memory",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "skill_search",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/skill_search.md",
+  "us": 1,
+  "wall": "none - reads the skill specs already loaded in memory",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "speak",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/speak.md",
+  "us": 1,
+  "wall": "OS TEMP DIR + a PowerShell process. Writes the text to a mkstemp file and spawns powershell to read it aloud. Outside every jail in this ground - the widest reach in the library, and Windows-only.",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "statistics",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/statistics.md",
+  "us": 1,
+  "wall": "none - pure computation over numbers parsed from text",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "subtask",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/subtask.md",
+  "us": 1,
+  "wall": "INHERITED - opens a nested run via env.sub_run, so its reach is the union of whatever that run's seats are cleared for. Bounded by depth, not by path.",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "time_align",
+  "kind": "skill",
+  "model": "phi4-mini:latest",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/time_aligner.md",
+  "us": 1,
+  "wall": "none - one model call, no filesystem",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "when",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/when.md",
+  "us": 1,
+  "wall": "logs/, read-only, by date",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "write_file",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/write_file.md",
+  "us": 1,
+  "wall": "agent_workspace/",
+  "writes": true
+}
+```

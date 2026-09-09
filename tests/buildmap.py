@@ -3,7 +3,7 @@
     python tests/buildmap.py            writes BUILDMAP.md at the root
     python tests/buildmap.py --check    exit 1 if BUILDMAP.md is stale (CI)
 
-The operator's ask, 2026-09-04: "the chainkit and modules are too much to be
+The operator's ask, 2026-09-04: "the manjuel and modules are too much to be
 grepped properly without some kind of build map or architecture oversight,
 as in 'where to look' in the modules for certain functions." This is that
 map, read off the code with `ast` so it cannot drift from it -- the same
@@ -11,12 +11,12 @@ instrument the landing gate and `windowed()` already use (DESIGN 14.10).
 
 Three tables:
 
-  MODULES     every chainkit/*.py: its first docstring line, its size, and
+  MODULES     every manjuel/*.py: its first docstring line, its size, and
               every top-level class and function with its line range.
   GUARDS      every `# THE ... (sitting N)` / `SITTING N` / `session N`
               marker inside a definition, so a guard can be found by the
               failure that earned it.
-  STROKES     every test_* function in tests/, the chainkit names it
+  STROKES     every test_* function in tests/, the manjuel names it
               touches, and its line range -- the "where is this proved"
               half of where-to-look.
 
@@ -33,7 +33,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 OUT = ROOT / "BUILDMAP.md"
-PKG = ROOT / "chainkit"
+PKG = ROOT / "manjuel"
 TESTS = ROOT / "tests"
 
 _MARK = re.compile(
@@ -119,11 +119,11 @@ def render() -> str:
         try:
             tree = ast.parse(src)
         except SyntaxError as exc:
-            out += [f"### chainkit/{p.name} — DOES NOT PARSE: {exc}", ""]
+            out += [f"### manjuel/{p.name} — DOES NOT PARSE: {exc}", ""]
             continue
         n = len(src.splitlines())
         total += n
-        out += [f"### chainkit/{p.name} — {n} lines", "",
+        out += [f"### manjuel/{p.name} — {n} lines", "",
                 f"*{_first_doc_line(tree) or '(no docstring)'}*", ""]
         defs = _defs(tree)
         if defs:
@@ -132,10 +132,10 @@ def render() -> str:
             for kind, name, lo, hi, doc in defs:
                 out.append(f"| {kind.strip()} | `{name}` | {lo}-{hi} | {doc[:80]} |")
             out.append("")
-    out += [f"chainkit/: {len(modules)} files, {total} lines.", ""]
+    out += [f"manjuel/: {len(modules)} files, {total} lines.", ""]
 
     out += ["## GUARDS — by the failure that earned them", "",
-            "Every comment or docstring line inside `chainkit/` that names a sitting,",
+            "Every comment or docstring line inside `manjuel/` that names a sitting,",
             "a session or a date, with the definition it sits in. Grep the sitting",
             "number in SEAT_LOG.md for the toll; the transcript is named there.", ""]
     for p in modules:
@@ -147,30 +147,30 @@ def render() -> str:
         gs = _guards(src, tree)
         if not gs:
             continue
-        out += [f"### chainkit/{p.name}", "", "| line | in | marker |", "|---|---|---|"]
+        out += [f"### manjuel/{p.name}", "", "| line | in | marker |", "|---|---|---|"]
         for i, owner, text in gs:
             out.append(f"| {i} | `{owner}` | {text} |")
         out.append("")
 
     out += ["## STROKES — where each thing is proved", "",
-            "Every `test_*` function in tests/, the chainkit names it touches, and",
+            "Every `test_*` function in tests/, the manjuel names it touches, and",
             "its line range. The suites are the memory (HANDOFF: test discipline).", ""]
-    pkg_names = {p.stem for p in modules} | {"chainkit"}
+    pkg_names = {p.stem for p in modules} | {"manjuel"}
     for tp in sorted(TESTS.glob("*.py")):
         src = tp.read_text(encoding="utf-8", errors="replace")
         try:
             tree = ast.parse(src)
         except SyntaxError:
             continue
-        # names imported from chainkit, so references can be attributed
+        # names imported from manjuel, so references can be attributed
         imported = set()
         for node in ast.walk(tree):
-            if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("chainkit"):
+            if isinstance(node, ast.ImportFrom) and node.module and node.module.startswith("manjuel"):
                 for a in node.names:
                     imported.add(a.asname or a.name)
             elif isinstance(node, ast.Import):
                 for a in node.names:
-                    if a.name.startswith("chainkit"):
+                    if a.name.startswith("manjuel"):
                         imported.add((a.asname or a.name).split(".")[0])
         tests = [n for n in tree.body if isinstance(n, ast.FunctionDef) and n.name.startswith("test_")]
         if not tests:

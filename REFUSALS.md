@@ -11,7 +11,7 @@ wrong thing once, in the record, and the record is in `logs/`.
 
 Verify any of it yourself:
 
-    python tests/test_chainkit.py     the strokes; every gate proven BOTH ways
+    python tests/test_manjuel.py     the strokes; every gate proven BOTH ways
     python law/law.py verify          the ledger; refuses a lying byte
 
 ---
@@ -243,7 +243,7 @@ entry, a spend.
 **Action.** Prepared, staged, and handed over. **Never landed.** Memory
 proposals are stamped `GENERATED` in `memory/pending.jsonl` and reach
 `memory.md` only when the operator lands them with `/memory`. Remote git
-(pull/push) is refused unless `CHAINKIT_GIT_REMOTE=1` — a push cannot be
+(pull/push) is refused unless `MANJUEL_GIT_REMOTE=1` — a push cannot be
 recalled once fetched, so it is the operator's act, not a seat's. Model
 downloads (`rack_pull`) are off behind their own switch: they cross the
 network and can move gigabytes onto the machine.
@@ -332,7 +332,7 @@ mistake.
 
 ## 17. The manifest is checked against the code
 
-**Trigger.** `python -m chainkit.us`.
+**Trigger.** `python -m manjuel.us`.
 
 **Action.** Every `us/*.us` record is compared to the thing it names:
 declared-vs-present both ways for skills and seats, `wall` present, `writes`
@@ -392,7 +392,7 @@ A, declined). One seat acts; the rest ask.
 
 **The operator's ruling, 2026-09-04:** "EVERY single call, no matter what,
 runs THROUGH the law." The same rule he wrote for the hands that morning
-(CLAUDE.md RULE 0), applied to the seats. Built the same day: `chainkit/lawgate.py`,
+(CLAUDE.md RULE 0), applied to the seats. Built the same day: `manjuel/lawgate.py`,
 called first thing in `run_pipeline`, after the gibberish gate and before
 intent decides anything.
 
@@ -510,13 +510,13 @@ clock or a lock; no model is asked.
 - **A seat call past its bound is cut** (`runtime.SeatTimeout`). The
   bound is the seat's own `Timeout:` (agents/*.md, by model size: 150 /
   300 / 600 / 700, his words of the afternoon) or the ceiling
-  `SEAT_TIMEOUT` = 700 (`CHAINKIT_SEAT_TIMEOUT`). Two halves: httpx's read
+  `SEAT_TIMEOUT` = 700 (`MANJUEL_SEAT_TIMEOUT`). Two halves: httpx's read
   timeout for a call that answers nothing (connect held at 10s), and a
   wall clock on the stream that CLOSES it for a call that never stops --
   Ollama stops generating. One named refusal; `on-fail: skip` goes on
   without the seat. Earned: sitting 92, Jesster 760s then a 500.
 - **A seat whose turn comes after the turn's deadline is not seated**
-  (`pipeline.TURN_DEADLINE` = 600, `CHAINKIT_TURN_DEADLINE`). Named in
+  (`pipeline.TURN_DEADLINE` = 600, `MANJUEL_TURN_DEADLINE`). Named in
   the record and in the delivery under OUT OF TIME (the recompose's third
   block, beside NOT EVERYTHING RAN and READ IN PART); a seat seated just
   before the line is cut to the seconds left (`_within_deadline`); a
@@ -585,7 +585,6 @@ Stroked: `test_the_seat_bound`, `test_the_turn_deadline`,
   sitting`): a reader dispatch guessed from the words is withdrawn; a
   tool the operator named is still his order; with no story yet (the
   first run) nothing changes.
-- **A hand's session has a ledger** (`sessions/hands.jsonl`): opened with
   the fingerprints of the rules as read, HEAD, the DAYBOOK entry and
   HANDOFF block read, the newest sitting seen; closed with HEAD, the
   files edited, the strokes, restart required or not. The brief prints

@@ -43,7 +43,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from chainkit.vectors import is_protected, is_secret          # noqa: E402
+from manjuel.vectors import is_protected, is_secret          # noqa: E402
 
 REPORT = ROOT / "tests" / "last_audit.md"
 
@@ -370,7 +370,7 @@ def main() -> int:
         pass
 
     print()
-    print("  chainkit — record audit")
+    print("  manjuel — record audit")
     print()
     for k in sorted(tally):
         print(f"    {tally[k]:>7,}  {k}")

@@ -32,7 +32,7 @@ THE LAWS THAT BIND YOU
    expected is the most expensive mistake you can make: it spends the
    operator's time and fills his record with noise.
 3. NAME THINGS, DO NOT DESCRIBE THEM. A path argument is `agents`,
-   `chainkit/intent.py`, `pipelines.md` — never "the folder with the seats".
+   `manjuel/intent.py`, `pipelines.md` — never "the folder with the seats".
    If you cannot name it, ask for it or run the tool that lists it.
 4. ONE CALL, ONE PURPOSE. Do not repeat a call you have already made this
    turn; its result stands. If it failed, either fix the argument or stop.

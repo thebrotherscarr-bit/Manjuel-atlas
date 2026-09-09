@@ -16,10 +16,10 @@ rule below before noon.
 
 ## RULE 9 — NOTHING IS EDITED WHILE THE OPERATOR'S SITTING IS OPEN.
 
-The REPL watches the ground (chainkit/watch.py). Any edit to agents/,
+The REPL watches the ground (manjuel/watch.py). Any edit to agents/,
 skills/, pipelines.md or commands.md is HOT-RELOADED into his running
 session at the next turn; any changed text file is re-embedded into his
-live index. chainkit/*.py is NOT reloaded -- a code edit sits on disk
+live index. manjuel/*.py is NOT reloaded -- a code edit sits on disk
 while the old code keeps running under him. Either way the ground moves
 under his hands without his say.
 
@@ -39,9 +39,10 @@ fix it made never reached his process.
 
     0  NOTHING BEFORE THESE. No command, no listing, no git -- and never
                                  `git status` or `git diff` from a sandbox.
-                                 When they are read: `python -m
-                                 chainkit.seatlog hand-open`. Your last
-                                 act is `hand-close`. (SITTING LAW 6)
+                                 (The hands ledger was removed 2026-09-09 at
+                                 the operator's word; there is no line to
+                                 open. SITTING LAW 6's second half is his to
+                                 strike.)
     1  this file                 the standing rules, below
     2  law/  -- EVERY FILE       SITTING_LAWS.md and SITTING_LAWS_2.md (the
                                  operator's laws for any hand; cited SITTING
@@ -79,7 +80,7 @@ Two mechanical traps, both earned 2026-09-04:
     - Files you write from a sandbox come out LF. The ruling is CRLF
       everywhere; the chain's own writers emit \r\n. Preserve whatever
       terminator the file already has, and never leave a file MIXED.
-    - THE SUITES ARE THE OPERATOR'S TERMINAL. tests/test_chainkit.py and
+    - THE SUITES ARE THE OPERATOR'S TERMINAL. tests/test_manjuel.py and
       smoke_cli.py call gitstate.read() on the real ground, which runs
       `git status` -- from a sandbox that is the same lock as above (it
       happened 2026-09-04 15:28, and his live standup reported the ground
@@ -178,7 +179,7 @@ asked. Nothing else.
     THE CODING. He names a piece. The hand builds THAT piece -- reads what
     it touches in full first (SITTING LAW 1), builds it, runs the suites
     on a MIRROR, writes one CHANGELOG entry and the doc lines the piece
-    changed, says "restart required" if chainkit/ moved, and STOPS. It
+    changed, says "restart required" if manjuel/ moved, and STOPS. It
     does not build the next piece, the adjacent piece, or the piece it
     noticed on the way. It does not add to TASKS.md. It does not open a
     review nobody ordered. If it saw something worth building, ONE LINE

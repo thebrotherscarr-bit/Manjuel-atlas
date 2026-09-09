@@ -27,7 +27,7 @@
 
       pip install .            # from a clone -- brings `ollama` with it
 
-  That puts a `chainkit` command on PATH. `python chain.py` from the clone
+  That puts a `manjuel` command on PATH. `python manjuel.py` from the clone
   still works and is what the record's examples use.
 - For voice only: `pip install sounddevice numpy`. Transcription uses the
   whisper.cpp build in `bin/` — already there, nothing to download.
@@ -35,9 +35,9 @@
 ## Run
 
     cd Desktop\Research
-    python chain.py
-    python chain.py --headless     # the same sitting as JSON lines on stdin/stdout
-    python chain.py --ground worlds\NAME   # either, sitting inside a world (its own record)
+    python manjuel.py
+    python manjuel.py --headless     # the same sitting as JSON lines on stdin/stdout
+    python manjuel.py --ground worlds\NAME   # either, sitting inside a world (its own record)
 
 Boot prints the report: GROUND, RACK (with real sizes and what is warm),
 RECORD, GATE, VOICE. If a needed model is missing it says which and stops.
@@ -64,14 +64,14 @@ Pay the sitting's toll with `/toll`.
 
 ## The two tests
 
-    python tests/test_chainkit.py    # the strokes; no model needed
+    python tests/test_manjuel.py    # the strokes; no model needed
     python tests/smoke_cli.py        # drives the REPL end to end
 
 Each prints its own tally when it finishes. That tally is the only honest
 one — the suites grow with the system, so no count is written into a doc.
 
 Both offline, both finish in seconds. Run them after any edit to agents/,
-skills/ or chainkit/. Red blocks; the failing stroke names what broke.
+skills/ or manjuel/. Red blocks; the failing stroke names what broke.
 
 ## Extending
 
@@ -79,7 +79,7 @@ skills/ or chainkit/. Red blocks; the failing stroke names what broke.
   anchor, prompt. `/reload`.
 - **New tool:** one file in `skills/` — keyword, description, params. A
   `Model Target:` line makes it a prompt skill needing no Python; otherwise
-  bind a handler in `chainkit/skills.py`. Startup refuses a manifest that
+  bind a handler in `manjuel/skills.py`. Startup refuses a manifest that
   advertises what cannot execute. A skill can also declare how it is
   reached and what it takes, so neither has to be carved into the engine:
 

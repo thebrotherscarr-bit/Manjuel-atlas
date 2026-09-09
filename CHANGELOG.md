@@ -34,6 +34,182 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since v0.1.4 (63fab9e, 2026-09-04 08:21)
 
+### 2026-09-09 — THE GLASS REACHES THE COUNCIL: env_* and run_* over the wire (operator: "finish the build", "get this webapp online"). atlas only; Manjuel untouched.
+- THE SEAM IS CLOSED. line/internal/engine/ supervises one Manjuel process
+  per open world over serve.py's PROTOCOL 1, and six tools sit on it:
+  env_open, env_close, env_list, run_start, run_answer, run_cancel. THE LINE
+  now carries 68 tools; --prove 125/125, go vet clean.
+- WHAT IT FIXES, in one comparison. Asked "in one sentence, what is a
+  sitting?", chat_send answered about WINE RACKS -- it routes straight to
+  rack.Ask, a bare model with no estate in it. The same question through
+  run_start came back: "a numbered run or session recorded in SEAT_LOG.md
+  ...", and carried `law: chain whole (4 links, head def001d70eb410d2);
+  objective passed 4 checks` plus the intent line, the seat timings and the
+  transcript path. NOTHING WAS REIMPLEMENTED IN GO. The law gate, the one
+  Router, the dedup of REFUSALS 9, the claim check and the recompose all
+  apply because the run happens INSIDE the core, not beside it -- which is
+  the operator's own ruling: manjuel.py is the core, atlas is the control
+  layer, and a control layer routes through the core.
+- A WRONG FIX, REVERTED FIRST. Before this the hand was one build away from
+  adding a dedup guard to atlas/line/internal/chat/chat.go -- reimplementing
+  the engine's rule inside the control layer, which is the second executor
+  SPEC_CONTROL_CENTER 3 forbids by name. Reverted to the artifact's copy. The
+  duplicate turn it was chasing does not exist on the run_* path.
+- THE SITTING LINE IS THE LOCK, and it holds (12.3, proved live): `env_open
+  research` is REFUSED BY NAME -- "research has an open sitting (99, opened
+  2026-09-09T06:36:55). One engine per world -- a second would fork the
+  ledger" -- and env_list reports that world "sat in elsewhere". No new
+  mechanism: it reads the same line RULE 9 already reads.
+- THE GATE SURVIVES THE WIRE. A run that reaches a needs_answer STOPS and
+  quotes the question; run_answer is the only way past. Nothing is answered
+  on the operator's behalf (RULE 6 / LAW 6).
+- run_* DOES NOT TAKE THE ASK LOCK. That mutex is package-level across every
+  tenant; a 600s turn beneath it would freeze every tool on every world. One
+  process per world already is the invariant (4.6).
+- EVERY ENGINE IS REAPED on the way down -- on SIGINT/SIGTERM and by defer --
+  because an orphan holds its world's sitting open, which RULE 9 forbids
+  editing under and the release gate refuses a tag over.
+- PROVED END TO END on a temp world: env_open (sitting 1) -> run_start (7.1s,
+  1 transcript + 1 prompt written) -> env_close (ended, runs=1,
+  toll_paid=True, engine reaped). The origin's ledger never moved: research
+  is still at sitting 99.
+- ONLINE NOW on loopback: THE LINE 127.0.0.1:8090, the glass 127.0.0.1:8091.
+- NOT BUILT, and said plainly: route_*; run_events (SSE), so a run is
+  reported whole rather than streamed; and the glass has no Run page wired
+  to run_start yet -- the prototype is in scratch, not landed.
+
+### 2026-09-09 — THE CHAIN IS NOW MANJUEL (operator: "just rename the whole chain system to Manjuel"). RESTART REQUIRED.
+- WHY NOW: `chain` meant two things in one tree the moment atlas landed this
+  morning -- the HASH CHAIN (atlas/specs/SPEC_CHAINS.md, verify_chain, the
+  EMPTY|INTACT|FLIP|TAMPER verdicts, law/chain.jsonl; 29 atlas files use it
+  that way) and THE ENGINE. One word, two meanings, one repository.
+- MOVED: chain.py -> manjuel.py; chainkit/ -> manjuel/;
+  tests/test_chainkit.py -> tests/test_manjuel.py; us/chainkit.us ->
+  us/manjuel.us. All with `git mv`, so history follows the files.
+- THE SEAT KEEPS HIS NAME (his ruling). Manjuel is the judge who rules last,
+  and agents/manjuel.md is untouched. The seats' manifests take a seat_
+  prefix so the system can be manjuel without landing on him:
+  us/chain_<seat>.us -> us/seat_<seat>.us, and their ids with them
+  ("chain_router" -> "seat_router"). manjuel/us.py keys on the new prefix.
+- REWRITTEN: 47 files, 547 references -- every .py, pyproject.toml, the 15
+  .us manifests, index_roots.txt, prove.yml, and the four declarations that
+  name the package (agents.md, agents/router.md, skills/ground_list.md,
+  skills/ground_read.md). 22 CHAINKIT_* dials became MANJUEL_*.
+- NEVER TOUCHED, and this is the point: the RECORD (SEAT_LOG 110 mentions,
+  CHANGELOG 57, DAYBOOK 17, HANDOFF 13, and every transcript under logs/) --
+  LAW 1, nothing in the record is deleted and a correction is appended. And
+  law/*.md, whose bytes are FINGERPRINTED by the sealed chain: renaming a
+  word inside one would break the seal. Both still read "chainkit", truly,
+  because that is what it was called when they were written.
+- TWO SHIMS, so nothing silently stops working:
+  * manjuel/__init__.py carries any CHAINKIT_* dial onto its MANJUEL_ twin at
+    import, once, only when the new name is unset. A dial that quietly stops
+    turning is worse than one that is gone.
+  * chainkit/ aliases onto manjuel. CLAUDE.md's READ FIRST list tells every
+    hand to run `python -m chainkit.seatlog hand-open` BEFORE its first
+    command; a rename that breaks the law's own procedure is a trap, not a
+    rename. Verified working. Retired by the docs pass, not before.
+- THE STROKES CAUGHT WHAT THE REWRITE MISSED: five reds in
+  test_the_manifest_reconciles_to_the_disk, all its own synthetic fixtures
+  still building chain_ ids for a reconciler that now keys on seat_. Fixed.
+  The stroke FUNCTION names that carry "chain" as the engine are prose and
+  are left for the docs pass.
+- PROVED ON A MIRROR: 1879/1879 strokes, smoke 60/60, the manifest reconciles
+  51 records with 0 findings, the law chain proves whole (4 links, head
+  def001d70eb410d2). BUILDMAP regenerated from the renamed code. HIS TERMINAL
+  IS THE PROOF.
+- DOCS FOLLOW (his ruling: code and config this pass). Still saying chainkit:
+  README, QUICKSTART, SPEC, BUILDPATH, DESIGN, CONTRIBUTING, TESTING,
+  SPEC_CONTROL_CENTER, SYSTEM_DESIGN, TASKS, memory.md, and CLAUDE.md's own
+  command line -- which the shim keeps honest until then.
+- manjuel/ moved: RESTART REQUIRED.
+
+### 2026-09-09 — H0: ATLAS IS IN THE GROUND; SPEC_CONTROL_CENTER 12, THE STACK (operator: "take what you need and bring it over"; "moved into the root dir. go for it."). Docs + a pull. No chainkit change.
+- H0 LANDED, the stone that blocked everything else all day. atlas lives at
+  Desktop\Research\atlas, beside chainkit/ -- inside the repo, versioned,
+  CI-visible. worlds/ was considered and REJECTED: worlds/ is gitignored (the
+  morning's push proved it -- 170 files, zero from worlds/), so the control
+  plane would never have been versioned; and a control plane nested inside
+  the tree it controls inverts the layering.
+- TAKEN, live organs only (ESTATE LAW 3): the Rust workspace (core, store,
+  apps), line/ (62 Go files), webapp/, specs/, docs/, agents/ (85 .us),
+  skills/, tools/, atl/, tests/ (168 fixtures), the build scripts and the
+  charter/road documents. 497 files, 4.5 MB, out of a 562 MB artifact.
+- LEFT: target/ (456 MB of cache), bin/ and every .exe (rebuildable), .git
+  (his history stays with the artifact), .venv, node_modules, shdbg.obj, and
+  kernels/ faces/ ide/ sdk/ -- capability not required by the mission stays
+  unloaded (LAW 7). ARCHIVE WAS READ AND NEVER WRITTEN (ESTATE LAW 2).
+- A JUDGMENT THAT WAS WRONG, AND THE PROVER CAUGHT IT. data/master.db,
+  SEAT_LOG.md and STATE_OF_BUILD.md were excluded as "records referenced,
+  state fresh" -- and the spine failed on exactly those three (enroll-dry:
+  data/master.db absent; orient-pack: LOG=false STATE=false). They are read
+  at runtime for the orientation pack and for enrolment: live organs, not
+  state. Brought; the prover went green. Recorded because the prover is what
+  found it, not the hand.
+- PROVED IN RESEARCH, which is H0's own gate: go vet clean; five Go commands
+  build; cargo build --release in 4.9s; `atlas --prove` PROVEN (full
+  battery); `atlas-mcp --prove` 125/125 PROVEN. Built with CARGO_TARGET_DIR
+  in scratch so no 456 MB target/ touched the ground.
+- NOT BROUGHT ON PURPOSE: atlas/docs/SPEC_CONTROL_CENTER.md, a second copy of
+  the governing document (644 lines, pre-amendment, still says "Python
+  retires" -- superseded by ADR-001), and atlas/CLAUDE.md, which a hand would
+  read as the standing rules and ground.Detect would read as a ground marker.
+- .gitignore gains atlas/target/, *.exe, *.exe~, *.obj, atlas/webapp/data/,
+  node_modules/, .venv/ -- the first in-place build would otherwise put half
+  a gigabyte in the repo pushed this morning.
+- SPEC_CONTROL_CENTER 12, THE STACK: the five layers and their two seams; the
+  CLI and the GUI named as PEERS rather than predecessor and successor (H7's
+  "optional" is not "deprecated"); H0's manifest and proof; what "online"
+  still needs, in order; the trade-offs; what to revisit.
+- THE RULING 12 NEEDED. One writer per world means the REPL and the glass
+  cannot drive the same world at once, and nothing in the record answered
+  that. The answer needs no new mechanism: sessions.jsonl's last line with no
+  `ended` IS the lock -- the same signal RULE 9 and SITTING LAW 5 already
+  use. THE LINE reads it and refuses that world by name. Acceptance written;
+  NOT BUILT.
+- Written with sitting 99's line still reading `ended: ""`, ruled stale by the
+  operator. Nothing in chainkit/ moved: NO RESTART REQUIRED.
+
+### 2026-09-09 — THE HEADLESS DOOR COULD NOT DRIVE GIT AT ALL (operator: "make sure you are allowing the chain to do the commit/push cycle and reviewing so we know its working, run it headless if you need to"). RESTART REQUIRED.
+- THE FAULT, found by doing what he asked. Driving `chain.py --headless
+  --ground <temp world>` through git status / git commit / git push: every
+  git call returned `git: unavailable (git rev-parse timed out)`, and
+  git_commit, git_push and git_init all refused with "this ground is not a
+  git repository" about a ground that plainly was one. Nothing committed,
+  nothing pushed. Reproduced twice, cold rack and warm -- deterministic, not
+  contention.
+- THE CAUSE. `subprocess.run()` with no `stdin` hands the child the PARENT's
+  stdin. Under the headless door that is the pipe `serve.Inbox` has a thread
+  permanently blocked reading; two readers on one pipe and git never returns.
+  Bisected: gitstate.read() is 0.12s in a plain process, 0.11s after the
+  stdout swap, 0.11s under every stdin pipe topology -- and 5.02s (the
+  timeout) the moment a thread parks on sys.stdin. THE REPL NEVER SAW IT:
+  there stdin is a console and nothing holds it, which is why 99 sittings of
+  hand-run git worked fine.
+- THE FIX, one argument. `gitstate._run` and `_write` pass `stdin=DEVNULL`;
+  no git command here reads stdin, so closing it costs nothing. 0.02s for
+  reads and writes alike.
+- PROVED ON THE DISK, not on a seat's word. Re-driven through the headless
+  door on a temp world with its own bare remote: world HEAD f6d4189 ->
+  1d20a8b COMMITTED; remote main f6d4189 -> 1d20a8b PUSHED, and the BARE
+  REMOTE's own log carries the commit. The Router ran git_status, git_commit,
+  git_status, git_push. The commit subject came from gitstate.areas() -- the
+  good path: "chain: law/, logs/, sessions/, the_chain_will_commit_this.md".
+- WHY A TEMP WORLD AND NOT THE GROUND: push() still takes no branch argument,
+  and this repo's master carries the 383 worlds/ files (268 under a vault).
+  The chain does not get pointed at the real remote until the branch
+  allow-list exists. --ground (landed this morning) made the test possible:
+  the world opened ITS OWN sitting 1 and the origin's ledger never moved.
+- Strokes: `test_git_never_waits_on_stdin` -- a static check that every git
+  call site closes stdin, and a live child with a thread parked on stdin. The
+  static one FAILED on its first run against correct code, because it counted
+  the comment explaining the fix; corrected to count calls, not prose.
+  1879/1879 strokes, smoke 60/60 ON THE MIRROR; his terminal is the proof.
+- Seen live and NOT fixed (his call, already open in TASKS): the door invented
+  a number in the delivery -- the tool result said 5 untracked, the Steward
+  wrote 4.
+- chainkit/gitstate.py moved: RESTART REQUIRED.
+
 ### 2026-09-09 — THE RECORD SOP; hand-close SAYS WHAT IT DID (operator: "atlas needs to first and foremost document and record everything ... make sure every step taken is recorded in the logs ... keep everything on record and usable by the next agent/operator"). RESTART REQUIRED.
 - G4, BUILT. `hand-close` with no `--edited` recorded `0 file(s) edited` --
   five such lines were written on the morning of the ruling, each true and

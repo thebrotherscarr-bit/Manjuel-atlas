@@ -5,13 +5,13 @@ markdown as the source of truth, and a git-versioned ground. Everything runs
 on this machine: no cloud service, no API key, no download at runtime. Unplug
 the router and it still works — that property is the point.
 
-    python chain.py
+    python manjuel.py
 
 ## Install
 
     pip install .          # one dependency: ollama
 
-Puts `chainkit` on PATH. `python chain.py` from a clone works too.
+Puts `manjuel` on PATH. `python manjuel.py` from a clone works too.
 Full prerequisites -- Ollama and the model pulls, seven since the rack
 was tiered -- are in QUICKSTART.md.
 
@@ -21,7 +21,7 @@ separately, so a machine without it boots, says so, and runs everything
 else. The suites never need it.
 
 The suites are offline and stubbed: no rack, no network, no GPU, no
-model. `python tests/test_chainkit.py && python tests/smoke_cli.py`
+model. `python tests/test_manjuel.py && python tests/smoke_cli.py`
 runs anywhere, and CI runs them (with the law's prover, the build map's
 check and the standup's dry run) on Windows and Ubuntu on every push.
 `python tests/standup.py` is the live one: the seats through ten fixed
@@ -77,7 +77,7 @@ widen a window, only cover more ground with each one.
     agents/        one seat per file: model, clearances, wake condition, prompt
     skills/        one tool per file: keyword, description, params
     pipelines.md   the running orders
-    chainkit/      the engine (26 modules — see BUILDPATH.md)
+    manjuel/      the engine (26 modules — see BUILDPATH.md)
     tests/         the strokes and the smoke suite — offline, seconds; both
                    print their own count, which is why none is written here.
                    They also write `tests/last_run.md`: the failures, with
@@ -112,15 +112,15 @@ measurement, not a configuration; `rack.md` keeps the declared models.
 opens one seat alone, its own voice, the shared thread. Typing "remember
 that" at the door lands a memory; "pay the toll" pays it.
 
-`python chain.py --headless` opens the same sitting over stdin/stdout as
-JSON lines (`chainkit/serve.py`): one `objective` per line in -- anything
+`python manjuel.py --headless` opens the same sitting over stdin/stdout as
+JSON lines (`manjuel/serve.py`): one `objective` per line in -- anything
 the prompt takes -- and the turn out as events (seat, token, tool,
 needs_answer, delivery). Every question the REPL would ask at the keyboard
 comes back as `needs_answer` and waits for an `answer`; nothing is
 decided for you. No socket: a front end runs the process and speaks on
 its pipes. The control center (SPEC_CONTROL_CENTER.md) is built on it.
 
-`python chain.py --ground worlds\NAME` (with or without `--headless`) sits
+`python manjuel.py --ground worlds\NAME` (with or without `--headless`) sits
 the engine inside a world: that folder's own `agents/`, `skills/`,
 `pipelines.md`, `law/`, `sessions/` and `logs/`. A sitting opened there is
 that world's, and this ground's record gains nothing. A path that is not a

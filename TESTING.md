@@ -7,7 +7,7 @@
 report-only) on Windows and Ubuntu, Python 3.10 and 3.13, on every push.
 
 **No rack, no network, no GPU, no model.** Every model call in both suites
-is a stub; `ollama` is installed only because `chainkit/runtime.py` imports
+is a stub; `ollama` is installed only because `manjuel/runtime.py` imports
 it at module load, and nothing in CI reaches 127.0.0.1:11434.
 
 That offline property is now a PUBLIC CLAIM, which changes its status: if a
@@ -26,7 +26,7 @@ checkout artifact.
 Five tiers, and they answer five different questions. Confusing them is how
 a suite ends up testing the room instead of the code.
 
-    STROKES   tests/test_chainkit.py   does the CODE do what it must?
+    STROKES   tests/test_manjuel.py   does the CODE do what it must?
               Offline, stubbed, deterministic. Gates every change.
 
     SMOKE     tests/smoke_cli.py       does the REPL still run end to end?
@@ -38,15 +38,15 @@ a suite ends up testing the room instead of the code.
     PARITY    /parity in the REPL      does the chain earn its keep?
               Real models. Measures, never rules. See parity.md.
 
-    SITTINGS  running chain.py         the E2E tier. Real models, real
+    SITTINGS  running manjuel.py         the E2E tier. Real models, real
               disk, real voice; `logs/` is the assertion record.
 
 ---
 
 ## Running them
 
-    python tests/test_chainkit.py         everything
-    python tests/test_chainkit.py intent  only strokes whose function name
+    python tests/test_manjuel.py         everything
+    python tests/test_manjuel.py intent  only strokes whose function name
                                           matches "intent"
     python tests/smoke_cli.py
     python tests/audit_record.py
@@ -114,7 +114,7 @@ phrase a stroke greps for in SOURCE must stay on one line — rewrapping one
 broke the same stroke twice in ten minutes.
 
 **Make strokes DISCRIMINATING.** The stub embedder scores by bag-of-words
-over a fixed VOCAB (`test_chainkit.py`, near the top) — pick fixture words
+over a fixed VOCAB (`test_manjuel.py`, near the top) — pick fixture words
 that are ON that vocab, or the stroke passes for the wrong reason.
 
 **No client data, ever.** Strokes prove the client shield against a
@@ -174,7 +174,7 @@ corrections, the interrupt, the spoken cap.
 
 ## The suites and the checks -- the five CI runs, and the two that report
 
-    python tests/test_chainkit.py     the strokes -- the ENGINE, offline
+    python tests/test_manjuel.py     the strokes -- the ENGINE, offline
     python tests/smoke_cli.py         the REPL end to end, offline
     python law/law.py --prove         the ledger, hermetic, exit 0
     python tests/buildmap.py --check  BUILDMAP.md matches the code (regenerate
@@ -190,7 +190,7 @@ corrections, the interrupt, the spoken cap.
                                       no markup in a delivery); the prose is
                                       the reviewer's judgement.
 
-    python -m chainkit.us             the MANIFEST reconciled to the code
+    python -m manjuel.us             the MANIFEST reconciled to the code
     python tests/audit_record.py      the RECORD swept for refused shapes
 
 The last two REPORT and never gate, and the reason is the same for both:

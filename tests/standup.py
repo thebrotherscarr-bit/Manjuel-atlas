@@ -5,7 +5,7 @@ write a report a person (or a hand) can review.
     python tests/standup.py --dry      the same harness on a stub, no models
     python tests/standup.py --only git the cases whose name contains "git"
 
-The operator's ask, 2026-09-04: "a proper pipeline within the chainkit to run
+The operator's ask, 2026-09-04: "a proper pipeline within the manjuel to run
 the agents through a full standup set of commands that can be reviewed --
 basically an automated test suite we can run to allow claude to design
 testing strategies that the agents can learn from."
@@ -44,11 +44,11 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from chainkit import cli, transcript, seatlog, gitstate           # noqa: E402
-from chainkit.context import RunContext                           # noqa: E402
-from chainkit.pipeline import Refused, Aborted, run_pipeline       # noqa: E402
-from chainkit.drift import DriftChecker                           # noqa: E402
-from chainkit.skills import EMBED_MODEL                           # noqa: E402
+from manjuel import cli, transcript, seatlog, gitstate           # noqa: E402
+from manjuel.context import RunContext                           # noqa: E402
+from manjuel.pipeline import Refused, Aborted, run_pipeline       # noqa: E402
+from manjuel.drift import DriftChecker                           # noqa: E402
+from manjuel.skills import EMBED_MODEL                           # noqa: E402
 
 LOGS = ROOT / "logs"
 HISTORY = ROOT / "tests" / "run_history.jsonl"
@@ -323,7 +323,7 @@ def main() -> int:
         only = sys.argv[sys.argv.index("--only") + 1].lower()
     cases = [c for c in CASES if only in c.name.lower()] if only else list(CASES)
 
-    print("\n  chainkit — the standup" + (" (dry)" if not live else ""))
+    print("\n  manjuel — the standup" + (" (dry)" if not live else ""))
     sess = cli.Session()
     if not sess.load():
         return 2

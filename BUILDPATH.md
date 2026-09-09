@@ -126,7 +126,7 @@ knows Ollama; nothing else knows either.**
                   section degrades alone. And the brief's facts, read off
                   the record at every open (`/brief` has the door say them).
     dotenv.py     .env honored; returns names, never values.
-    chain.py      sixteen lines; the entrypoint.
+    manjuel.py      sixteen lines; the entrypoint.
 
 ## Layer 8 — the declaration, and the reconciliation
 
@@ -147,8 +147,8 @@ knows Ollama; nothing else knows either.**
     with a field, per capability, in a file the operator can read in one
     sitting. That is the deliverable's whole argument.
 
-    IT IS VERIFIED SINCE 2026-09-03. `chainkit/us.py` parses us/*.us and
-    reconciles every record to the disk (`python -m chainkit.us`). When
+    IT IS VERIFIED SINCE 2026-09-03. `manjuel/us.py` parses us/*.us and
+    reconciles every record to the disk (`python -m manjuel.us`). When
     this paragraph was first written nothing parsed it and it had drifted:
     20 of 35 skills undeclared, 3 of 14 seats without a record, the
     embedder and the tool cap both wrong. Today: every skill file has a
@@ -193,7 +193,7 @@ knows Ollama; nothing else knows either.**
     Not built. What stands between this ground and someone else running
     it, in the order it blocks them:
 
-    pyproject.toml    LANDED 2026-09-03. One dependency; `chainkit` on
+    pyproject.toml    LANDED 2026-09-03. One dependency; `manjuel` on
                       PATH; the wheel carries the ENGINE and not the
                       record -- 31 files, no SEAT_LOG, no memory, no
                       logs, no sessions, no .env, no bin/. `law/` is
@@ -261,7 +261,7 @@ knows Ollama; nothing else knows either.**
 
 ## The order it actually grew (and why)
 
-1. Rewrite: mangled chain.py → chainkit/, containment rule established.
+1. Rewrite: mangled manjuel.py → manjuel/, containment rule established.
 2. Skills verified against handlers; prompt skills added.
 3. Transcripts, sessions, memory, git, sittings — the record before polish.
 4. Index + drift (the embedder as instrument, not stage).

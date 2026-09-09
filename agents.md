@@ -1,6 +1,6 @@
 # Agents — index
 
-The seats live one per file in **`agents/`**. `chainkit/registry.py` reads that
+The seats live one per file in **`agents/`**. `manjuel/registry.py` reads that
 directory; this file is documentation only and is not parsed while `agents/`
 exists. Use `/reload` in the REPL to pick up edits without restarting.
 

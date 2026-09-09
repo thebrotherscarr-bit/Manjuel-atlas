@@ -52,3 +52,17 @@ dist/
 sessions/*.jsonl
 SEAT_LOG.md
 memory.md
+
+# atlas's build output, from H0 (2026-09-09). The source is 4.5 MB; a cargo
+# build drops a 456 MB target/ beside it and `go build` leaves .exe in
+# line/ and webapp/. None of that is source and none of it goes in the
+# record. The provers were run with CARGO_TARGET_DIR pointed at scratch so
+# the ground never saw them; these lines are here for the first in-place
+# build, which would otherwise put half a gigabyte into the repo.
+atlas/target/
+*.exe
+*.exe~
+*.obj
+atlas/webapp/data/
+node_modules/
+.venv/
