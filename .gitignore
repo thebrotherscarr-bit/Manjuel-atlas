@@ -1,0 +1,54 @@
+# Derived state — rebuilt from the ground, never a record.
+index/
+__pycache__/
+*.pyc
+
+# Scratch the seats write. The record is SEAT_LOG.md and memory.md, not this.
+agent_workspace/
+
+# Proposals not yet landed by the operator.
+memory/pending.jsonl
+
+# Run transcripts. Every run writes one, so versioning them left the ground
+# permanently dirty -- session 6's second commit was nothing but the logs of
+# its first. The durable record is SEAT_LOG.md and memory.md; logs/ is the
+# working trace behind them and stays on disk, just untracked.
+logs/
+
+# Binaries and weights: whisper.cpp lives here so the CLI is self-contained,
+# but 144MB of .exe/.dll/.bin is not source and does not go in the record.
+bin/
+
+# Keys are silent (LAW 9).
+.env
+
+# The operator's archive of his own work. Local only, left alone, never
+# versioned here. Operator's ruling 2026-09-02.
+#
+# ADDING THIS DID NOT UNTRACK WHAT WAS ALREADY TRACKED: 383 files under
+# worlds/ (268 of them under a vault/) entered history at e1c0ae6 and 0bfd8c4.
+# `git rm -r --cached worlds/` was run by the operator (d0d6426, 2026-09-02);
+# `git ls-files worlds/` is 0. The two old commits still hold them. The existing commits are a separate question and
+# LAW 1 cuts against rewriting them. Not an exposure while this repo has no
+# remote -- it has never had one, and pushes are gated behind
+# CHAINKIT_GIT_REMOTE.
+worlds/
+
+# Packaging artifacts. `pip install .` / `python -m build` leave these in the
+# ground; they are generated, never authored. Added 2026-09-03 with
+# pyproject.toml -- the first commit after it would otherwise have tracked a
+# build tree.
+build/
+dist/
+*.egg-info/
+
+# The ledger, the seat log and the memory are written by the chain at every
+# open, toll, land and close, so a tracked copy made the ground DIRTY before
+# the operator typed a word (TASKS, the REPL read of 2026-09-08). Operator's
+# ruling 2026-09-08: "dont git track them." They stay on disk as the record;
+# git holds the code and the docs. Adding these lines does not untrack what
+# is already tracked -- `git rm --cached` of each is the operator's act
+# (RULE 6), as it was for worlds/ on 2026-09-02.
+sessions/*.jsonl
+SEAT_LOG.md
+memory.md

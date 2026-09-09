@@ -1,0 +1,86 @@
+# THE INDEX ROOTS. This file ships as a WORKING DEFAULT, not a template:
+# the strokes read it, and it is tracked on purpose -- gitignoring it would
+# red the suites on a new machine. NOT every root exists in a fresh clone:
+# logs, agent_workspace, SEAT_LOG.md and memory.md are the record and are
+# untracked (the operator's ruling 2026-09-08); the indexer skips an absent
+# root and names it.
+#
+# It is also the file you edit first. Add your own grounds by name; remove
+# what you do not want retrieved. `index_ground rebuild` after a change, and
+# see the prune note in RUNBOOK.md before REMOVING a root.
+#
+# Grounds the semantic index reads. One path per line, relative to this folder.
+# Read-only: nothing here is ever written to. The index lives in index/vectors.db.
+#
+# RESEARCH ONLY. Nothing outside this folder is listed, and nothing outside it
+# ever should be -- Archive is reference the operator reads, not ground the
+# chain indexes.
+#
+# logs/_prompts is skipped -- prompts repeat the feed once per stage.
+
+# what the chain IS
+chainkit
+chain.py
+tests
+
+# what the chain is CONFIGURED as
+agents
+skills
+agents.md
+pipelines.md
+parity.md
+index_roots.txt
+
+# what the chain has DONE
+logs
+memory.md
+SEAT_LOG.md
+rack.md
+agent_workspace
+
+# the estate
+us
+foundation
+DESIGN.md
+
+# the worlds. NOT versioned (see .gitignore) -- the operator's archive of his
+# own work, local only. Indexed by NAME, one world at a time, on his call:
+#
+#   worlds/manjuel   YES. Operator's ruling 2026-09-02.
+#   worlds/tbc       NEVER. Client ground. Not listed here and not to be
+#                    added; it is also shielded HARD at vectors.py by the
+#                    vault/ rule, but the shield is the second line and this
+#                    list is the first. A stroke asserts the PROPERTY (no
+#                    root under worlds/, nothing holding a vault/), not a name.
+#
+# worlds/ itself is never listed -- listing the parent would sweep tbc in by
+# inheritance, which is the whole thing being avoided.
+#
+# NO WORLD IS A ROOT. Operator's ruling, 2026-09-03, sitting 78: manjuel is
+# ORIGIN ONLY. `worlds/manjuel` was listed here and put 91 of 783 indexed
+# documents into the corpus, and they answered for the estate:
+#
+#   logs/2026-09-02_114103_who_is_steward_and_whats_he_doing_here.md
+#   -> semantic_search returned worlds\manjuel\Archive\doctrine\
+#      THE_CHARACTERS.md at rank 3, cosine 0.7505, ABOVE two of the
+#      estate's own logs, and the delivery was "Steward is Manjuel, the
+#      instance of llama3.2". Manjuel is the COURT seat; the Steward is a
+#      different seat; llama3.2 is named by nothing on the rack. Three
+#      errors in one sentence, from one retrieval.
+#
+# The collision is not a coincidence and cannot be tuned away. That world's
+# AGENTS.md describes a DIFFERENT system in this one's exact vocabulary --
+# `law.py verify`, "proves whole", PROVEN, Steward, rack, .env -- attached
+# to different commands (`run.py --proof`, `python -m manjuel --selftest`,
+# port 8899). Embeddings cannot separate the same words about another
+# machine. NOT a shield breach: 0 vault docs, 0 .client. names, 0 secrets,
+# re-proved over all 783 at the time of this ruling. A doctrine collision.
+#
+# A stroke now asserts the property rather than the absence of one name:
+# no entry in this file resolves under worlds/, ever, for any world.
+
+# the law -- NOT listed. Until 2026-09-04 the library was law/Archive/law and
+# the roots stroke bans the substring "Archive" (aimed at Desktop\Archive), so
+# it could not be listed. The folder is flat now (law/*.md); the collision is
+# gone, and listing `law` is the operator's call, not made here. 05_THE_LAW.md
+# is indexed via foundation/.

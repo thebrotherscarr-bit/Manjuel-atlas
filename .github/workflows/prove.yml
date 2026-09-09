@@ -1,0 +1,81 @@
+# THE SUITES, ON SOMEONE ELSE'S MACHINE.
+#
+# This is the point of the file. The strokes and the smoke checks existed
+# for weeks and only one person could run them -- which, for a harness whose
+# whole claim is "every guard is named after the failure that earned it",
+# meant a stranger had to take the guards on faith.
+#
+# NO RACK, NO NETWORK, NO GPU, NO MODEL. Every model call in both suites is
+# a stub. `ollama` is installed because chainkit/runtime.py imports it at
+# module load; nothing here ever reaches 127.0.0.1:11434. If a change makes
+# these suites need a live model, THAT IS THE REGRESSION -- the offline
+# property is the thing being protected, not an incidental convenience.
+#
+# law.py --prove is hermetic (9 strokes, temp dirs, exit 0) and runs beside
+# them. `verify` is NOT run here: it walks the committed chain, and a fork
+# with a re-terminated law file should fail on the operator's terminal, not
+# in a CI job that cannot tell tampering from a checkout artifact.
+
+name: prove
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prove:
+    strategy:
+      fail-fast: false
+      matrix:
+        # The ground is Windows and the record is CRLF (.gitattributes).
+        # Ubuntu is in the matrix precisely BECAUSE of that: the suites must
+        # not quietly depend on the operator's platform, and the terminator
+        # rules are declared in-repo rather than per-machine.
+        os: [windows-latest, ubuntu-latest]
+        python: ["3.10", "3.13"]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+
+      - name: Install (one dependency)
+        run: python -m pip install --upgrade pip && python -m pip install .
+
+      - name: The strokes
+        run: python tests/test_chainkit.py
+
+      - name: The smoke suite
+        # RUN THE SMOKE SUITE, NOT JUST THE STROKES. It was RED at 34/50
+        # from 14e2711 to 2026-09-02 because its StubRuntime had not been
+        # moved with pipeline.py, and the strokes were green the whole
+        # time. That is the exact failure this step exists to prevent.
+        run: python tests/smoke_cli.py
+
+      - name: The law proves itself
+        run: python law/law.py --prove
+
+      - name: The build map matches the code
+        # BUILDMAP.md is generated from the code with ast (tests/buildmap.py).
+        # A stale map is a map that lies about where things are.
+        run: python tests/buildmap.py --check
+
+      - name: The standup harness runs (dry, stub models)
+        # The live standup is the operator's terminal; this proves the
+        # harness itself and the two arithmetic gates it exercises.
+        run: python tests/standup.py --dry
+
+      - name: The record, audited
+        # Reports, never gates (audit_record.py's own rule: the corpus is
+        # ambient and an assertion over it goes red because someone ran the
+        # CLI). Kept visible in the log; its exit code is not the verdict.
+        continue-on-error: true
+        run: python tests/audit_record.py

@@ -1,0 +1,102 @@
+{"suite": "smoke", "at": 1788386265.2344093, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788386254.4062643, "state": "crashed", "passed": null, "total": null, "green": false}
+{"suite": "strokes", "at": 1788386343.8452468, "state": "finished", "passed": 1133, "total": 1133, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788386358.0096743, "state": "finished", "passed": 1133, "total": 1133, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788386367.6138558, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788387452.8193867, "state": "finished", "passed": 1156, "total": 1163, "green": false, "failed": ["an empty seat reply is recorded as a fault, not swallowed", "raising `hard` seats the Reasoner in the same run", "an unfinished verdict sends the work back to the Router", "the record names what was missing", "and the gap is stated to the operator, not hidden", "asking about a tool is recognised: 'tell me about the router'", "a markup-only reply is recorded as a fault, not delivered as an answer"]}
+{"suite": "smoke", "at": 1788387462.4307997, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788387728.126323, "state": "finished", "passed": 1166, "total": 1166, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788387738.4979289, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788387749.0848823, "state": "finished", "passed": 1166, "total": 1166, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788389372.9906201, "state": "finished", "passed": 1184, "total": 1184, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788389379.7034607, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788392502.2956307, "state": "crashed", "passed": null, "total": null, "green": false}
+{"suite": "strokes", "at": 1788393102.9705858, "state": "finished", "passed": 1201, "total": 1211, "green": false, "failed": ["an act-describing subject is refused: 'Committing 13 changed files locall'", "an act-describing subject is refused: 'committing the changes'", "an act-describing subject is refused: 'commit all files'", "an act-describing subject is refused: 'saving work'", "an act-describing subject is refused: 'save the changes now'", "an act-describing subject is refused: 'updating the repo'", "an act-describing subject is refused: 'check in these files'", "@seat exchanges never touch the shared dialogue", "that the ground's facts are READ, never remembered", "with what to do about it, rather than left to guess"]}
+{"suite": "strokes", "at": 1788393176.63438, "state": "finished", "passed": 1201, "total": 1211, "green": false, "failed": ["an act-describing subject is refused: 'Committing 13 changed files locall'", "an act-describing subject is refused: 'committing the changes'", "an act-describing subject is refused: 'commit all files'", "an act-describing subject is refused: 'saving work'", "an act-describing subject is refused: 'save the changes now'", "an act-describing subject is refused: 'updating the repo'", "an act-describing subject is refused: 'check in these files'", "@seat exchanges never touch the shared dialogue", "that the ground's facts are READ, never remembered", "with what to do about it, rather than left to guess"]}
+{"suite": "strokes", "at": 1788393267.5398583, "state": "finished", "passed": 1210, "total": 1211, "green": false, "failed": ["@seat exchanges never touch the shared dialogue"]}
+{"suite": "strokes", "at": 1788393322.0509486, "state": "finished", "passed": 1211, "total": 1211, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788393334.259638, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788393767.3455431, "state": "finished", "passed": 1211, "total": 1211, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788393777.6358774, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788395614.6694815, "state": "finished", "passed": 1211, "total": 1211, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788395621.2236028, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788445396.6312149, "state": "finished", "passed": 1211, "total": 1211, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788445407.0854504, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788446683.2447133, "state": "finished", "passed": 1257, "total": 1257, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788446690.0124998, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788447705.0060322, "state": "finished", "passed": 1266, "total": 1266, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788447714.7286038, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788449449.1923316, "state": "finished", "passed": 1282, "total": 1282, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788449460.0467365, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788451312.1059296, "state": "finished", "passed": 1297, "total": 1297, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788451320.949583, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788460831.8722456, "state": "finished", "passed": 1362, "total": 1362, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788460841.8860922, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788473223.6204004, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788473235.0308874, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788532852.8247545, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788532892.1900394, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788533621.4561925, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788533793.8722243, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788533795.5076084, "state": "finished", "passed": 58, "total": 59, "green": false, "failed": ["the real runtime's unreachable message names the fix"]}
+{"suite": "smoke", "at": 1788533808.844445, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788534269.02462, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788534270.7877393, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788534781.057224, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788534793.0628586, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788535025.6016467, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788535252.0260923, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788535258.4598546, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788535409.468367, "state": "finished", "passed": 1470, "total": 1470, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788536713.5405302, "state": "finished", "passed": 1466, "total": 1470, "green": false, "failed": ["the estate pipeline runs on door + one counsel model", "no pipeline needs more than 3 distinct models", "every plan fits a 15GB card with all models resident", "the coder is judged against a bare coder"]}
+{"suite": "strokes", "at": 1788536758.46887, "state": "finished", "passed": 1471, "total": 1471, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788536760.2124724, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788536820.094245, "state": "finished", "passed": 1471, "total": 1471, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788536850.9609087, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788536854.0638738, "state": "finished", "passed": 1471, "total": 1471, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788537057.764795, "state": "finished", "passed": 1471, "total": 1471, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788537063.2983894, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788537613.751721, "state": "finished", "passed": 1471, "total": 1471, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788537659.2267694, "state": "finished", "passed": 1471, "total": 1471, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788537660.8577569, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788538180.3822186, "state": "finished", "passed": 1471, "total": 1471, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788538216.789405, "state": "finished", "passed": 1484, "total": 1484, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788538239.8089948, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788538304.781393, "state": "finished", "passed": 1484, "total": 1484, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788538349.7585793, "state": "finished", "passed": 1484, "total": 1484, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788538917.1792135, "state": "finished", "passed": 1490, "total": 1490, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788538918.8740695, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788541356.2794948, "state": "finished", "passed": 1499, "total": 1499, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788541357.9997845, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788541510.3153782, "state": "finished", "passed": 1499, "total": 1499, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788541549.102452, "state": "crashed", "passed": null, "total": null, "green": false}
+{"suite": "strokes", "at": 1788541559.7624955, "state": "crashed", "passed": null, "total": null, "green": false}
+{"suite": "strokes", "at": 1788541570.8894196, "state": "crashed", "passed": null, "total": null, "green": false}
+{"suite": "strokes", "at": 1788541586.9810853, "state": "finished", "passed": 1520, "total": 1520, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788541588.8000686, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788541603.0410268, "state": "finished", "passed": 1520, "total": 1520, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788561071.088783, "state": "finished", "passed": 1520, "total": 1520, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788561072.8761413, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "standup", "at": 1788561592.0854948, "state": "finished", "passed": 8, "total": 10, "green": false, "failed": ["a folder", "a question about the ground"], "report": "logs/standup_2026-09-04_153951.md"}
+{"suite": "strokes", "at": 1788569154.7413633, "state": "finished", "passed": 1520, "total": 1520, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788796611.8869884, "state": "finished", "passed": 1589, "total": 1589, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788796625.4555824, "state": "finished", "passed": 59, "total": 59, "green": true, "failed": []}
+{"suite": "standup", "at": 1788797197.4746437, "state": "finished", "passed": 9, "total": 10, "green": false, "failed": ["a folder"], "report": "logs/standup_2026-09-07_090637.md"}
+{"suite": "strokes", "at": 1788804749.7547083, "state": "finished", "passed": 1662, "total": 1662, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788804803.5546436, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "standup", "at": 1788805401.6984274, "state": "finished", "passed": 9, "total": 10, "green": false, "failed": ["a folder"], "report": "logs/standup_2026-09-07_112321.md"}
+{"suite": "strokes", "at": 1788805991.2988644, "state": "finished", "passed": 1678, "total": 1678, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788805999.3998647, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788806007.2511065, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "standup", "at": 1788806457.2479992, "state": "finished", "passed": 9, "total": 10, "green": false, "failed": ["a folder"], "report": "logs/standup_2026-09-07_114057.md"}
+{"suite": "strokes", "at": 1788806794.652272, "state": "finished", "passed": 1685, "total": 1685, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788806802.9310794, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "standup", "at": 1788807877.5096543, "state": "finished", "passed": 10, "total": 10, "green": true, "failed": [], "report": "logs/standup_2026-09-07_120437.md"}
+{"suite": "strokes", "at": 1788880702.5976784, "state": "finished", "passed": 1697, "total": 1697, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788880712.2347202, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "standup", "at": 1788887009.925487, "state": "finished", "passed": 10, "total": 10, "green": true, "failed": [], "report": "logs/standup_2026-09-08_100329.md"}
+{"suite": "standup", "at": 1788896692.8785062, "state": "finished", "passed": 9, "total": 10, "green": false, "failed": ["a folder"], "report": "logs/standup_2026-09-08_124452.md"}
+{"suite": "strokes", "at": 1788960212.6770308, "state": "finished", "passed": 1854, "total": 1854, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788960237.932576, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788960595.7454004, "state": "finished", "passed": 1872, "total": 1872, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788960602.9960587, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}

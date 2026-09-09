@@ -1,0 +1,67 @@
+# Line terminators are DECLARED here, never inherited from whichever machine
+# or git install happens to be running. Operator's ruling, 2026-09-03: this is
+# a Windows estate and the record is CRLF.
+#
+# WHY THIS FILE EXISTS. `core.autocrlf` was unset in every scope, so the
+# answer to "what terminator does this file have" depended on the client
+# reading it. The same SEAT_LOG.md read as clean on the operator's terminal
+# and as 3,000 changed lines from a Linux sandbox -- one file, two truths,
+# and neither of them written down anywhere. An attribute in the repo travels
+# with the repo; a git config does not.
+#
+# WHAT THIS DOES. Git stores every text blob LF (the portable form, and what
+# HEAD already holds) and checks it out CRLF. The working tree is CRLF, the
+# history is clean, and a terminator flip stops showing up as a whole-file
+# diff. Nothing here changes what the CHAIN writes -- that is declared in the
+# code, newline="\r\n" at every writer, and stroked by
+# test_the_chain_writes_declared_newlines.
+
+* text=auto eol=crlf
+
+
+# ---------------------------------------------------------------------
+# SEALED BY HASH -- no conversion, in either direction.
+# ---------------------------------------------------------------------
+# EXACTLY the files whose RAW BYTES are hashed, and nothing else.
+#
+# law.py:63 `_fingerprint()` opens a law document "rb" and sha256s it; the
+# ledger binds that digest link by link. An eol translation here changes
+# every fingerprint and `python law/law.py verify` goes red on a chain
+# nobody tampered with -- a false alarm on the one instrument whose whole
+# value is that it does not raise them. Re-terminating a law is a RE-SEAL,
+# the operator's act (RULE 6, LAW 6), not a sweep.
+#
+# WHAT IS NOT HERE, AND WHY -- corrected 2026-09-03, sitting 76.
+# The first version of this file also froze `law/state/law/**` and
+# `law/**/*.jsonl` on the reasoning "law/ is sealed by hash". That
+# generalised from two files to a directory without checking which,
+# and it was wrong twice over:
+#
+#   links.py:96   the chain hashes CANONICAL JSON -- sha256(prev +
+#                 json.dumps(body, sort_keys=True)) -- never file bytes.
+#   links.py:230  and reads the chain with universal newlines, so a CR
+#                 is stripped before json.loads ever sees the line.
+#
+# chain.jsonl's terminator therefore cannot affect the chain. What the
+# exclusion DID do was freeze a CRLF-on-disk / LF-in-HEAD mismatch into a
+# file that then showed modified forever -- the exact phantom diff this
+# file exists to kill, parked in the worst possible directory.
+#
+# Stroked by test_only_byte_hashed_law_files_are_eol_frozen.
+
+law/*.md  -text
+
+
+# ---------------------------------------------------------------------
+# Notes on what is deliberately NOT here
+# ---------------------------------------------------------------------
+# No `binary` lines: the ground tracks no binaries today (95 .md, 33 .py,
+# 12 .us, 4 .jsonl, and one each of .txt/.json/.bak/LICENSE). `text=auto`
+# detects one if it ever arrives, so a speculative rule would be a guard
+# against nothing.
+#
+# `worlds/` is not listed because it is in .gitignore and untracked as of
+# 2026-09-02 -- attributes on ignored paths are noise.
+#
+# voice.py's mkstemp is not a tracked file at all: it is handed to
+# PowerShell's ReadAllText and deleted after it speaks.

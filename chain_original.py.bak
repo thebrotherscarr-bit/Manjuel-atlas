@@ -1,0 +1,214 @@
+import os
+import re
+import sys
+import time
+import httpx
+import ollama
+
+SKILLS_DIR = "skills"
+WORKSPACE_DIR = "agent_workspace"
+
+def initialize_system():
+    """Creates the necessary skill repository and workspace folders if missing."""
+    for folder in [SKILLS_DIR, WORKSPACE_DIR]:
+        if not os.path.exists(folder):
+            os.makedirs(folder)
+            print(f"📁 Created system folder: {os.path.abspath(folder)}")
+
+def get_safe_workspace_path(filename):
+    """Locks file paths securely into the agent_workspace directory."""
+    return os.path.join(WORKSPACE_DIR, os.path.basename(filename))
+
+def load_skills_manifest():
+    """Scans the skills/ folder and bundles all markdown files into a prompt instruction set."""
+    if not os.path.exists(SKILLS_DIR):
+        return "No skills directory found."
+    
+    manifest_lines = []
+    files = [f for f in os.listdir(SKILLS_DIR) if f.endswith(".md")]
+    
+    if not files:
+        return "No markdown tool files currently found in the skills folder."
+
+    for file in files:
+        with open(os.path.join(SKILLS_DIR, file), "r", encoding="utf-8") as f:
+            manifest_lines.append(f"--- Skill File: {file} ---\n{f.read().strip()}")
+            
+    return "\n\n".join(manifest_lines)
+
+# =====================================================================
+# 🛠️ LOCAL ENVIRONMENT SKILL EXECUTION ENGINE
+# =====================================================================
+
+def execute_markdown_skill(action_name, args, client):
+    """Executes the file-system operations or triggers deep model processing."""
+    action_clean = action_name.strip().lower()
+    filename = args.get("filepath", "").strip()
+    content = args.get("content", "")
+
+    if "list_directory" in action_clean:
+        try:
+            items = os.listdir(WORKSPACE_DIR)
+            return "📁 Workspace Items:\n" + "\n".join([f" • {i}" for i in items]) if items else "📁 Workspace is empty."
+        except Exception as e:
+            return f"❌ Directory Error: {e}"
+
+    elif "read_file" in action_clean:
+        if not filename: return "❌ Error: Missing <filepath> parameter tag."
+        path = get_safe_workspace_path(filename)
+        if not os.path.exists(path): return f"❌ Error: Workspace File '{filename}' not found."
+        try:
+            with open(path, "r", encoding="utf-8") as f: return f.read()
+        except Exception as e: return f"❌ Read Error: {e}"
+
+    elif "write_file" in action_clean:
+        if not filename: return "❌ Error: Missing <filepath> parameter tag."
+        path = get_safe_workspace_path(filename)
+        try:
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(content)
+            return f"✅ File successfully saved inside workspace: {os.path.basename(path)}"
+        except Exception as e: return f"❌ Write Error: {e}"
+        
+    elif "deep_research" in action_clean:
+        print("🔬 [SKILL] Launching Deep Research Sub-Agent (qwen3.5:0.8b)...")
+        research_prompt = f"You are an expert Research Analyst. Conduct a detailed deep-dive investigation on this topic or data payload:\n{content if content else filename}"
+        research_resp = client.chat(model='qwen3.5:0.8b', messages=[{'role': 'user', 'content': research_prompt}])
+        return f"🔬 Deep Research Findings:\n{research_resp['message']['content']}"
+
+    return f"❌ Execution Handler: Skill '{action_name}' is not bound to a functional python script handle."
+
+def extract_xml_arguments(model_output):
+    """Safely pulls XML tags out of tool calling responses."""
+    action_match = re.search(r"<action>(.*?)</action>", model_output, re.DOTALL)
+    if not action_match:
+        return None, {}
+    
+    args = {}
+    for tag in ["filepath", "content"]:
+        val_match = re.search(rf"<{tag}>(.*?)</{tag}>", model_output, re.DOTALL)
+        if val_match:
+            args[tag] = val_match.group(1).strip()
+            
+    return action_match.group(1).strip(), args
+
+# =====================================================================
+# 🔄 RE-ORDERED AGENT PIPELINE LOOP
+# =====================================================================
+
+def run_multi_agent_pipeline():
+    client = ollama.Client(host='http://127.0.0.1:11434')
+    initialize_system()
+    
+    try:
+        client.list()
+    except (httpx.ConnectError, ConnectionError):
+        print("\n❌ Connection Error: Cannot communicate with Ollama at http://127.0.0.1:11434.")
+        sys.exit(1)
+
+    print("🤖 Action-First Dynamic Multi-Agent System Engaged.\n")
+    
+    while True:
+        skills_manifest = load_skills_manifest()
+        
+        print("=" * 60)
+        target_topic = input("🔍 Enter task objective or research topic: ").strip()
+        if not target_topic or target_topic.lower() == 'exit':
+            break
+            
+        raw_feed = input("📰 Paste raw context text (or leave blank if using file skills): ").strip()
+        if raw_feed.lower() == 'exit':
+            break
+            
+        print("\n⚡ Initializing execution pipeline...")
+
+        try:
+            # -----------------------------------------------------------------
+            # AGENT 1: Baseline Reviewer (qwen2.5:0.5b)
+            # -----------------------------------------------------------------
+            print("🌅 [1/4] Running Baseline Filter Agent...")
+            reviewer_prompt = f"""
+            Compress the incoming user parameters and raw text down to a tight, 2-sentence situational objective.
+            Target Topic: {target_topic}
+            Provided Feed Text: {raw_feed if raw_feed else 'None provided'}
+            """
+            review_resp = client.chat(model='qwen2.5:0.5b', messages=[{'role': 'user', 'content': reviewer_prompt}])
+            situational_context = review_resp['message']['content']
+
+            # -----------------------------------------------------------------
+            # AGENT 2: SKILLS ROUTING & EXECUTION LAYER (qwen2.5-coder:1.5b) [MOVED UP]
+            # -----------------------------------------------------------------
+            print("🛠️  [2/4] Running Skills Routing Tool Layer...")
+            
+            router_prompt = f"""
+            You are an Action Router with access to a Workspace Skill Repository.
+            Analyze the current situational objective and choose whether to execute a tool skill right now.
+            
+            --- AVAILABLE SKILLS MANIFEST ---
+            {skills_manifest}
+            ---------------------------------
+            
+            If a skill applies (e.g., listing files, reading data, writing files, or launching deep research), respond with this exact XML block structure:
+            <action>Skill Action Keyword</action>
+            <filepath>filename_only.ext</filepath>
+            <content>data payload here</content>
+            
+            If no file operations or explicit tools are required, do not output XML tags. Instead, write out a raw text draft that resolves the user's objective.
+            
+            Current Situational Objective:
+            \"\"\"{situational_context}\"\"\"
+            """
+            
+            router_resp = client.chat(model='qwen2.5-coder:1.5b', messages=[{'role': 'user', 'content': router_prompt}])
+            router_output = router_resp['message']['content']
+            
+            # Check for early execution tool action trigger
+            action, extracted_args = extract_xml_arguments(router_output)
+            
+            working_payload = ""
+            if action:
+                print(f"🛠️  Agent triggered an early action step: [{action}]")
+                tool_output = execute_markdown_skill(action, extracted_args, client)
+                print("📥 Action complete. Ingesting execution result into pipeline...")
+                working_payload = f"Tool Action Executed: {action}\nResult Output:\n{tool_output}"
+            else:
+                working_payload = router_output
+
+            # -----------------------------------------------------------------
+            # AGENT 3: Quality Evaluator Gate (qwen2.5:0.5b)
+            # -----------------------------------------------------------------
+            print("⚖️  [3/4] Running Quality Evaluator Verification Agent...")
+            critic_prompt = f"""
+            You are a strict editorial quality gate. Review the following payload block for logical bugs, inconsistencies, or clarity errors.
+            Rewrite the text directly to correct any gaps. Fix structural clutter. Return only the revised text.
+            
+            Current Payload Data:
+            \"\"\"{working_payload}\"\"\"
+            """
+            eval_resp = client.chat(model='qwen2.5:0.5b', messages=[{'role': 'user', 'content': critic_prompt}])
+            verified_report = eval_resp['message']['content']
+
+            # -----------------------------------------------------------------
+            # AGENT 4: Final Delivery Package Agent (qwen3.5:0.8b)
+            # -----------------------------------------------------------------
+            print("📦 [4/4] Structuring Final Executive Package...")
+            delivery_prompt = f"""
+            You are an Executive Communications Specialist. Format the provided verified pipeline text into a clean business briefing document.
+            You must output a clean Markdown layout containing: An authoritative Header Title, a '• Action/Status Summary:' bullet point, and a '### Operational Analysis' paragraph section.
+            Do not include conversational introductions like 'Here is your file'.
+            
+            Verified Pipeline Text:
+            \"\"\"{verified_report}\"\"\"
+            """
+            delivery_resp = client.chat(model='qwen3.5:0.8b', messages=[{'role': 'user', 'content': delivery_prompt}])
+            final_delivery = delivery_resp['message']['content']
+
+            # DISPLAY DELIVERY
+            print("\n📬 --- FINAL INTELLIGENCE RUN DELIVERY ---")
+            print(final_delivery)
+            print("=" * 60 + "\n")
+            except (httpx.ConnectError, ConnectionError):print("\n❌ Connection Error: Ollama instance went offline.\n")breakif name == "main":
+try:run_multi_agent_pipeline()
+except KeyboardInterrupt:
+    print("\nProcess interrupted. Goodbye!")
+    sys.exit(0)

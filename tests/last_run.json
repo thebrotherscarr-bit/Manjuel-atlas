@@ -1,0 +1,18 @@
+{
+  "smoke": {
+    "at": 1788960602.9960587,
+    "failures": [],
+    "green": true,
+    "passed": 60,
+    "state": "finished",
+    "total": 60
+  },
+  "strokes": {
+    "at": 1788960595.7454004,
+    "failures": [],
+    "green": true,
+    "passed": 1872,
+    "state": "finished",
+    "total": 1872
+  }
+}

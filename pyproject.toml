@@ -1,0 +1,61 @@
+# chainkit — packaging.
+#
+# ONE DEPENDENCY. That is the headline and it is load-bearing: everything
+# else in this ground is the standard library. A safety harness whose own
+# supply chain is a single package can make claims about its surface that a
+# harness with a node_modules tree cannot.
+#
+# The suites are OFFLINE AND STUBBED BY DESIGN -- no rack, no network, no
+# GPU, no model. `ollama` is imported by chainkit/runtime.py at module load,
+# so CI installs the package; it never reaches a server. See TESTING.md.
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "chainkit"
+version = "0.1.4"
+description = "A local multi-agent harness that refuses to land anything."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { file = "LICENSE" }
+authors = [{ name = "Kyler" }]
+keywords = ["agents", "local-first", "ollama", "audit", "safety-harness"]
+
+# The whole surface. `ollama` speaks to 127.0.0.1:11434 and nothing else.
+dependencies = ["ollama"]
+
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Environment :: Console",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Topic :: Software Development :: Libraries :: Application Frameworks",
+]
+
+[project.optional-dependencies]
+# Voice is Windows-bound (SAPI out, whisper.cpp in) and DEGRADES ALONE --
+# boot.py reports GROUND / RACK / RECORD / GATE / VOICE separately, so a
+# machine with no voice still boots and says so. Kept out of the default
+# install because the binaries in bin/ are Windows-only and nobody should
+# pay for them to run a REPL.
+voice = []
+
+[project.urls]
+Homepage = "https://github.com/OWNER/chainkit"
+Documentation = "https://github.com/OWNER/chainkit/blob/master/QUICKSTART.md"
+
+[project.scripts]
+chainkit = "chainkit.cli:main"
+
+[tool.setuptools]
+# The ENGINE ships. The RECORD does not get installed as a package -- it is
+# read from the ground at runtime, and a ground is a directory the operator
+# owns, never something site-packages provides.
+#
+# `law/` is NOT packaged either. It is a ledger bound to this ground by
+# sha256; a copy in site-packages would be a second chain nobody walks.
+packages = ["chainkit"]
