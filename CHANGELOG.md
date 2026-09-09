@@ -34,6 +34,56 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — RECORDS: the estate's own documents, sorted by what they are (operator: "add a tab to the sidebar for the sittings and the logs from the evals … the records will hold all the docs for quick lookup"; "the logs and the function/command docs should all be separated out. like doctrine/agents/function/tools/skills")
+- **A NEW TOOL, BECAUSE NOTHING COULD REACH THEM.** `read_doctrine` serves only
+  what the carried manifest declares (ONE file in this ground), `read_plan` maps
+  five names to THE_ROAD.md and its siblings — none of which exist here, so every
+  one answers "present in the map but unreadable" — and `read_handoffs` serves
+  SEAT_LOG alone. The page was asked to hold the docs and there was no door to
+  hold them through. `records` (read-only) now serves **140 documents in 7
+  kinds**: doctrine 6 (CLAUDE.md + the sealed law/), record 6, spec 14, agents
+  14, commands 3, skills 37, logs 60.
+- **SORTED, NOT LISTED.** A flat list of forty markdown files is a directory
+  listing, not a record. `kindOrder` is the estate's own furniture — what binds
+  a hand first, what happened second, what the thing is third, then the seats,
+  the commands, the skills, and the transcripts. Not alphabetical: alphabetical
+  puts agents above the law.
+- **THE LIST IS THE ONLY WAY IN.** A name is matched against the listing the
+  same tool produces; nothing is joined onto Home from the caller's string, so
+  there is no traversal to defend against. Measured in the running page:
+  `../.env` comes back "no record named \"../.env\" in research. Kinds carried:
+  …" — denied honestly, the way the rest of the registry denies an absent name.
+  Only `.md`, only from root/law/agents/skills/logs, `Writes: false`, no
+  recursion. RULE 7 holds by what is walked, not by inspecting what was asked.
+- **EVERY DOCUMENT CARRIES ITS RECEIPT.** sha256 of the bytes served, the same
+  receipt read_doctrine and read_handoffs give. Checked against the disk:
+  law/ESTATE_LAWS.md served `2837d3d5…431ce`, and `sha256sum` of the file agrees
+  byte for byte. The sealed files show a **sealed** badge — read, never edited.
+- **THE FOUR MARKUPS, ALL OF THEM:** RECENT SITTINGS left the launchpad for
+  Records; the Evals proof cards, the estate block and LIVE STANDUPS went with
+  them; THE ENGINE moved to the TOP of the dashboard, above the chat bar,
+  because nothing below it runs until one is open and it sat three cards down;
+  and the "no engine" pill came off the Chat header — the composer under it is
+  already disabled with the whole reason written out, and the badge was the
+  smaller, more alarming half of one fact.
+- **TWO FAULTS THE REORDER ITSELF CAUSED, both caught on the page and fixed:**
+  the brief repeated the engine card word for word three inches below it, with
+  its own Boot button — the same duplication just removed from Chat; and once
+  that row was gone the brief REACHED ITS QUIET LINE with no engine open, where
+  it read "The estate is standing. engine open on research, sitting —". A
+  hardcoded clause that had only ever run while an engine WAS open. It says what
+  is true now.
+- Also: the kind buttons were one unwrapping 621px flex row inside a narrower
+  card, so **skills and logs were clipped off the right edge** — two whole kinds
+  invisible on a page whose job is showing what the ground carries. They wrap on
+  their own line now.
+- Proven: 1915/1915 strokes, 60/60 smoke, `go build` + `go vet` clean on both
+  trees, `node --check` on all three changed scripts, and every kind opened in
+  the running page with a document read from each. Tools are deliberately NOT a
+  records kind: /api/tools is the registry itself, and a second list here would
+  drift from it the first time a tool was added.
+
+
 ### 2026-09-09 — THE LAUNCHPAD REPAINTS, AND THE PROOFS IT ALREADY FETCHED REACH THE GLASS (operator: "you just built the whole thing and never landed it on the dashboard or anywhere in the webapp"; "just stale from when you were doing the git commit/status/push work earlier")
 - **HE READ SOMETHING UNTRUE OFF THIS PAGE.** He said a sitting was open; it was
   not. Three sources agreed it had closed at 14:32:58 — `sessions.jsonl`'s last
