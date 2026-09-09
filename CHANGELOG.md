@@ -35,6 +35,33 @@ hand that iterates without updating this file is out of line.
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
 
+### 2026-09-09 — THE ENTRY POINT SAYS ITS OWN NAME, AND REFUSES WHAT IT CANNOT READ (operator: "look at the manjuel.py REPL, it's the core of the system, what is it missing?" / "fix everything")
+- **The rename never reached the program's own voice.** Every launch still said
+  `Chain -- local multi-agent pipeline`, in both doors, plus the reconnect line
+  and the voice-chat speaker label (`chain: I stopped.`). The rename reached the
+  package, the docs and the record and stopped at what he actually reads. Mine.
+- **THE ROOT CAUSE UNDER THE OTHER THREE: the entry point was the only door in
+  this estate that did not refuse what it could not understand.** `--ground`
+  refuses a bad path by name; `env_open` refuses an occupied world by name; the
+  release gate refuses by name. `manjuel.py` accepted any argv, ignored what it
+  did not recognise, and did the default. Measured, that cost three things:
+  - `--help` fell through and **opened a sitting** and loaded models. Asking for
+    help had the largest side effect in the system.
+  - a typo in `--headless` silently gave the INTERACTIVE REPL:
+    `--heedless`, `-headless`, `--headless=1` all landed at the prompt.
+  - a typo in `--ground` silently ran on **the estate's own record** instead of
+    the world he named: `--gound worlds/x` returned None and opened Research.
+    The path is guarded (a typo never creates a folder, SITTING LAW 4); the
+    FLAG NAME was not.
+- `cli.read_argv` is the contract, spelled beside the flag vocabulary it shares,
+  and pure so a stroke holds it to its word. An unknown flag is never a request
+  to do the default thing -- it is a typo or a misunderstanding, and both are
+  named. `manjuel.py` stays a launcher: it asks, it prints, it exits.
+- Proven at the real entry point: `--help`/`-h` and `--version`/`-V` print and
+  exit 0 having opened nothing; every typo above exits 2 naming itself and the
+  six flags the door does read; and the ledger's last sitting was unchanged by
+  all of it. 1915/1915 strokes, 60/60 smoke.
+
 ### 2026-09-09 — CONTEXT FROM TURN TO TURN: two causes found by measurement, both fixed (operator: "couldnt really figure out either heuristic or semantic ... the context and history is a real pain point")
 - **Neither approach was failing on its own merits; they were failing
   together.** `RECALL_FLOOR = 0.30` is the floor for BOTH questions -- "is this

@@ -2830,11 +2830,56 @@ def test_the_ground_flag(reg, lib, book):
     chain_src = (ROOT / "manjuel.py").read_text(encoding="utf-8")
     check("cli.main honours the flag before the banner; serve.main before it takes ROOT",
           "ground_from_argv(sys.argv[1:])" in cli_src
-          and cli_src.index("ground_from_argv(sys.argv[1:])") < cli_src.index('print("\\nChain -- local multi-agent pipeline")')
+          and cli_src.index("ground_from_argv(sys.argv[1:])") < cli_src.index('print("\\nManjuel -- local multi-agent pipeline")')
           and "_cli.ground_from_argv(" in serve_src
           and serve_src.index("_cli.ground_from_argv(") < serve_src.index("ROOT = _cli.ROOT"))
     check("manjuel.py names the flag for both doors", "--ground" in chain_src)
     check("the flag is spelled once", cli_src.count('"--ground"') == 1 and "GROUND_FLAG" in serve_src)
+
+    #    THE PROGRAM SAYS ITS OWN NAME. The rename reached the package, the
+    #    docs and the record, and never reached what the operator actually
+    #    reads on every launch.
+    check("the REPL introduces itself as Manjuel",
+          "Manjuel -- local multi-agent pipeline" in cli_src
+          and "Chain -- local multi-agent pipeline" not in cli_src)
+    check("so does the headless door",
+          "Manjuel -- local multi-agent pipeline (headless door)" in serve_src
+          and "Chain -- local multi-agent pipeline" not in serve_src)
+    for src, who in ((cli_src, "cli.py"), (serve_src, "serve.py")):
+        check(f"nothing {who} prints still carries the old name",
+              "the chain reconnects" not in src and '"  chain: ' not in src
+              and "f\"  chain: " not in src, who)
+
+    #    THE ARGUMENT CONTRACT. Every other door in this estate refuses what
+    #    it does not understand, by name. The entry point accepted anything
+    #    and did the default -- so --help opened a sitting, a typo in
+    #    --headless silently gave the REPL, and a typo in --ground silently
+    #    ran on the estate's own record instead of the world he named.
+    check("no flags is the REPL", _cli.read_argv([]) == "repl")
+    check("--headless is the door", _cli.read_argv(["--headless"]) == "headless")
+    check("help is asked for, not stumbled into",
+          _cli.read_argv(["--help"]) == "help" and _cli.read_argv(["-h"]) == "help")
+    check("the version is asked for the same way",
+          _cli.read_argv(["--version"]) == "version"
+          and _cli.read_argv(["-V"]) == "version")
+    check("--ground carries a value without it being read as a flag",
+          _cli.read_argv(["--ground", "worlds/x"]) == "repl"
+          and _cli.read_argv(["--ground=worlds/x", "--headless"]) == "headless")
+
+    for bad in ("--heedless", "-headless", "--headless=1", "--gound",
+                "--ground-", "--nope", "worlds/x"):
+        try:
+            got = _cli.read_argv([bad])
+            check(f"{bad!r} is refused, not silently defaulted", False, repr(got))
+        except ValueError as exc:
+            check(f"{bad!r} is refused BY NAME, with what is known",
+                  bad in str(exc) and "--headless" in str(exc)
+                  and "--ground" in str(exc), str(exc))
+
+    check("the typo that mattered most: --gound does not become the default ground",
+          _cli.ground_from_argv(["--gound", "worlds/x"]) is None)
+    check("...and read_argv is what refuses it before anything opens",
+          "--gound" in _refused_by(_cli, ["--gound", "worlds/x"]))
 
 
 def test_git_never_waits_on_stdin(reg, lib, book):
@@ -10081,6 +10126,15 @@ def test_record_and_git():
 
 
 # ---------------------------------------------------------------------
+
+
+def _refused_by(mod, argv):
+    """The refusal a bad argv earns, as text --  when it is accepted."""
+    try:
+        mod.read_argv(argv)
+    except ValueError as exc:
+        return str(exc)
+    return ''
 
 
 def main() -> int:

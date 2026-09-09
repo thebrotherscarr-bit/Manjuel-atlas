@@ -712,7 +712,7 @@ def main(argv: list[str] | None = None) -> int:
     ROOT = _cli.ROOT
 
     # cli.main, line for line, with the prints landing on the wire as text.
-    print("\nChain -- local multi-agent pipeline (headless door)")
+    print("\nManjuel -- local multi-agent pipeline (headless door)")
     if ground is not None:
         print(f"  ground: {ROOT}")
     for line in dotenv.report(*dotenv.load(ROOT / ".env")):
@@ -727,7 +727,7 @@ def main(argv: list[str] | None = None) -> int:
         return 1
     if not sess.rack_check():
         print("\n  RACK UNREACHABLE — the ground is open, the models are not.")
-        print("  Start `ollama serve` whenever; the chain reconnects on the "
+        print("  Start `ollama serve` whenever; Manjuel reconnects on the "
               "next turn.\n")
     elif not sess.preflight():
         wire.emit("error", text="preflight failed; see the text above")

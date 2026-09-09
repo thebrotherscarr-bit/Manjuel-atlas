@@ -71,6 +71,66 @@ def set_ground(path) -> Path:
     return ROOT
 
 
+USAGE = """Manjuel -- local multi-agent pipeline
+
+  python manjuel.py                       the REPL, on this ground
+  python manjuel.py --headless            the same sitting over stdin/stdout,
+                                          JSON lines (PROTOCOL 1)
+  python manjuel.py --ground <path>       either door, sitting INSIDE a world:
+                                          its own agents/, skills/, sessions/,
+                                          logs/ -- the origin's record untouched
+
+  --help, -h                              print this and exit
+  --version, -V                           print the version and exit
+
+Nothing here opens a sitting. --help and --version read no ground, load no
+model and write no record."""
+
+# The whole vocabulary, spelled once. --ground takes a value; the rest are bare.
+_FLAGS_WITH_VALUE = (GROUND_FLAG,)
+_BARE_FLAGS = ("--headless", "--help", "-h", "--version", "-V")
+
+
+def read_argv(argv) -> str:
+    """What the operator asked for: repl | headless | help | version.
+
+    REFUSES BY NAME anything it cannot read, because the entry point was the
+    one door in this estate that did not. It accepted any argv and did the
+    default, so `--help` opened a sitting and loaded models, `--heedless`
+    silently gave the interactive REPL instead of the headless door, and
+    `--gound worlds/x` silently ran on the estate's own record instead of the
+    world he named. An unknown flag is never a request to do the default
+    thing; it is a typo or a misunderstanding, and both deserve to be named.
+
+    Pure: reads no ground, opens nothing, and is what the strokes hold.
+    """
+    argv = list(argv or [])
+    known = set(_FLAGS_WITH_VALUE) | set(_BARE_FLAGS)
+    mode = "repl"
+    i = 0
+    while i < len(argv):
+        a = argv[i]
+        name = a.split("=", 1)[0]
+        if name not in known:
+            raise ValueError(
+                f"{a!r} is not a flag this door knows. It reads: "
+                f"{', '.join(sorted(known))}. Nothing was opened.")
+        if "=" in a and name not in _FLAGS_WITH_VALUE:
+            raise ValueError(
+                f"{a!r} takes no value. It reads: "
+                f"{', '.join(sorted(known))}. Nothing was opened.")
+        if name in ("--help", "-h"):
+            return "help"
+        if name in ("--version", "-V"):
+            mode = "version" if mode != "help" else mode
+        elif name == "--headless":
+            mode = "headless" if mode == "repl" else mode
+        if name in _FLAGS_WITH_VALUE and "=" not in a:
+            i += 1                      # its value is not a flag
+        i += 1
+    return mode
+
+
 def ground_from_argv(argv) -> Path | None:
     """`--ground <path>` or `--ground=<path>` from an argv, else None.
 
@@ -1141,7 +1201,7 @@ def _cmd_chat(sess: Session, arg: str = "") -> None:
                          drift=DriftChecker(sess.runtime, EMBED_MODEL))
         except (Aborted, Refused) as exc:
             spoken = f"I stopped. {exc}"
-            print(f"  chain: {spoken}")
+            print(f"  manjuel: {spoken}")
             try:
                 voice.speak(spoken)
             except voice.VoiceError:
@@ -1725,7 +1785,7 @@ def main() -> int:
     if ground is not None:
         set_ground(ground)
 
-    print("\nChain -- local multi-agent pipeline")
+    print("\nManjuel -- local multi-agent pipeline")
     if ground is not None:
         print(f"  ground: {ROOT}")
 
@@ -1741,7 +1801,7 @@ def main() -> int:
     # skills are not, and the CLI recovers the moment the rack appears.
     if not sess.rack_check():
         print("\n  RACK UNREACHABLE — the ground is open, the models are not.")
-        print("  Start `ollama serve` whenever; the chain reconnects on the "
+        print("  Start `ollama serve` whenever; Manjuel reconnects on the "
               "next turn.\n")
     elif not sess.preflight():
         return 1
