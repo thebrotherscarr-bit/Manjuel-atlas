@@ -34,6 +34,41 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since v0.1.4 (63fab9e, 2026-09-04 08:21)
 
+### 2026-09-09 — THE CHAT IS A CONVERSATION; THE RUN IS ON EVALS (operator: "this looks like the evals loops. lets put it there, rebuild the chat page clean"). atlas only; Manjuel untouched.
+- **The split.** Chat shows what he said, what came back, and ONE line of what
+  is happening while it streams. The waterfall -- every seat, every tool, every
+  result, the per-seat table and the transcript -- moved to Evals, which is
+  where a run is judged. Both pages read the same `Run` object (`council.js`),
+  so they cannot tell different stories about the same turn.
+- **What Chat may never hide, however clean it gets.** The delivery's own
+  `failures` are shown red, on the answer's face, NOT behind the "what ran"
+  toggle -- an answer that ran on a failed tool says so or the page is lying by
+  omission (LAW 5). Same for OUT OF TIME and for any dropped events. A question
+  from the council renders as a gate bubble with a form field; no prompt(), no
+  default, no guess (RULE 6). No engine open is a disabled box with the reason.
+- **A NIL-CHANNEL DRAIN DEADLOCKED THE END OF EVERY TURN.** Caught by watching
+  one: the delivery landed, the answer was on screen, and the page still read
+  `running` at 48s. `/run/stream` sets its event channel to nil when it closes
+  (the idiom that stops a closed channel spinning a select), then the shutdown
+  path did `for ev := range frames` -- and RANGING A NIL CHANNEL BLOCKS FOREVER.
+  `stream_end` was never sent and the handler goroutine leaked, once per turn.
+  The drain is now guarded.
+- **The run survives the walk to Evals.** The `inspect` link was a plain href,
+  so it reloaded the page and took the in-memory run with it -- the inspection
+  page showed "No run yet" seconds after a delivery. The link now navigates
+  in-app, and the turn is additionally kept in sessionStorage (per tab, this
+  viewer's browser, sent nowhere) so a reload or a hard landing on /evals still
+  has the evidence. Over quota, the turn is kept WITHOUT its events and says so
+  on its face rather than reading as a run that did almost nothing.
+- Fixed: `[hidden]` is a UA rule and loses to any class selector, so the Cancel
+  button stayed up after every turn ended; a CSS hex escape rendered as a
+  control character; the meta line wrapped the answer bubble narrow.
+- Proven live in the glass against a real rack: streaming answer with
+  `Steward · llama3.2:latest · 39.0s` beneath it, delivered at 53.4s with 248
+  events kept, then `inspect` carrying the whole turn to Evals -- run, seats,
+  the drift note, two resting seats, the DELIVERY with its law-chain line, and
+  the seat table showing Router skipped.
+
 ### 2026-09-09 — THE CHAT REACHES THE COUNCIL (operator: "align the system, make this atlas control plane modern. start simple, chat capabilities"). atlas only; Manjuel untouched.
 - **/chat now opens on the estate, not on one model.** `chat_send` reaches a
   single voice through `rack.Ask`. The chat page now sends an OBJECTIVE into the
