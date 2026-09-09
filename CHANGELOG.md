@@ -34,6 +34,37 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.6 (23a6a38, 2026-09-09 12:00)
 
+### 2026-09-09 — A DATE IS NOT A FABRICATED QUANTITY (operator: "let's make sure dates and numbers wont destroy the guard for any reason")
+- **The guard was firing on true statements.** The number guards exist to catch
+  a seat INVENTING a quantity, and they have earned it: "34 markdown files" for
+  a listing of 37 (sitting 96), "260 seconds total" from nowhere (sitting 95),
+  "35" and then "36" for a true 37 on 2026-09-08 and 2026-09-09. Then the
+  standup failed a seat for saying `Wednesday 09 September 2026, 12:15 (local)`
+  and blocked a tag over it. The seat was telling the truth: the clock reaches
+  it through its BRIEF, and the harness sources numbers only from tool results
+  and the objective, so no answer that says what time it is could ever pass.
+- **A guard that cries wolf is a guard that gets ignored, and an ignored guard
+  catches nothing.** That is how a lie-detector is destroyed -- not by being
+  switched off, but by being unreadable.
+- **The fix is SHAPE, not loosening.** `cli.CLOCK_SHAPES` / `cli.without_clock`
+  blank numbers written as a date or a clock -- ISO with or without time,
+  `09/09/2026`, `12:15:30`, `3:04 pm`, `09 September 2026`, `September 9, 2026`
+  -- before judgement. Everything else is judged exactly as before. A bare
+  four-digit number is deliberately NOT exempt: 1858 is a stroke count.
+- **ONE DEFINITION, IN THE CORE, USED BY BOTH.** `cli._unsourced` (live, on the
+  brief) and the standup's `unsourced_numbers` already differed in what counts
+  as a source; they will not also differ in what a date looks like. The harness
+  imports the core's.
+- **The sources keep their dates.** Only what is JUDGED is stripped, so a date a
+  tool returned still grounds a number in the delivery.
+- **The fault now quotes the phrase.** `15, 2026` was a mystery to investigate;
+  `2026 in '...Wednesday 09 September 2026, 12:15 (local)...'` is judged at a
+  glance, and a guard whose firings can be judged at a glance stays trusted.
+- **Twelve strokes pin it**, and their real job is the second half: every number
+  the record ever caught -- 34, 35, 36, 260 -- is asserted to still fire. A hand
+  that widened either guard to buy a green gate would turn those red.
+  1870/1870 strokes, 60/60 smoke.
+
 ### 2026-09-09 — THE MIC: PROTOCOL 1 gains a fifth command (operator: "i can click the little mic icon, ask it for some stuff"; "i have the whisper stuff set up already ... in the REPL it's a local thing that works")
 - **Nothing was built to hear.** `manjuel/voice.py` already holds it: compiled
   whisper.cpp on `ggml-base.en.bin`, offline, with room calibration, the estate

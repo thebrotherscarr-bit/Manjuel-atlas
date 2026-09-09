@@ -2422,6 +2422,37 @@ def test_the_p0_of_the_review(reg, lib, book):
           _su.unsourced_numbers("37 files, in 3 groups", ["37 entries"], "") == [])
     check("a number the operator typed is his, not invented",
           _su.unsourced_numbers("sitting 94 is open", [], "close sitting 94") == [])
+
+    #    A DATE IS NOT A FABRICATED QUANTITY. The clock reaches a seat
+    #    through its brief, which the harness never sees, so this guard
+    #    failed a seat for saying "Wednesday 09 September 2026, 12:15"
+    #    (2026-09-09) and blocked a tag over it. A guard that fires on
+    #    true statements gets ignored, and an ignored guard catches
+    #    nothing. The exemption is by SHAPE, and the strokes below exist
+    #    to prove it did not become a hole.
+    for said in ("Wednesday 09 September 2026, 12:15 (local) is the current time.",
+                 "The current moment is Wednesday, September 9, 2026, 11:43 local time.",
+                 "started 2026-09-09T12:15:30 and ended 2026-09-09 12:16",
+                 "on 09/09/2026 at 3:04 pm"):
+        check(f"a date or a clock is not judged: {said[:34]!r}",
+              _su.unsourced_numbers(said, [], "") == [],
+              str(_su.unsourced_numbers(said, [], "")))
+
+    #    ...AND EVERY NUMBER THE RECORD EVER CAUGHT IS STILL CAUGHT.
+    #    A widened guard shows up here as a red.
+    for said, results, want, when in (
+            ("The skills directory contains 34 files in 3 groups.", ["37 entries"], "34", "sitting 96"),
+            ("The skills directory contains 36 markdown files.", ["37 entries listed"], "36", "2026-09-09"),
+            ("35 markdown files", ["37 entries listed"], "35", "2026-09-08"),
+            ("260 seconds total", [], "260", "sitting 95")):
+        got = _su.unsourced_numbers(said, results, "")
+        check(f"the catch of {when} still fires ({want})", got == [want], str(got))
+    check("a bare year is NOT exempt -- 1858 is a stroke count, not a date",
+          _su.unsourced_numbers("1858 strokes and 2026 things", [], "") == ["1858", "2026"],
+          str(_su.unsourced_numbers("1858 strokes and 2026 things", [], "")))
+    check("a date a TOOL returned still sources its numbers",
+          _su.unsourced_numbers("the log says 2026-09-09 and 37 files",
+                                ["2026-09-09", "37"], "") == [])
     o4 = _su.Outcome(case=next(c for c in _su.CASES if c.name == "a folder"))
     o4.seats = ["Router", "Steward"]; o4.tools = ["ground_list"]; o4.notes = ["law: ok"]
     o4.results = ["37 entries"]; o4.delivery = "The skills directory contains 34 files."
@@ -2515,6 +2546,15 @@ def test_the_p0_of_the_review(reg, lib, book):
           "0917c6d4a" in got3 and "87" in got3, str(got3))
     check("a hash the facts carry passes, even abbreviated",
           _unsourced("we are at f1da1a4 with 16 changed", facts) == [])
+    #    The live guard shares ONE definition of a date with the standup's
+    #    (cli.without_clock), so the two can never disagree about what a
+    #    date looks like.
+    check("the door may say what day it is",
+          _unsourced("It is Wednesday 09 September 2026, 12:15.", facts) == [],
+          str(_unsourced("It is Wednesday 09 September 2026, 12:15.", facts)))
+    check("...and an invented hash beside a true date is still named",
+          _unsourced("on 2026-09-09 we were at 0917c6d4a", facts) == ["0917c6d4a"],
+          str(_unsourced("on 2026-09-09 we were at 0917c6d4a", facts)))
 
 
 def test_the_sitting_story(reg, lib, book):

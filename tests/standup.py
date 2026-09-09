@@ -138,13 +138,28 @@ def unsourced_numbers(delivery: str, results: list[str], objective: str = "") ->
     sitting 95: "260 seconds total" from nowhere. A number a seat did not
     read it invented. Small integers (0-12) are words in prose ("three
     seats", "one model") and are not judged; a number in the objective is
-    the operator's and is not judged either."""
+    the operator's and is not judged either.
+
+    A number written as a DATE or a CLOCK is not judged. The clock reaches
+    a seat through its brief, which this harness never sees, so without
+    that exemption no answer stating the time could ever pass -- and it
+    duly failed one that said "Wednesday 09 September 2026, 12:15". A
+    guard that fires on true statements is a guard that gets ignored, and
+    an ignored guard catches nothing. cli.without_clock holds the single
+    definition of that shape, shared with the live guard.
+    """
     have = set()
     for r in results:
         have |= numbers_in(r)
     have |= numbers_in(objective)
     out = []
-    for n in sorted(numbers_in(delivery)):
+    # THE SOURCES KEEP THEIR DATES; only what is JUDGED is stripped. The
+    # clock reaches a seat through its brief, which this harness never
+    # sees, so without this no answer that says what time it is could
+    # ever pass -- and a guard that fires on true statements gets
+    # ignored. cli.without_clock is the single definition of that shape,
+    # shared with the live guard so the two cannot drift.
+    for n in sorted(numbers_in(cli.without_clock(delivery))):
         try:
             if float(n) <= 12:
                 continue
@@ -153,6 +168,16 @@ def unsourced_numbers(delivery: str, results: list[str], objective: str = "") ->
         if n not in have:
             out.append(n)
     return out
+
+
+def where(text: str, number: str, span: int = 34) -> str:
+    """The phrase a flagged number sits in, so a human can judge it fast."""
+    i = (text or "").find(number)
+    if i < 0:
+        return number
+    a, b = max(0, i - span), min(len(text), i + len(number) + span)
+    return (("..." if a else "") + " ".join(text[a:b].split())
+            + ("..." if b < len(text) else ""))
 
 
 @dataclass
@@ -214,8 +239,13 @@ def _judge(o: Outcome, live: bool = True) -> None:
         # THE NUMBER CHECK: a number in the delivery from no tool result.
         made_up = unsourced_numbers(o.delivery, o.results, c.objective)
         if made_up and not o.refused:
-            o.faults.append(f"numbers in the delivery that no tool returned: "
-                            f"{', '.join(made_up[:6])}")
+            # QUOTE THE PHRASE, not just the digits. "15, 2026" reads as a
+            # mystery to be investigated; "...2026, 12:15 (local)..." is
+            # judged at a glance. A guard whose firings can be judged at a
+            # glance is a guard that stays trusted.
+            o.faults.append("numbers in the delivery that no tool returned: "
+                            + "; ".join(f"{n} in {where(o.delivery, n)!r}"
+                                        for n in made_up[:6]))
     o.ok = not o.faults
 
 
