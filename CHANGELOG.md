@@ -35,6 +35,37 @@ hand that iterates without updating this file is out of line.
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
 
+### 2026-09-09 — THE DASHBOARD SEES THE REPOSITORY AND THE SITTINGS, AND THE COMMIT GOES THROUGH THE COUNCIL (operator: "the dashboard needs to see the sessions, the engine being open, and the git status/commit/push flow")
+- **`git` is a door tool, not an engine call.** "Is my tree dirty" is what he
+  asks BEFORE deciding to boot anything, and a panel that needs an engine to
+  answer it cannot answer it. Branch, head, subject, dirty counts, the changed
+  files, upstream and ahead/behind. Every git call closes its own stdin -- the
+  fault that cost 5s a call in the core this morning inherits the same way in Go.
+- **GREEN IS SILENCE holds here too:** a clean tree level with its upstream is
+  one line. The card grows only for uncommitted work or commits not yet pushed.
+- **COMMIT GOES THROUGH THE COUNCIL, not around it.** The button fires an
+  objective, so the sealed law gate stamps it, the Router runs `git_commit`,
+  the dedup applies and the run lands in the record like any other turn. A
+  button that shelled out to git would be a second write-path past everything
+  this estate checks. Proven live: Commit -> `git_commit`, `git_status` ->
+  committed, tree clean, and the panel followed the turn.
+- **THE WALL IS NAMED PRECISELY.** The core walls push and pull behind
+  MANJUEL_GIT_REMOTE, and that is SEPARATE from being authenticated -- `gh` is
+  logged in as thebrotherscarr-bit and push works from a shell. The panel says
+  which of the two is closed, by name, instead of failing and leaving him to
+  wonder whether his credentials broke.
+- **Fixed by reading the record rather than guessing at phrasing.** The first
+  commit button said "Commit the working tree with this message: X" and the
+  Router passed that WHOLE SENTENCE as the message -- a commit titled after its
+  own instruction (`30dc7fe`, left standing as the evidence). sessions.jsonl
+  shows the operator says **"git commit"**, 36 times, and lets the estate
+  compose. The button now speaks that way, with a quoted message when he types
+  one: `582181c` came out as exactly what was typed.
+- **The sittings strip**, from `proofs`: 107 sittings, 79 tolled, 730 runs --
+  and **22 never closed**, which the recent-twelve view had been hiding. Those
+  are sittings whose last line has no `ended`: a REPL or an engine that died
+  without writing one.
+
 ### 2026-09-09 — THE SEATS PAGE READS THE SEATS (operator: "lets look at that, fill in the info that is already existing")
 - **Third and last instance of the same fault.** The Agents page listed the
   webapp's own SQLite table -- `{"agents":[],"count":0}` -- on a ground holding
