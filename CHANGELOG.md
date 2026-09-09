@@ -35,6 +35,38 @@ hand that iterates without updating this file is out of line.
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
 
+### 2026-09-09 — THE WALL IS OPEN AND THE COUNCIL PUSHES ITS OWN WORK (operator: "pull that wall and push it out to the repo")
+- **The wall is his and he opened it.** `MANJUEL_GIT_REMOTE=1` lives in the
+  ground's `.env` -- gitignored, never printed (RULE 7), written with the reason
+  and the date and his words beside it.
+- **A DEAD DIAL, FOUND ON THE WAY IN.** `__init__.py` carries `CHAINKIT_*` to
+  its `MANJUEL_*` twin AT IMPORT, so it sees only what the shell held before the
+  process started -- and `.env` is read LATER, in cli.main and serve.main.
+  Measured: `CHAINKIT_GIT_REMOTE=1` in a .env was applied by dotenv and its twin
+  was still unset. The dial did nothing. And `.env.example` documented exactly
+  those names, so following the estate's own example file was the way to produce
+  it. The shim's own comment says why that matters: "a dial that silently stops
+  working is worse than one that is gone." The carry is now callable and called
+  again after each door reads .env; it only writes an unset twin, so running it
+  twice costs nothing. `.env.example` names the dials the code actually reads.
+- **THE DOOR WAS READING THE WALL IN THE WRONG PLACE.** The panel said the wall
+  was shut while the council pushed straight through it -- both true about
+  different things: the flag is in the GROUND's .env, which the Python engine
+  loads, and atlas-mcp is a separate Go process whose environment never saw it.
+  It now reads the same two places in the engine's own precedence (a shell
+  variable wins over a line in the file, per dotenv.load) and honours the old
+  twin. One key looked up, a boolean reported: no value is returned or logged.
+- **`master` -> `main`.** `git push` refused honestly: "the upstream branch of
+  your current branch does not match the name of your current branch." The
+  remote's default has always been `main` and the local branch was `master`,
+  which is why every push this session went `master:main` by hand. Renamed, and
+  the upstream set, so a plain `git push` works -- which is what the council
+  runs.
+- **Proven end to end: the estate commits and pushes its own work.**
+  `git commit: "..."` -> git_status, git_commit, ok. `git push` -> git_status,
+  git_push, ok. `79c8247` is on the remote, local and origin level, and the
+  repo carries no .env, no vault file and no attribution.
+
 ### 2026-09-09 — THE DASHBOARD SEES THE REPOSITORY AND THE SITTINGS, AND THE COMMIT GOES THROUGH THE COUNCIL (operator: "the dashboard needs to see the sessions, the engine being open, and the git status/commit/push flow")
 - **`git` is a door tool, not an engine call.** "Is my tree dirty" is what he
   asks BEFORE deciding to boot anything, and a panel that needs an engine to
