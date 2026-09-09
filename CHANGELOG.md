@@ -34,6 +34,60 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — THE LAUNCHPAD REPAINTS, AND THE PROOFS IT ALREADY FETCHED REACH THE GLASS (operator: "you just built the whole thing and never landed it on the dashboard or anywhere in the webapp"; "just stale from when you were doing the git commit/status/push work earlier")
+- **HE READ SOMETHING UNTRUE OFF THIS PAGE.** He said a sitting was open; it was
+  not. Three sources agreed it had closed at 14:32:58 — `sessions.jsonl`'s last
+  line for n=110, the engine's own `open:false`, and `proofs`' record. The page
+  was right when it was painted and had NEVER BEEN PAINTED AGAIN. `render()`
+  read once; the only interval in the file was the elapsed-seconds ticker that
+  runs during a turn. Leave the tab open across an afternoon and the brief, the
+  engine card, the repository and the sittings all show the estate as it stood
+  when the tab was opened.
+- **IT REPAINTS.** Every 15s while the dashboard is the page on screen — paused
+  while the tab is hidden (a background tab must not keep waking the rack),
+  refreshed the instant it comes back, which is the moment he looks at it, and
+  released the moment he routes away, guarded on the element the page actually
+  writes into. Measured: a 15.0s gap between unattended reads; interval and
+  visibility hook both let go on a route to /chat and both return on the way
+  back.
+- **AND IT CONFESSES.** Every read is stamped, and past a minute the page says
+  "Nothing has been read since … Everything below is that old" above whatever
+  it is showing. CAUGHT IN TESTING, in my own first cut: that check sat inside
+  the quiet branch, so a page showing ROWS — which is exactly what he read —
+  could be an hour old and never admit it. Judged once now, above both paths.
+  The stale rows still render: old facts plus "these are old" beats hiding them,
+  because half of them are still true and he can see which.
+- **PROOFS WAS FETCHED AND THROWN AWAY.** The tool served four things — suites,
+  standups, parity, record — and the launchpad rendered the record. The suites'
+  verdict, the thing that says the estate is sound, was read over the wire and
+  dropped on the floor, and so was the standup he runs by hand every sitting.
+  The brief now speaks when a suite is red, when one did not finish, when the
+  last standup failed, and when a GREEN verdict predates the code it claims to
+  prove. Green stays silent. And proofs is asked for once per paint, not twice.
+- **TWO CLOCKS, AND THE GUARD REFUSES RATHER THAN GUESSES.** `suites.*.at` is
+  epoch SECONDS from the Python suites; `code_changed` is an RFC3339 STRING from
+  Go. `ms()` normalises both and returns null for anything it cannot read, and
+  the staleness comparison is SKIPPED whenever either side is null — an
+  unreadable clock must not manufacture a red row. Proven against ten forms:
+  seconds and milliseconds land on the same instant, RFC3339 parses, and empty,
+  null, NaN, zero, negative and two kinds of prose all come back null and
+  silent.
+- **FOUND, NOT FIXED (reported instead, RULE 10):** atlas serves 71 tools and
+  the webapp names 38. Thirty-three were built and never landed anywhere — the
+  record and the law (`read_handoffs`, `read_doctrine`, `read_plan`, `memory`,
+  `remember`, `ask_steward`, `get_in_line`, `check_the_wall`, `list_doctrine`),
+  the rack (6), the mesh (6), keys and tenants (7), and three cancels. Also: the
+  sittings strip's head paints `22 never closed` in red with no time word on it,
+  directly under the current sitting; it counts every sitting in ALL of history
+  that was killed rather than exited, and it reads as a live alarm.
+- Proven: `go build` + `go vet` clean, `node --check` on home.js, and the shipped
+  code driven against doctored inputs in the running page — red suite, unfinished
+  suite, failed standup, stale-but-green, red-and-stale-together (the red wins,
+  the stale row does not pile on), and proofs missing entirely (silent). The
+  webapp is go:embed, so it was rebuilt and restarted; no file in `manjuel/`
+  moved and no engine restart is required.
+
+
 ### 2026-09-09 — THE DOCS SAY MANJUEL AND ATLAS (operator: "needs to all be reconciled for the manjuel-merger. remove the chainkit references, as well. just manjuel and atlas from here on out.")
 - **180 lines renamed across the live docs.** Three passes: the root docs
   (50 lines), the bare `chain`/`chain's` the first pass required a "the" to
