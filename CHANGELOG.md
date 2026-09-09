@@ -34,6 +34,52 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since v0.1.4 (63fab9e, 2026-09-04 08:21)
 
+### 2026-09-09 — THE CHAT REACHES THE COUNCIL (operator: "align the system, make this atlas control plane modern. start simple, chat capabilities"). atlas only; Manjuel untouched.
+- **/chat now opens on the estate, not on one model.** `chat_send` reaches a
+  single voice through `rack.Ask`. The chat page now sends an OBJECTIVE into the
+  world's own Manjuel process, so the sealed law gate stamps it before any model
+  reads a word, the one Router executes the tools, the dedup refuses a repeat and
+  the recompose puts every failure in the delivery. The voice path is one click
+  away and unchanged -- it is still right for a quick question at one seat.
+- **Every engine event escapes LIVE.** `engine.pump` handed out `token` events as
+  they arrived and held everything else -- the law stamp, each seat waking, every
+  tool call and result, the notes -- until the turn ended, so a glass could show
+  a cursor and then an answer but never the council working. The callback is now
+  a sink over EVERY event, fired the instant the line is read. `Result` keeps its
+  exact old shape and its `KeptEvents` bound: the sink streams, `Result`
+  remembers, and the two do not trade places.
+- **`GET /run/stream` and `GET /run/state`** on the door, proxied by the webapp as
+  `/api/council/stream` and `/api/council/state` -- byte-for-byte, exactly as
+  `StreamChat` already proxies `/chat/stream`. The webapp owns no council logic.
+- **ONE SSE frame name, earned by running it.** The first cut named each frame
+  after the engine's event kind; the stream emitted `seat` and `report` and the
+  glass showed neither, because EventSource fires only listeners it was given a
+  name for and has no wildcard. A client that must enumerate the vocabulary in
+  advance silently loses every event the core adds later -- and on a surface whose
+  whole claim is "this is what actually ran", a dropped event is indistinguishable
+  from nothing having happened. Every engine event now rides `event: engine` with
+  the kind inside; the handler's own frames are named apart (stream_open,
+  stream_end, stream_error) so they cannot be confused with the core's `refused`.
+- **The gate is a form field.** A `needs_answer` renders the council's question
+  with an answer box wired to `run_answer`. No prompt(), no default, no guess.
+- **The send box refuses honestly.** `/run/state` says whether an engine is even
+  standing, so a closed world is a disabled button with a reason rather than a
+  turn that fails. The glass never opens an engine on its own: that would open a
+  sitting the operator never opened, and the sitting line is the lock.
+- Fixed while watching it: navigating away mid-turn orphaned the EventSource and
+  left the page stuck `running`, so the Run button never came back; and Enter did
+  not send, because a form's implicit submit is not reliable in every host.
+- Proven live in the glass against a real rack: the Router deciding by arithmetic,
+  `ground_read` firing and returning green, tokens streaming under the seat that
+  spoke them, and a delivery at 14.9s carrying the law-chain line, the per-seat
+  table and the recompose's own note that a seat "recited the conversation
+  scaffold instead of answering -- discarded".
+- NOT DONE, and named rather than quietly skipped: the Cloudflare Agents SDK the
+  request came through cannot land in this ground. It is Workers and Durable
+  Objects -- someone else's server, which RULE 4 forbids. Its PATTERNS are what
+  landed here on local rails: streamed events, live state to the client, and a
+  human-in-the-loop gate.
+
 ### 2026-09-09 — THE VIBE CODING LOOP: a `run` node, a rendered gate, a walk away (operator: "site up my vibe coding loop with atlas"). atlas only; Manjuel untouched.
 - **`run` is a flow node kind.** `flow.Kinds` gains `run`; a `run` node drives
   a whole Manjuel turn through `councilEngine.Turn` -- the law gate, the one
