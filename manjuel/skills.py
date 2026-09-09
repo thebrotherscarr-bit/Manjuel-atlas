@@ -585,7 +585,18 @@ def _ground_list(env: SkillExecutionEnv, args: dict) -> str:
         else:
             files.append(f"  {item.name}  ({item.stat().st_size:,} bytes)")
     where = rel or "the ground"
-    return (f"Contents of {where}, live from disk (read-only):\n"
+    # THE TOTAL IS PART OF THE RESULT. Without it the closing seat counts
+    # the lines itself, and on 2026-09-08 and 2026-09-09 it counted 35 and
+    # 36 against a true 37 -- twice blocking a tag, because the standup's
+    # number guard rightly refuses a figure no tool returned. A number a
+    # seat can QUOTE cannot be miscounted. It counts what is LISTED: the
+    # filters above drop secrets and protected items, and a total that
+    # included them would not reconcile against the lines beneath it.
+    n = len(dirs) + len(files)
+    tally = (f"{n} entr{'y' if n == 1 else 'ies'} listed "
+             f"({len(dirs)} folder{'' if len(dirs) == 1 else 's'}, "
+             f"{len(files)} file{'' if len(files) == 1 else 's'})")
+    return (f"Contents of {where}, live from disk (read-only) -- {tally}:\n"
             + "\n".join(dirs + files))
 
 
