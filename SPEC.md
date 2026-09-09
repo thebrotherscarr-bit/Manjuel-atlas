@@ -171,7 +171,7 @@ are the whole remaining distance.
 - MET — every run a transcript; every sitting a ledger line and a toll (unattended closes now write their line); CHANGELOG from sitting 1; DAYBOOK per session; HANDOFF per day.
 - OPEN — the client token is still in 12 log filenames, `sessions.jsonl`, the index and the git pack (names, not contents). The scrub reached SEAT_LOG only.
 - OPEN — the two-terminator state: 144 tracked text files LF, 14 CRLF, one MIXED. The ruling is CRLF; the disk is not. Decision (renormalize, or rule LF) is the operator's; then a stroke.
-- OPEN — SEAT_LOG numbering has 11 gaps and 5 unmarked duplicates from before the ledger was fixed. Record, not defect; noted so nobody "fixes" it by rewriting (LAW 1).
+- OPEN — SEAT_LOG numbering has **13 gaps and 11 unmarked duplicates** as of 2026-09-09 (gaps: 1, 2, 5, 6, 15, 16, 20, 33, 34, 36, 43, 97, 99 -- 97 and 99 are the newest, both sittings that closed untolled; duplicated numbers: 22, 26, 40, 42, 57, 60, 61, 63, 64, 79, 85, and nothing in the file marks any of them, so all eleven are unmarked). Record, not defect; noted so nobody "fixes" it by rewriting (LAW 1). THE COUNT MOVES whenever a sitting closes untolled, so it carries its date and the way to recompute it rather than a bare number that rots: read the `## <date> - sitting N -` headings out of SEAT_LOG.md, and compare the set against 1..max. It read "11 and 5" for days after it stopped being true.
 
 ### 4.6 Proof
 - MET — the strokes and the smoke checks, offline, every model stubbed; their counts are READ from `tests/last_run.json` (invariant 10 -- this line carried "1685" until 2026-09-08 and was wrong the same day); `law.py --prove` 9/9; `us.py` reconciles 51 records; the standup harness proves dry 10/10.

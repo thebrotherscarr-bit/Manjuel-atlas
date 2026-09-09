@@ -32,7 +32,28 @@ hand that iterates without updating this file is out of line.
 
 ---
 
-## Unreleased — since 0.1.6 (23a6a38, 2026-09-09 12:00)
+## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
+
+Nothing yet.
+
+---
+
+## 0.1.7 — 2026-09-09 13:22 (tag on b22bf81)
+
+THE DASHBOARD LOADS THE CLI AND SHOWS IT WORKING -- the operator's own
+words on cutting this. He no longer runs a REPL: Boot on the glass closes
+the sitting, opens a fresh engine, warms the pipeline's models and prints
+boot.report() whole. He speaks to it through the core's own compiled
+whisper. He watches each seat stream under its own name, and the run --
+every seat, model, tool, drift and the transcript -- lands on Evals beside
+what the estate has actually proved, all of it read from the record.
+
+Underneath: PROTOCOL 1 gained `listen` (a fifth command) and `command` (a
+seventh terminal), the second because every /command hung the wire forever
+and nothing had noticed -- the REPL loops back to its prompt and never had
+to know a turn was over. And the number guards stopped firing on true
+statements: a date is not a fabricated quantity, and a guard that cries
+wolf is a guard that gets ignored.
 
 ### 2026-09-09 — THE TOOLS ARE FILLED IN, AND THE SKILLS NAMED (operator: "let's fill in the tools and add the skills used, as well"; "we know the tools used from the ollama and other model reports")
 - He was right that the data was already on the wire and the page was throwing
@@ -193,7 +214,15 @@ hand that iterates without updating this file is out of line.
 
 ---
 
-## 0.1.6 — 2026-09-09 12:00 (tag on 23a6a38)
+## 0.1.6 — 2026-09-09 12:00 — BUILT, NOT TAGGED (superseded by 0.1.7 the same day)
+
+Never sealed, and the record says why rather than leaving a heading that
+promises a tag nobody cut. The release gate refused at 23a6a38 -- the live
+standup was 9/10 there -- so a tag on that commit would have claimed a
+proof that does not exist. By the time the gate passed, PROTOCOL 1 had
+gained a fifth command and a seventh terminal event, which is a
+wire-contract change and not a point release of a frontend. 0.1.5 stands
+the same way, a few sections down.
 
 THE FRONTEND. The operator, on cutting this: "we have a working frontend
 now." atlas's glass reaches the council over the engine's own wire -- an

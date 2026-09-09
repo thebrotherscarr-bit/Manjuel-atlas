@@ -15,7 +15,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "manjuel"
-version = "0.1.6"
+version = "0.1.7"
 description = "A local multi-agent harness that refuses to land anything."
 readme = "README.md"
 requires-python = ">=3.10"
