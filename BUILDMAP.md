@@ -18,24 +18,25 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 |---|---|---|---|
 | def | `carry_old_dials` | 10-31 | Map any CHAINKIT_* to its MANJUEL_* twin. Idempotent: only an |
 
-### manjuel/boot.py — 359 lines
+### manjuel/boot.py — 420 lines
 
 *The boot report: what is actually here, before you ask for anything.*
 
 | kind | name | lines | says |
 |---|---|---|---|
-| def | `_rule` | 25-26 |  |
-| def | `_models` | 29-82 |  |
-| def | `suite_tally` | 85-140 | What the suites last proved, and WHEN -- read from the stamp they |
-| def | `_record` | 143-171 |  |
-| def | `_clip` | 191-193 |  |
-| def | `_last_toll` | 196-213 |  |
-| def | `_handoff_head` | 216-226 |  |
-| def | `_open_tasks` | 229-242 |  |
-| def | `_last_standup` | 245-258 |  |
-| def | `_arrivals` | 261-284 | Files in the workspace newer than the previous sitting's close. |
-| def | `brief_facts` | 287-325 | The brief's facts, one block, read off the record. |
-| def | `report` | 328-359 |  |
+| def | `_rule` | 27-28 |  |
+| def | `_models` | 31-84 |  |
+| def | `suite_tally` | 87-142 | What the suites last proved, and WHEN -- read from the stamp they |
+| def | `_record` | 145-173 |  |
+| def | `_clip` | 193-195 |  |
+| def | `_last_toll` | 198-215 |  |
+| def | `_handoff_head` | 218-228 |  |
+| def | `_open_tasks` | 231-244 |  |
+| def | `_last_standup` | 247-260 |  |
+| def | `_arrivals` | 263-286 | Files in the workspace newer than the previous sitting's close. |
+| def | `brief_facts` | 289-327 | The brief's facts, one block, read off the record. |
+| def | `_gate` | 330-385 | The release gate's verdict, from what can be READ. Never raises. |
+| def | `report` | 388-420 |  |
 
 ### manjuel/cli.py — 2022 lines
 
@@ -731,7 +732,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `GroundWatch.start` | 109-134 |  |
 | def | `GroundWatch.stop` | 136-142 |  |
 
-manjuel/: 28 files, 15552 lines.
+manjuel/: 28 files, 15613 lines.
 
 ## GUARDS — by the failure that earned them
 
@@ -749,8 +750,8 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 
 | line | in | marker |
 |---|---|---|
-| 113 | `suite_tally` | was reported as green to the operator (2026-09-02, twice in one |
-| 178 | `(module)` | The operator, 2026-09-07: the standup "needs to ... actually give me some |
+| 115 | `suite_tally` | was reported as green to the operator (2026-09-02, twice in one |
+| 180 | `(module)` | The operator, 2026-09-07: the standup "needs to ... actually give me some |
 
 ### manjuel/cli.py
 

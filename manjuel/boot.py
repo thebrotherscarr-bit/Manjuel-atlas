@@ -6,7 +6,9 @@ Four questions, answered from observation rather than assumption:
   RACK    what Ollama has, what this pipeline needs, what is loaded RIGHT NOW,
           and which of it belongs to somebody else
   RECORD  the index, the memory, the transcripts
-  GATE    git, and whether remote operations are permitted
+  GATE    git, whether remote operations are permitted, and the release
+          gate's nine checks (tests/release.py) -- so the ground says at
+          every boot whether it could be tagged, not only when one is cut
 
 Every section degrades on its own. If Ollama is unreachable the RACK section
 says so and the rest still prints -- a boot report that vanishes when one thing
@@ -325,6 +327,64 @@ def brief_facts(sess, ROOT: Path, git=None) -> list[str]:
     return out
 
 
+def _gate(ROOT: Path) -> list[str]:
+    """The release gate's verdict, from what can be READ. Never raises.
+
+    tests/release.py is the authority on every check; this asks the ones that
+    read a file and prints what it said. It re-judges nothing and counts
+    nothing of its own -- the same rule as the rest of this file.
+
+    SIX OF NINE, AND IT SAYS SO. buildmap and law each spawn a fresh python,
+    and manifest dials the rack. Measured 2026-09-09: all nine run in 1.4s
+    from a shell and NEVER RETURNED inside the engine -- two python processes
+    blocked for three minutes on 0.6 CPU seconds between them, and no engine
+    opened. atlas spawns this door with PROTOCOL 1 on its stdio and those
+    children inherit it. Whatever the exact hold, the shape is the fault: boot
+    is a door being opened under somebody, and spawning interpreters inside it
+    is fragile by construction. The three are named as not asked, with the
+    command that asks them; a report that checked six and implied nine would be
+    a number the record cannot prove.
+
+    LOADED BY PATH. tests/ has no __init__.py; it imports as a namespace
+    package, which works from the ground and is a coin-flip from anywhere else.
+    A boot report that dies on an import is worse than one that says the gate
+    could not be read.
+    """
+    import importlib.util
+
+    path = ROOT / "tests" / "release.py"
+    if not path.is_file():
+        return ["    gate     tests/release.py is not in this ground"]
+    try:
+        spec = importlib.util.spec_from_file_location("_release_at_boot", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        edited = mod.newest_edit(ROOT)
+        results = list(mod.suites(ROOT, edited))
+        results.append(mod.standup(ROOT, edited))
+        results.append(mod.spec(ROOT, None))
+        results.append(mod.daybook(ROOT))
+        results.append(mod.handoff(ROOT))
+    except Exception as exc:
+        # Every reason this can fail -- a missing file, an import error, a
+        # check that raises -- is one line, and the boot continues.
+        return [f"    gate     could not be asked ({type(exc).__name__}: {exc})"]
+
+    DEFERRED = "buildmap, law, manifest"
+    bad = [c for c in results if not c.ok]
+    if not bad:
+        return [f"    gate     {len(results)}/{len(results)} read here -- "
+                f"{DEFERRED} not asked (python tests/release.py --check)"]
+
+    out = [f"    gate     {len(results) - len(bad)}/{len(results)} read here -- "
+           f"REFUSED: {', '.join(c.name for c in bad)}"]
+    for c in bad:
+        out.append(f"      !! {c.name:9} {c.why}")
+    out.append(f"      .. {DEFERRED} not asked at boot -- "
+               f"python tests/release.py --check")
+    return out
+
+
 def report(sess, ROOT: Path, EMBED_MODEL: str, git=None) -> list[str]:
     live = [str(s) for s in sess.pipeline if not getattr(s, "when", None)]
     resting = len(sess.pipeline) - len(live)
@@ -350,6 +410,7 @@ def report(sess, ROOT: Path, EMBED_MODEL: str, git=None) -> list[str]:
     lock = gitstate.lock_state(ROOT) if g.is_repo else ""
     if lock:
         out.append(f"    !! {lock.splitlines()[0]}")
+    out += _gate(ROOT)
 
     # Voice is optional everywhere. Say what is available rather than leaving
     # the operator to discover a missing library mid-sentence.

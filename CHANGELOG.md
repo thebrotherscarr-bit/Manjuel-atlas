@@ -34,6 +34,67 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — THE GATE IS ASKED AT EVERY BOOT (operator: "wire the release gate into boot")
+- **`tests/release.py` was called by nothing.** Nine checks that read and never
+  write — strokes, smoke, buildmap, standup, the law chain, the manifest,
+  SPEC↔CHANGELOG, DAYBOOK's close, HANDOFF's day — and not prove.yml, not the
+  standup, not boot ever asked it. Its own first paragraph says what that is
+  worth: "a habit is a rule that has not failed yet."
+- **It reports under GATE**, beside git's wall, because GATE already means "may
+  this proceed"; the release gate answers the same question about the whole
+  ground. The file's contract at the top of boot.py names it.
+- **GREEN IS SILENCE.** Nine passing is ONE line. Anything refusing is named
+  with the reason the gate itself gave. Nothing here re-judges a check or
+  counts anything of its own — every line is release.py's own `why`, printed.
+- **IT WEDGED HIS DOOR, AND THAT IS WHY IT NOW READS ONLY.** The first cut
+  asked all nine. From a shell that is 1.4s -- suites 0.00, standup 0.00,
+  buildmap 0.68, law 0.12, manifest 0.55, spec 0.05, daybook 0.00, handoff
+  0.00. INSIDE THE ENGINE it never returned: two python processes sat for three
+  minutes on 0.6 CPU SECONDS between them -- blocked, not working -- and no
+  engine opened at all. The engine is not a shell. atlas spawns it with
+  PROTOCOL 1 on its stdio, and release.py runs `buildmap.py --check` and
+  `law.py --prove` through subprocess.run, whose children inherit that stdin.
+  Whatever the exact hold, the SHAPE is the fault: boot is a door being opened
+  under somebody, and spawning two interpreters and dialling the rack inside it
+  is fragile by construction. The one thing this section was required never to
+  do is stop the boot, and it did.
+- **SO IT ASKS THE SIX IT CAN READ OFF THE DISK** -- the two suite stamps, the
+  standup line, SPEC vs CHANGELOG, DAYBOOK's close, HANDOFF's day; every one
+  0.05s or less, **0.058s for all six**, no child process and no network. The
+  three that need a spawn or the rack are NAMED AS NOT ASKED with the command
+  that asks them: a report that checked six and implied nine would be the same
+  lie this estate keeps finding, a number the record cannot prove.
+- **It cannot break boot.** Loaded BY PATH (`tests/` has no `__init__.py` -- it
+  imports as a namespace package, which works from the ground and is a
+  coin-flip from anywhere else), and every failure -- missing file, import
+  error, a check that raises -- becomes one honest line while the rest of the
+  report prints.
+- **It proved itself immediately.** The first run after wiring read
+  `5/9 -- REFUSED: strokes, smoke, buildmap, standup`, because editing boot.py
+  is exactly what makes a green stamp stale. In the live boot report now:
+  `gate 5/6 read here -- REFUSED: standup`, under GATE, beside git's wall.
+- **AND IT LEFT AN ORPHAN I HAD TO CLOSE.** Killing the two blocked processes
+  left sitting 118's opening line standing, so the next boot refused correctly
+  -- "one engine per world -- a second would fork the ledger". Closed by
+  APPENDING a closing line through seatlog.close_sitting + record, never by
+  editing the line already written.
+- A style correction on the way: the two new lines wrote the em dash as a
+  `—` ESCAPE. boot.py already writes it as a CHARACTER in four places
+  (lines 36, 167, 204, 209), so the escape was replaced with the character the
+  file already uses. The `?` in my console was a codepage, not the file — I
+  nearly "fixed" a working line into `--` on that misreading.
+- **FOUND, NOT FIXED (reported, RULE 10) — why the gate still refuses:** the
+  live standup is 9/10. **Neiro ran past the 150s seat bound (LAW 7)** in the
+  court pipeline; that is a real seat failure, not a harness artifact. What the
+  harness added is second: `pipeline._handle_failure` asks
+  `retry / skip / abort?` on a seat failure, and with no tty `input()` raises
+  EOFError and the case aborts — so an UNATTENDED standup can never choose
+  retry, and any seat failure ends that case. The operator at a terminal gets
+  the choice; a scheduled or hand-run standup does not.
+- Proven: 1915/1915 strokes, 60/60 smoke, BUILDMAP regenerated, sitting 117
+  opened and closed and tolled by the standup with no orphan left.
+
+
 ### 2026-09-09 — EVERY DOCUMENT THE ESTATE IS BOUND BY IS NOW RETRIEVABLE (operator: "then run a sitting and index everything, the embedding model is already there in the manjuel core")
 - **THE GAP, MEASURED FIRST.** 11 of 24 root documents were in NO index root:
   SPEC.md among them, so a seat asked what DONE means could not retrieve the
