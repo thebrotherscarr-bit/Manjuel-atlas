@@ -34,6 +34,27 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.6 (23a6a38, 2026-09-09 12:00)
 
+### 2026-09-09 — THE DASHBOARD ANSWERS WHERE HE TYPED (operator: "dashboard kicks you over to chat. and the evals page is all discombobulated")
+- **The dashboard no longer moves him.** He asked for a vibe-coding loop --
+  "click the little mic icon, ask it for some stuff, it outputs into a message
+  box" -- and being thrown to another page mid-thought is the opposite of that.
+  The turn runs where he typed it and the answer lands under the box, with one
+  line of what is happening and the failures if there were any. Chat still keeps
+  the conversation (the turn joins it there, so the two pages never hold
+  different histories) and the whole trace still goes to Evals.
+- **The Evals run spilled through the page.** `#ev-run` carried `council-log`,
+  which sets a max-height -- but `overflow-y: auto` lives on `.chat-log`, which
+  that card never had. So a long run (the boot's /status is ~50 text events)
+  grew past its own card and rendered straight through the stat cards beneath
+  it. Bounded and scrolled now, and a delivery's text is capped so one enormous
+  answer cannot own the page; the transcript named beneath it is the whole
+  thing.
+- Proven live: typed on the dashboard with no engine open -> refused in place,
+  the words kept in the box rather than lost; Boot -> sitting 15; typed again ->
+  GREEN under the box, `default · 0.5s · the whole run is on Evals`, never
+  leaving `/`; and the run whole on Evals -- three seats, Router and the closing
+  Steward shown skipped, the law-chain line, the transcript.
+
 ### 2026-09-09 — THE ENGINE IS CONTROLLABLE FROM THE DASHBOARD, AND EVERY TURN NOW ENDS ON THE WIRE (operator: "i am not running that terminal anymore ... we need that functionality on the dashboard"; "maybe a reboot/bootup process to warm everything up"; "check that REPL and make sure its actually functional")
 - **A `/command` HUNG THE WIRE FOREVER.** serve.py's own docstring promises an
   objective may be "a plain turn, a `/command`, `@seat words`, 'pay the toll',
