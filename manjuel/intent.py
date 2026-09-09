@@ -502,10 +502,25 @@ _FOLLOWUP_LEADS = (
 )
 _QUOTE_MIN = 40
 
-# A TURN THAT POINTS AT WHAT THE OTHER SPEAKER JUST SAID. The third way a
+# A TURN THAT NAMES AN EARLIER TURN -- BY EITHER SPEAKER. The third way a
 # turn can point back, and the one that was missing: _ANAPHORA covers
 # pointing words ("that", "it"), _FOLLOWUP_LEADS covers fixed openings
-# ("say that again"), and neither covers "what colour did you just say".
+# ("say that again"), and neither covers "what colour did you just say"
+# or "what were the two colours I asked you for".
+#
+# BOTH HALVES WERE MEASURED, a fix apart. The seat's half first: "what
+# colour did you just say" was routed as a fresh objective. Then the
+# operator's own half, live and after that fix: "What were the two colours
+# I asked you for?" answered "I don't have access to the conversation
+# history", and "And which one did I ask for first?" ran a semantic_search
+# over past sessions -- both had asks_the_ground TRUE, so the guess that
+# the question was about the GROUND claimed them. pipeline.py withdraws
+# that guess for a follow-up; only the recognition was missing.
+#
+# PAST TENSE ONLY on the operator's half, and that is the whole guard
+# against false positives: "what should i ask the router" is a real
+# question about the ground, and a present-tense "i ask" would claim it,
+# keep the door, and stop his work reaching the Router.
 #
 # Measured through the glass 2026-09-09: that exact question was routed as
 # a fresh objective, so the Steward was skipped, and the Router -- which
@@ -522,7 +537,14 @@ _SPOKE_BACK = re.compile(
     r"|\bdid\s+you\s+(?:just\s+)?(?:say|said|tell|mention|call|answer)\b"
     r"|\byour\s+(?:last|previous|first|own)\s+"
     r"(?:answer|reply|response|word|words|message|line)\b"
-    r"|\bthe\s+last\s+thing\s+you\s+(?:said|wrote|told)\b",
+    r"|\bthe\s+last\s+thing\s+you\s+(?:said|wrote|told)\b"
+    # the operator's own earlier turn: "I asked", "did I say", "my last
+    # question". Past tense only -- see the note above.
+    r"|\bi\s+(?:just\s+)?(?:asked|said|told|mentioned|requested|wanted)\b"
+    r"|\bdid\s+i\s+(?:just\s+)?(?:ask|say|tell|mention|request)\b"
+    r"|\bwas\s+i\s+(?:just\s+)?(?:asking|saying|telling)\b"
+    r"|\bmy\s+(?:last|previous|first|own)\s+"
+    r"(?:question|request|words?|message|line|ask)\b",
     re.IGNORECASE,
 )
 
@@ -563,7 +585,8 @@ def is_followup(objective: str, dialogue: list | None) -> bool:
         return True
     if any(low.startswith(lead) for lead in _FOLLOWUP_LEADS):
         return True
-    # "what colour did you just say", "your last answer", "you said green"
+    # either speaker's earlier turn: "what colour did you just say",
+    # "your last answer", "what were the two colours I asked you for"
     if _SPOKE_BACK.search(low):
         return True
     # a turn that carries the previous delivery's own words

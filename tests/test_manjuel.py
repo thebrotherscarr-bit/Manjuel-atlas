@@ -1651,6 +1651,34 @@ def test_sitting_87_the_thread_the_scaffold_and_the_mention(reg, lib, book):
     check("and it cannot fire on a first turn -- there is nothing to point at",
           not intent.is_followup("what did you just say", []))
 
+    #    ...AND THE MIRROR: the operator pointing at his OWN earlier turn.
+    #    Measured live 2026-09-09, after the adjacency fix: "What were the
+    #    two colours I asked you for?" -> "I don't have access to the
+    #    conversation history", and "And which one did I ask for first?"
+    #    ran a semantic_search over past sessions. Both had is_followup
+    #    False and asks_the_ground TRUE, so the guess that the question was
+    #    about the GROUND claimed them and dispatched a search of the
+    #    record. pipeline.py already withdraws that guess for a follow-up;
+    #    only the recognition was missing.
+    for said in ("What were the two colours I asked you for?",
+                 "And which one did I ask for first?",
+                 "what did I ask you to do",
+                 "I said green, remember",
+                 "my last question",
+                 "what was I asking about"):
+        check(f"the operator pointing at his own turn is a follow-up: {said!r}",
+              intent.is_followup(said, thread), said)
+
+    #    PAST TENSE ONLY. A present-tense "i ask" belongs to a real question
+    #    about the ground, and claiming it would keep the door and stop his
+    #    work reaching the Router.
+    for said in ("what should i ask the router about",
+                 "who do i ask for a rack change",
+                 "read pipelines.md",
+                 "what is in the skills dir"):
+        check(f"a forward-looking question is not a follow-up: {said!r}",
+              not intent.is_followup(said, thread), said)
+
     g = Path(tempfile.mkdtemp())
     seen_seats = []
     def door_answers(a):
@@ -5898,6 +5926,40 @@ def test_topic_boundaries(reg, lib, book):
           any("vram ctx model ruling" in w for _, w in sel))
     check("and the new topic's tail rides",
           any("fresh reply" in w for _, w in sel))
+
+    #    A SHIFT MUST NOT COST THE LAST EXCHANGE. When detect_shift fires,
+    #    _dialogue_for sets boundary = len(dialogue) -- there is nothing
+    #    after the line yet -- so `segment` is empty and the recency tail is
+    #    empty too. Retrieval is then the only source, and it runs on the
+    #    SAME floor detect_shift just used: RECALL_FLOOR answers both "is
+    #    this a new topic" and "is this worth recalling", so the two cannot
+    #    disagree. Measured on the record 2026-09-09, every shift handed the
+    #    seat a ZERO-CHARACTER conversation block, and the seat answered as
+    #    a stranger -- the 1-2 turn ceiling the operator kept hitting.
+    #
+    #    Conversational adjacency is STRUCTURAL, not semantic: a turn is
+    #    about the turn before it by default, whatever the cosine says.
+    def orthogonal(t):
+        return [1.0, 0.0] if "brand new subject" in t else [0.0, 1.0]
+
+    past = [("operator", "say the single word green"),
+            ("steward", "GREEN")]
+    at_the_line = select_dialogue(past, "brand new subject entirely",
+                                  embed=orthogonal, boundary=len(past))
+    check("a shift keeps the last exchange -- nothing scores, and it is "
+          "still the turn this one follows",
+          len(at_the_line) >= 2
+          and any("GREEN" in w for _, w in at_the_line)
+          and any("green" in w.lower() for _, w in at_the_line),
+          str(at_the_line))
+    check("and it is the LAST exchange, not an arbitrary one",
+          at_the_line[-1][1] == "GREEN", str(at_the_line))
+
+    #    ...but a shift with nothing behind it stays empty: there is no
+    #    previous turn to be about.
+    check("a shift on the first turn keeps nothing -- there is nothing to keep",
+          select_dialogue([], "brand new subject entirely",
+                          embed=orthogonal, boundary=0) == [])
 
     src = (ROOT / "manjuel" / "cli.py").read_text(encoding="utf-8")
     check("acknowledgments are HARNESS lines, never prompt text",

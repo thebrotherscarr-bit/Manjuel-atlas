@@ -119,3 +119,10 @@
 {"suite": "standup", "at": 1788985728.9193716, "state": "finished", "passed": 10, "total": 10, "green": true, "failed": [], "report": "logs/standup_2026-09-09_132848.md"}
 {"suite": "strokes", "at": 1788986365.673435, "state": "finished", "passed": 1884, "total": 1884, "green": true, "failed": []}
 {"suite": "smoke", "at": 1788986369.4971497, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788987177.5202072, "state": "crashed", "passed": null, "total": null, "green": false}
+{"suite": "strokes", "at": 1788987188.5021834, "state": "crashed", "passed": null, "total": null, "green": false}
+{"suite": "strokes", "at": 1788987248.1225286, "state": "finished", "passed": 1887, "total": 1887, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788987276.3453257, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1788987414.105597, "state": "finished", "passed": 1891, "total": 1897, "green": false, "failed": ["the operator pointing at his own turn is a follow-up: 'What were the two colours I asked you for?'", "the operator pointing at his own turn is a follow-up: 'And which one did I ask for first?'", "the operator pointing at his own turn is a follow-up: 'what did I ask you to do'", "the operator pointing at his own turn is a follow-up: 'I said green, remember'", "the operator pointing at his own turn is a follow-up: 'my last question'", "the operator pointing at his own turn is a follow-up: 'what was I asking about'"]}
+{"suite": "strokes", "at": 1788987454.2011735, "state": "finished", "passed": 1897, "total": 1897, "green": true, "failed": []}
+{"suite": "smoke", "at": 1788987458.0027611, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}

@@ -35,6 +35,50 @@ hand that iterates without updating this file is out of line.
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
 
+### 2026-09-09 — CONTEXT FROM TURN TO TURN: two causes found by measurement, both fixed (operator: "couldnt really figure out either heuristic or semantic ... the context and history is a real pain point")
+- **Neither approach was failing on its own merits; they were failing
+  together.** `RECALL_FLOOR = 0.30` is the floor for BOTH questions -- "is this
+  a new topic?" (`detect_shift`) and "is this past turn worth recalling?"
+  (`select_dialogue`). Same cosine, same embedding, same number, so they cannot
+  disagree: the moment one declares a turn related to nothing, the other
+  necessarily finds nothing worth keeping.
+- **Measured on the record, not guessed.** Rebuilding the deepest sitting (n=40,
+  36 runs) and running the real selection over it: at every detected shift the
+  conversation block handed to the seat was **0 characters**. Not trimmed --
+  gone. `select_dialogue`'s docstring promises "a boundary stops CARRIAGE,
+  never memory"; it stopped both.
+- **And the floor is noise on short turns.** Best cosine against the whole past:
+  "commit this act" 0.213, "sup dude?" 0.276, "hows it handing?" 0.214, "yup"
+  0.324. Those are what conversation is MADE of, and they score under 0.30
+  against everything -- so retrieval contributed nothing even with no shift,
+  leaving only the 4-entry tail.
+- **FIX 1 -- adjacency is structural, not semantic.** `select_dialogue` keeps
+  the last exchange when the boundary sits at the end of the thread. A turn is
+  about the turn before it BY DEFAULT, whatever the cosine says. Relevance is
+  untouched and the floor is unchanged: lowering it would trade amnesia for
+  noise. Re-running the same measurement, every `LOST` became `yes`, and a
+  first turn still keeps nothing because there is nothing behind it.
+- **FIX 2 -- the mirror of this morning's.** `_SPOKE_BACK` covered "YOU said";
+  nothing covered "I asked". Live, after fix 1: "What were the two colours I
+  asked you for?" -> "I don't have access to the conversation history", and
+  "And which one did I ask for first?" -> ran a `semantic_search` over past
+  sessions. Both measured `is_followup` False and `asks_the_ground` TRUE, so
+  the guess that the question was about the GROUND claimed them. pipeline.py
+  already withdraws that guess for a follow-up; only the recognition was
+  missing. Past tense only, so "what should i ask the router" stays a real
+  question about the ground.
+- After both: "What were the two colours I asked you for?" -> **"You asked me
+  for the colours GREEN and BLUE."** 1897/1897 strokes, 60/60 smoke.
+- **A THIRD CAUSE IS FOUND AND NOT FIXED, on purpose.** Turns 2 and 4 of the
+  same conversation answered with DAYBOOK's standing block instead of the
+  question. There is already a guard for the same disease in another organ --
+  "Steward recited the conversation scaffold instead of answering -- discarded"
+  -- and this is its second instance: a seat's prompt carries several large
+  record blocks (standing, story, conversation, source) and a small model
+  sometimes returns one instead of answering. Guarding each block as it turns
+  up is symptom-fixing. It is the operator's call, and it is written down
+  rather than patched quietly.
+
 ### 2026-09-09 — THE CONVERSATIONAL LOOP: a turn that points at what the seat just said (operator: "i want the actual conversational loop first"; "review the REPL, the cause may be in there, may need some tuning on it")
 - **Measured through the glass, not guessed.** Turn one: "Say the single word
   GREEN and nothing else." -> GREEN. Turn two: "What colour did you just say?"

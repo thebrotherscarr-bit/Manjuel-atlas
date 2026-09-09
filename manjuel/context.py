@@ -154,6 +154,24 @@ def select_dialogue(thread: list, objective: str, embed=None,
     # from the current topic's segment, while retrieval may still reach
     # across the line for anything genuinely relevant.
     segment = thread[max(0, boundary):]
+    # ADJACENCY IS STRUCTURAL, NOT SEMANTIC -- and this is where that was
+    # lost. At the moment a shift is detected, _dialogue_for sets
+    # boundary = len(dialogue): nothing is after the line yet, so `segment`
+    # is empty and there is no recency tail at all. Retrieval was then the
+    # only source, and it judges on RECALL_FLOOR -- the SAME floor
+    # detect_shift just used to declare this turn related to nothing. The
+    # two cannot disagree, so the seat was handed a ZERO-CHARACTER
+    # conversation block and answered as a stranger. Measured on the record
+    # 2026-09-09: every shift, every time; the 1-2 turn ceiling.
+    #
+    # A turn is about the turn before it BY DEFAULT, whatever the cosine
+    # says -- 'yup' scores 0.324 against everything and is entirely about
+    # what was just said. So the last exchange is kept for WHERE it is, not
+    # for what it scores. Relevance is untouched: this adds one pair, the
+    # old topic still does not ride, and with nothing behind it nothing is
+    # kept.
+    if not segment and thread:
+        segment = thread[-2:]
     if embed is None:
         return segment[-max(tail, 8):]
     recent = segment[-tail:] if segment else []
