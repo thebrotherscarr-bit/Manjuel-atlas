@@ -35,6 +35,36 @@ hand that iterates without updating this file is out of line.
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
 
+### 2026-09-09 — THE SEATS PAGE READS THE SEATS (operator: "lets look at that, fill in the info that is already existing")
+- **Third and last instance of the same fault.** The Agents page listed the
+  webapp's own SQLite table -- `{"agents":[],"count":0}` -- on a ground holding
+  fourteen declared seats. Same as the dashboard before P0-11 and the Evals
+  cards this morning: a page counting its own store instead of asking the
+  record.
+- **`seats` is a new tool on THE LINE**, reading `agents/*.md` and
+  `pipelines.md`, which ARE the source of truth. It returns every declared
+  field, where the seat stands in each pipeline and under what gate, and the
+  system prompt -- a page for defining and tuning seats that hides the prompt
+  is a page for looking at seats.
+- **A SHAPE, NOT A SCHEMA, and that is what makes reading it from Go safe.**
+  The core parses a declaration with two regexes (`registry.py`'s `_HEADING_RE`
+  and `_FIELD_RE`) and NEITHER NAMES A FIELD. So the reader takes the same
+  shape and returns whatever keys a declaration carries -- Model Target, Wakes
+  On, Voice, or one added tomorrow -- without a code change. Keys are cleaned
+  the core's own way (`_clean_key`: strip, rstrip ":", strip), because the
+  colon lives inside the bold markers in this estate's files.
+- Every card names its file, and a declaration that cannot be read says so on
+  its own card instead of vanishing from the list.
+- **Found while filling it in:** `.search-bar::before` set
+  `content: '&#128269;'` -- an HTML entity written inside CSS, which CSS does
+  not decode, so nine literal characters rendered on top of the placeholder.
+  Removed rather than re-escaped: that is the same trick that landed a control
+  character in the streaming caret earlier today.
+- Reading live: 14 seats, 5 pipelines. Security Guardian wakes on
+  `has_feed, suspicious`, aborts on fail, 48 max tokens, stands `#1` in four
+  pipelines; the Steward stands twice in `default` (`#1`, and `#3 · worked`);
+  Deep Researcher stands in none and says so -- racked, summoned by its flag.
+
 ### 2026-09-09 — THE ENTRY POINT SAYS ITS OWN NAME, AND REFUSES WHAT IT CANNOT READ (operator: "look at the manjuel.py REPL, it's the core of the system, what is it missing?" / "fix everything")
 - **The rename never reached the program's own voice.** Every launch still said
   `Chain -- local multi-agent pipeline`, in both doors, plus the reconnect line
