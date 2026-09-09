@@ -34,6 +34,28 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.6 (23a6a38, 2026-09-09 12:00)
 
+### 2026-09-09 — THE TOOLS ARE FILLED IN, AND THE SKILLS NAMED (operator: "let's fill in the tools and add the skills used, as well"; "we know the tools used from the ollama and other model reports")
+- He was right that the data was already on the wire and the page was throwing
+  it away. The delivery ships per-seat `tools` -- StepResult.tool_calls, the
+  actual names -- and Evals rendered it through `String()`, so `["ground_read"]`
+  became the bare word and `[]` became an empty cell. A column that looks the
+  same whether nothing ran or something did is worse than no column.
+- The seat table now reads **seat · model · elapsed · tools · drift · verdict**,
+  and every column names where it is read from: the delivery's own StepResults.
+  A failed call is marked from the `tool_result` event's own `failed` field --
+  the pipeline's test, never a reading of the words that came back -- and hovers
+  its error.
+- **Drift is blank when it was not scored, and says so.** A drift of 0.00 and no
+  drift at all are opposite claims, and rendering the second as the first would
+  put a measurement in the record that nobody took.
+- **A skill and a tool are one thing here**, and the page says it once instead of
+  implying two lists: the estate's 37 skills ARE its tool surface, so a seat
+  calling `ground_read` is calling the skill of that name. The per-seat rows
+  answer "who called what"; the roll-up beneath the delivery answers "what did
+  this run touch", which is the question an eval asks.
+- Proven live: "What is in the skills dir?" -> Router/qwen3.5:4b/4.3s/ground_list,
+  Steward/llama3.2:latest/1.6s/—, skills used `ground_list`, transcript named.
+
 ### 2026-09-09 — THE DASHBOARD ANSWERS WHERE HE TYPED (operator: "dashboard kicks you over to chat. and the evals page is all discombobulated")
 - **The dashboard no longer moves him.** He asked for a vibe-coding loop --
   "click the little mic icon, ask it for some stuff, it outputs into a message
