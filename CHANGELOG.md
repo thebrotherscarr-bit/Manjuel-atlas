@@ -34,7 +34,17 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.6 (23a6a38, 2026-09-09 12:00)
 
-Nothing yet.
+### 2026-09-09 — the record caught up to the day, so the gate can be asked
+- HANDOFF.md gains **HANDOFF FOR 2026-09-09**: the frontend, the vibe coding
+  loop, what 0.1.6 cut and what it did not, and the two known reds that are
+  fixtures rather than code. The release gate refuses a tag without it.
+- The suites re-run on the ground and re-stamped: **1858/1858** strokes
+  (1872 before the hands ledger left; 14 strokes went with it) and **60/60**
+  smoke, both after the newest edit.
+- `python tests/release.py --check 0.1.6` now refuses on ONE check: the live
+  standup's newest line is 9/10 from 2026-09-08, failing "a folder" -- "what
+  is in the skills dir" did not reach `ground_list`. A routing miss in the
+  core that predates today and has blocked 0.1.5 and 0.1.6 both.
 
 ---
 

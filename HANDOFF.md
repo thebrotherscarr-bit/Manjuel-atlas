@@ -670,6 +670,57 @@ dropped by operator ruling 2026-09-01 — see the fix log.
        is testimony (LAW 5). `WHAT RAN (observed)` and the file itself are
        the facts.
 
+## HANDOFF FOR 2026-09-09 — read this before anything below it
+
+**THE FRONTEND IS UP AND THE GLASS REACHES THE COUNCIL. atlas-mcp on
+:8090, atlas-webapp on :8091. /chat sends an OBJECTIVE into the world's
+own Manjuel process over PROTOCOL 1, so the law gate stamps it, the one
+Router runs the tools, the dedup refuses a repeat and the recompose puts
+every failure in the delivery. Chat is the conversation; Evals is the run,
+whole -- every seat, every tool, every result, the per-seat table, the
+transcript. Both read one `Run` object, so they cannot disagree about what
+ran. Proven live: delivered at 53.4s, 248 events kept, Router shown
+skipped in the seat table.**
+
+**THE VIBE CODING LOOP LANDED THE SAME DAY.** `run` is a flow node kind: it
+drives a whole Manjuel turn, where `ask` reaches a bare model. A `run` node
+will NOT start an engine -- that would open a sitting he never opened.
+Gate titles render, so `{{out_work}}` puts what the council produced into
+the question he walks back to, and `flow_status` prints it whole with the
+exact `flow_resume` line under it. Proven: PAUSED at the gate in 4.1s, read
+back intact AFTER the door was rebuilt and restarted, `continue` ->
+COMPLETE at 7.8s. SPEC_CONTROL_CENTER 4.9.
+
+**MANJUEL WAS NOT TOUCHED for any of the above.** Every change is in
+`atlas/`. The one edit outside it is the version string.
+
+**0.1.6: THE STRINGS AND THE CHECKPOINT ARE CUT; THE TAG IS NOT.**
+`manjuel/__init__.py` and `pyproject.toml` now read 0.1.6 (they carried
+0.1.4 while 0.1.5 and 0.1.6 were built -- LAUNCH_PLAN's step 5), and
+CHANGELOG's Unreleased folded down into `## 0.1.6` per its own convention.
+**RESTART REQUIRED**: a running REPL read the version at import.
+
+**WHAT THE GATE STILL REFUSES, and it is right to.** `python
+tests/release.py --check 0.1.6` -> standup. Strokes (1858/1858), smoke
+(60/60), buildmap, law (9 strokes), manifest, spec and daybook are green
+and fresh. The standup's newest LIVE line is 9/10 from 2026-09-08 12:44,
+failing the case **"a folder"**: "what is in the skills dir" did not reach
+`ground_list`. That is a live ROUTING miss in the core, it predates today,
+and it has blocked 0.1.5 and 0.1.6 both. It is the last thing between this
+ground and a tag. Fixing it means touching the Router's routing -- the
+operator's call, not a hand's.
+
+**KNOWN AND UNTOUCHED, neither of them code.** `atlas/tests/fixtures/
+rack_open_ground/` came over from the H0 pull EMPTY, so `internal/rack`
+fails four strokes; `cmd/atlas-door`'s prove stroke needs the Rust spine
+built (`cargo build -p atlas`) or `ATLAS_BIN` set.
+
+**THE REPO.** `origin/main` and local `master` are squared, zero
+divergence, zero attribution, and zero vault files. The local history that
+carried `worlds/tbc/vault` in seven old commits is kept as
+`pre-strip-master` and is NOT what is published; the published line is the
+clean one. Do not force-push `pre-strip-master`.
+
 ## HANDOFF FOR 2026-09-08 — read this before anything below it
 
 **Newest first (12:45–): 0.1.6 IS BUILT but for his seal. THE STORY:
