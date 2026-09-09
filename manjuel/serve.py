@@ -59,7 +59,13 @@ THE WIRE (protocol 1). One JSON object per line, UTF-8.
                                           on exit)
   out  opened · text · run · report · seat · token · tool · tool_result ·
        needs_answer · heard · delivery · refused · aborted · cancelled ·
-       unreachable · error · note · closed
+       unreachable · error · note · command · closed
+
+EVERY TURN ENDS IN EXACTLY ONE TERMINAL EVENT: delivery for a pipeline
+run, command for a `/command` or any other turn that finished without
+running one, or refused / aborted / cancelled / unreachable. A client
+pumps until one arrives, so a turn that ended silently hung the wire
+forever -- which is what every command did until this was added.
 
 An `objective` is anything the REPL would take at its prompt: a plain
 turn, a `/command`, `@seat words`, "pay the toll", "remember that". One
@@ -99,7 +105,16 @@ PROTOCOL = 1
 COMMANDS = ("objective", "answer", "listen", "cancel", "close")
 EVENTS = ("opened", "text", "run", "report", "seat", "token", "tool",
           "tool_result", "needs_answer", "delivery", "refused", "aborted",
-          "cancelled", "unreachable", "error", "note", "heard", "closed")
+          "cancelled", "unreachable", "error", "note", "heard", "command",
+          "closed")
+
+# THE EVENTS THAT END A TURN. A client pumps until one of these arrives, so
+# a turn that ends without one hangs it for the life of the process -- which
+# is exactly what every `/command` did until 2026-09-09. `error` is NOT here:
+# the inbox emits it non-terminally for a malformed command and the turn
+# carries on.
+TERMINAL = ("delivery", "refused", "aborted", "cancelled", "unreachable",
+            "command")
 
 # The first characters of a tool result that mean it failed -- the
 # pipeline's own test (pipeline.py, the tool loop), repeated here so the
@@ -121,8 +136,16 @@ class Wire:
         self._out = out
         self._lock = threading.Lock()
         self.sent: int = 0
+        # Whether a terminal event has gone out since the turn began. The
+        # serve loop clears it at the start of a turn and closes any turn
+        # that ended without one. Kept HERE rather than at each early
+        # return in turn(): enumerating those fixes the four that exist and
+        # misses the fifth someone adds.
+        self.ended: bool = False
 
     def emit(self, event: str, **fields) -> None:
+        if event in TERMINAL:
+            self.ended = True
         row = {"event": event}
         row.update(fields)
         line = json.dumps(row, ensure_ascii=False, default=str) + "\n"
@@ -446,9 +469,16 @@ class Door:
                 if method.strip():
                     self.sess.pending_method = method.strip()  # a command's method
                 self.inbox.set_state(Inbox.RUNNING)
+                self.wire.ended = False
                 try:
                     if not self.turn(objective):
                         return 0
+                    # A turn that ran no pipeline -- a /command, @seat, the
+                    # toll, a remember cue, an empty line -- printed its
+                    # words and returned. Nothing told the client it was
+                    # over, and a client pumps until something does.
+                    if not self.wire.ended:
+                        self.wire.emit("command", text=objective)
                 except KeyboardInterrupt:
                     # A cancel that landed after the model call returned --
                     # in the tail of the turn, or at a command. The turn is

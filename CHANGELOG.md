@@ -34,6 +34,48 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.6 (23a6a38, 2026-09-09 12:00)
 
+### 2026-09-09 — THE ENGINE IS CONTROLLABLE FROM THE DASHBOARD, AND EVERY TURN NOW ENDS ON THE WIRE (operator: "i am not running that terminal anymore ... we need that functionality on the dashboard"; "maybe a reboot/bootup process to warm everything up"; "check that REPL and make sure its actually functional")
+- **A `/command` HUNG THE WIRE FOREVER.** serve.py's own docstring promises an
+  objective may be "a plain turn, a `/command`, `@seat words`, 'pay the toll',
+  'remember that'" -- and every terminal event (delivery, refused, aborted,
+  cancelled, unreachable) is emitted inside the PIPELINE path. All four of the
+  others return before reaching it and emit nothing terminal. Measured: `/warm`
+  over the wire produced ONE event in 25 seconds and never ended. The REPL never
+  noticed because it just loops back to its prompt; the door is the only thing
+  that has to know a turn is over, and it was never told.
+- **The fix is on the Wire, not at each return.** Enumerating the early returns
+  would fix the four that exist and miss the fifth someone adds. `Wire.ended` is
+  cleared when a turn begins and set by any terminal emit; the serve loop closes
+  any turn that ended without one. `command` is the seventh terminal and the
+  nineteenth event -- deliberately NOT a `delivery`, because a delivery means a
+  pipeline ran and a recompose produced it, and calling a command a delivery
+  would put a lie in every record that counts deliveries. `/warm` now ends in
+  0.107s; `/status` streams the whole boot report and ends.
+- **Boot, reboot and close, on the dashboard.** Nothing here reimplements a
+  boot -- the operator: "the core is actually very functional." The button
+  drives what the estate already does, in the REPL's own order: `env_close`
+  (the toll is paid, `ended` is written) -> `env_open` -> `/warm` -> `/status`
+  (boot.report: GROUND, RACK with resident-vs-cold and sizes, RECORD, GATE,
+  VOICE). Only close and open are tools; the other two are the REPL's commands
+  riding the council stream.
+- **"restart required" was an instruction addressed to nobody.** He no longer
+  runs a REPL. The engine holds whatever manjuel/*.py said when it was spawned,
+  so `Engine.Started` + `CodeChanged` now answer it: the dashboard names the
+  file, both times, and puts Reboot beside them. ONLY .py counts -- seats,
+  skills and pipelines hot-reload at the next turn (CLAUDE.md), and an alarm
+  over a doc edit would teach him to ignore the one row that matters.
+- Fixed while pressing the button: the brief went on saying "no engine" while
+  the card below it said "sitting 11" (boot repainted one half); and the brief's
+  copy still read "this page will not open one for you", written before there
+  was a Boot button. What still holds is the part that matters, and it says so:
+  nothing opens by itself.
+- NOT CHANGED, and worth knowing: `runtime.resident()` reads `ollama ps` but
+  takes only `size`, never `size_vram`, so it cannot tell a model on the GPU
+  from one held in CPU RAM. Both were fully on the GPU when checked, so nothing
+  was lying today -- but "already warm" is not a claim about VRAM, and one day
+  that will matter.
+- 1870/1870 strokes, 60/60 smoke.
+
 ### 2026-09-09 — A DATE IS NOT A FABRICATED QUANTITY (operator: "let's make sure dates and numbers wont destroy the guard for any reason")
 - **The guard was firing on true statements.** The number guards exist to catch
   a seat INVENTING a quantity, and they have earned it: "34 markdown files" for
