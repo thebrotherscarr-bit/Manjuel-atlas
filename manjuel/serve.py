@@ -715,7 +715,12 @@ def main(argv: list[str] | None = None) -> int:
     print("\nManjuel -- local multi-agent pipeline (headless door)")
     if ground is not None:
         print(f"  ground: {ROOT}")
-    for line in dotenv.report(*dotenv.load(ROOT / ".env")):
+    # .env is read AFTER import, so an old CHAINKIT_ dial that arrives here
+    # has not been carried to its twin yet. Idempotent; see carry_old_dials.
+    from . import carry_old_dials as _carry
+    _dotenv_lines = dotenv.report(*dotenv.load(ROOT / ".env"))
+    _carry()
+    for line in _dotenv_lines:
         print(line)
 
     sess = _cli.Session()

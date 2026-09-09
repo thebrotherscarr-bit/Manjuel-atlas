@@ -1790,6 +1790,10 @@ def main() -> int:
         print(f"  ground: {ROOT}")
 
     env_lines = dotenv.report(*dotenv.load(ROOT / ".env"))
+    # .env is read AFTER import, so an old CHAINKIT_ dial that arrives here
+    # has not been carried to its twin yet. Idempotent; see carry_old_dials.
+    from . import carry_old_dials as _carry
+    _carry()
     for line in env_lines:
         print(line)
 

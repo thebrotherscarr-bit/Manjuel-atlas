@@ -7,7 +7,18 @@ __version__ = "0.1.7"
 # dial table and may sit in a .env or a shell that predates the rename; a
 # dial that silently stops working is worse than one that is gone. Each is
 # honoured once, at import, and only when its MANJUEL_ twin is unset.
-def _carry_old_dials():
+def carry_old_dials():
+    """Map any CHAINKIT_* to its MANJUEL_* twin. Idempotent: only an
+    UNSET twin is written, so calling it twice costs nothing.
+
+    CALL IT AGAIN AFTER .env IS READ. This runs once at import, which sees
+    only what the shell held before the process started -- and .env is read
+    later, in cli.main and serve.main. Measured 2026-09-09:
+    CHAINKIT_GIT_REMOTE=1 in a .env was applied by dotenv and its twin was
+    still unset, so the dial did nothing. .env.example documented exactly
+    those names, which made the estate's own example the way to produce a
+    dead dial.
+    """
     import os
     carried = []
     for k, v in list(os.environ.items()):
@@ -20,4 +31,5 @@ def _carry_old_dials():
     return carried
 
 
-OLD_DIALS_CARRIED = _carry_old_dials()
+_carry_old_dials = carry_old_dials      # the old private name still answers
+OLD_DIALS_CARRIED = carry_old_dials()
