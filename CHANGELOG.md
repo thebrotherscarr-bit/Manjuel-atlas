@@ -34,6 +34,42 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since v0.1.4 (63fab9e, 2026-09-04 08:21)
 
+### 2026-09-09 — THE VIBE CODING LOOP: a `run` node, a rendered gate, a walk away (operator: "site up my vibe coding loop with atlas"). atlas only; Manjuel untouched.
+- **`run` is a flow node kind.** `flow.Kinds` gains `run`; a `run` node drives
+  a whole Manjuel turn through `councilEngine.Turn` -- the law gate, the one
+  Router, the dedup and the recompose -- where `ask` reaches a bare model. A
+  `run` node with no objective is refused at `Validate`. The golden vector file
+  `atlas/tests/fixtures/flow_vectors.json` pins the new kind and a refusal for
+  the objectiveless node, so the contract test still holds the closed set.
+- **A `run` node never starts an engine.** No engine open on that world means
+  the node fails saying exactly that. A flow that spawned a process behind the
+  operator's back would open a sitting he never opened, and the sitting line is
+  the lock (SPEC_CONTROL_CENTER 12.3).
+- **Gate titles render.** A gate's title now goes through `play.Render` against
+  the run's vars, so `{{out_work}}` puts what the council produced into the
+  question the operator walks back to. A bad reference does not lose the pause;
+  it shows itself in the title.
+- **The waterfall says the WHY.** `flow.Status` now prints a failed node's
+  `error` and a paused node's full gate title, with the exact `flow_resume`
+  command under it. Both were already in `flows/runs.jsonl`; reading them cost
+  a shell and a grep.
+- **`flow_run` no longer drops its inputs.** `flowInputs` read `inputs` only as
+  a JSON string, so a caller sending an object ran the flow with NO inputs and
+  failed on a missing var, blaming the spec. It now takes either shape and
+  refuses anything else BY NAME.
+- **`NOT EVERYTHING RAN` reaches the gate once.** Manjuel's recompose already
+  stamps the failure list into the delivery; `councilEngine.Turn` appended a
+  second copy. The append stays as the fallback if the core ever stops.
+- Proven live on the glass world against a real rack: no-engine -> `FAIL` with
+  the reason on the waterfall; engine open -> `PAUSED` at the gate in 4.1s with
+  the answer inside the question; the gate read back intact after the door was
+  rebuilt and restarted; `continue` -> `land` ran and the run closed `COMPLETE`
+  at 7.8s. Documented as SPEC_CONTROL_CENTER 4.9.
+- KNOWN, not touched (both predate this and neither is code): `internal/rack`
+  fails four strokes because `atlas/tests/fixtures/rack_open_ground/` came over
+  from the H0 pull EMPTY, and `cmd/atlas-door`'s prove stroke needs the Rust
+  spine built (`cargo build -p atlas`) or `ATLAS_BIN` set.
+
 ### 2026-09-09 — THE GLASS REACHES THE COUNCIL: env_* and run_* over the wire (operator: "finish the build", "get this webapp online"). atlas only; Manjuel untouched.
 - THE SEAM IS CLOSED. line/internal/engine/ supervises one Manjuel process
   per open world over serve.py's PROTOCOL 1, and six tools sit on it:

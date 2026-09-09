@@ -490,6 +490,57 @@ that surface was easier to reach that afternoon.
 
 ---
 
+### 4.9 THE VIBE CODING LOOP — a `run` node, a gate, and a walk away
+
+The operator, 2026-09-09: "site up my vibe coding loop with atlas." His fourth
+acceptance question names the shape: *"can i set a task and come back in 20-30
+minutes to a gate question?"* This is that loop, and it is three parts already
+in the build wired to each other -- nothing new was invented for it.
+
+**The `run` node.** `flow`'s closed kind set gains one member:
+
+    ask | prompt | seat | memory | eval | gate | run
+
+An `ask` node reaches a **bare model**. A `run` node reaches the **whole
+council**: the objective goes through the world's own Manjuel process, so the
+sealed law gate stamps it, the one Router runs the tools, the dedup refuses a
+repeat, and the recompose puts every failed tool in the answer. A `run` node
+whose spec carries no objective (`question`) is refused at `Validate`, not at
+run time.
+
+**The refusal that keeps it honest.** A `run` node will NOT start an engine.
+If no engine is open on that world, the node fails and the waterfall says why,
+in those words. A flow that spawned a process behind the operator's back could
+open a sitting he never opened -- and the sitting line is the lock (12.3).
+
+**The gate is the return leg.** A `gate` node's title is now RENDERED against
+the run's vars, so `{{out_work}}` puts what the council actually produced into
+the question he walks back to. `flow_status` prints that question whole on the
+waterfall -- untruncated, with the exact `flow_resume` command under it. The
+pause lives in `flows/runs.jsonl`, so it survives the door restarting, the
+engine closing, and the machine being left alone for as long as he likes.
+
+**The loop, whole:**
+
+| he does | the system does |
+|---|---|
+| `env_open {project}` | one Manjuel process for that world; refuses a world already being sat in |
+| `flow_run {name: vibe-loop, inputs: {task}}` | the `run` node puts his task through the council; the `gate` node pauses; verdict `PAUSED` |
+| *walks away* | nothing moves. No default is taken, nothing is landed, nothing is committed (RULE 6) |
+| `flow_status {run}` | the waterfall: what ran, how long, the receipt per node, and the gate question in full |
+| `flow_resume {run, continue\|stop}` | `continue` fires the pass-edges past the gate; `stop` ends it `STOPPED`, reached nodes standing |
+
+**Proven live, 2026-09-09,** on the glass world against a real rack: fired
+with no engine open -> `FAIL` with the reason on the waterfall; fired with the
+engine open -> `PAUSED` at the gate in 4.1s with the council's answer inside
+the question; the paused gate read back intact **after the door was rebuilt
+and restarted**; `continue` -> the `land` node ran through the council and the
+run closed `COMPLETE` in 7.8s total.
+
+The spec that proves it is saved as `vibe-loop` and is three nodes:
+`work` (run, `{{task}}`) -> `review` (gate) -> `land` (run, `{{out_work}}`),
+with `work -> review` on `always` and `review -> land` on `pass`.
+
 ## 5. User stories
 
 **The operator**
