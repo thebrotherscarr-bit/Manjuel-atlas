@@ -10,13 +10,13 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 
 ## MODULES
 
-### manjuel/__init__.py — 23 lines
+### manjuel/__init__.py — 35 lines
 
 *manjuel -- local multi-agent pipeline driven by agents.md.*
 
 | kind | name | lines | says |
 |---|---|---|---|
-| def | `_carry_old_dials` | 10-20 |  |
+| def | `carry_old_dials` | 10-31 | Map any CHAINKIT_* to its MANJUEL_* twin. Idempotent: only an |
 
 ### manjuel/boot.py — 359 lines
 
@@ -37,7 +37,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `brief_facts` | 287-325 | The brief's facts, one block, read off the record. |
 | def | `report` | 328-359 |  |
 
-### manjuel/cli.py — 2018 lines
+### manjuel/cli.py — 2022 lines
 
 *Interactive REPL.*
 
@@ -89,8 +89,8 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `_cmd_remember` | 1670-1695 | Operator-written memory. Shown back, then confirmed, then landed. |
 | def | `_cmd_memory` | 1698-1728 | Review what seats proposed. Each is landed or dropped by hand. |
 | def | `_close` | 1736-1774 | Every sitting pays its toll (LAW 10). If the operator did not pay it by |
-| def | `main` | 1777-1863 |  |
-| def | `_loop` | 1866-2014 | The typed turn loop. main() wraps it so any escape still closes. |
+| def | `main` | 1777-1867 |  |
+| def | `_loop` | 1870-2018 | The typed turn loop. main() wraps it so any escape still closes. |
 
 ### manjuel/context.py — 372 lines
 
@@ -469,7 +469,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `render_toll` | 307-365 |  |
 | def | `pay` | 368-375 | Append the toll. Never rewrites what stands above it. |
 
-### manjuel/serve.py — 792 lines
+### manjuel/serve.py — 797 lines
 
 *The headless door: the REPL's turn over stdin/stdout as JSON lines.*
 
@@ -507,7 +507,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `Door._close` | 491-499 |  |
 | def | `Door.turn` | 503-663 | One typed turn, cli._loop's body line for line (the REPL read of |
 | def | `open_wire` | 671-688 | The real stdout and stdin as the wire. stdout is swapped for the |
-| def | `main` | 691-785 |  |
+| def | `main` | 691-790 |  |
 
 ### manjuel/skills.py — 2795 lines
 
@@ -731,7 +731,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `GroundWatch.start` | 109-134 |  |
 | def | `GroundWatch.stop` | 136-142 |  |
 
-manjuel/: 28 files, 15531 lines.
+manjuel/: 28 files, 15552 lines.
 
 ## GUARDS — by the failure that earned them
 
@@ -774,11 +774,11 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 | 1612 | `_ask_kind` | """One word from the list. Sitting 94 typed "outcome failed due to |
 | 1752 | `_close` | SITTING 84 (2026-09-04, found reading this file whole). The |
 | 1768 | `_close` | with two timestamps (the REPL read, 2026-09-08). |
-| 1810 | `main` | ONE read of the repo at open (the REPL read, 2026-09-08: this line was |
-| 1835 | `main` | THE BRIEF'S FACTS, at every open, no model (2026-09-07). /brief has |
-| 1852 | `main` | An exception nothing below caught. Before 2026-09-08 it escaped to |
-| 1905 | `_loop` | Sitting 29: "let me talk to manjuel" had no door. @seat opens one: |
-| 1997 | `_loop` | Never print nothing and call it an answer. Session 5c handed the |
+| 1814 | `main` | ONE read of the repo at open (the REPL read, 2026-09-08: this line was |
+| 1839 | `main` | THE BRIEF'S FACTS, at every open, no model (2026-09-07). /brief has |
+| 1856 | `main` | An exception nothing below caught. Before 2026-09-08 it escaped to |
+| 1909 | `_loop` | Sitting 29: "let me talk to manjuel" had no door. @seat opens one: |
+| 2001 | `_loop` | Never print nothing and call it an answer. Session 5c handed the |
 
 ### manjuel/context.py
 

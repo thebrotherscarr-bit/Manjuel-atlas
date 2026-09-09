@@ -5,7 +5,7 @@ the ground actually holds — built-in commands, every skill, every pipeline —
 and then this file. Add a block, `/reload`, and it appears.
 
 A `**Runs:**` line makes the command a shortcut: invoking it feeds that text
-to the chain as the objective, exactly as if typed.
+to Manjuel as the objective, exactly as if typed.
 
 **Arguments.** Whatever you type after the command is its argument. Put
 `$ARGS` where it belongs in the objective, or leave the token out and it is

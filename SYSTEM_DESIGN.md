@@ -11,7 +11,7 @@ have your own personal digital assistant on your own home network with your
 files and your functionality … basically the software side of the NAS, you
 just add whatever hardware to it."*
 
-*Grounded in the disk as of today: `Desktop\Research` (chain, 0.1.6
+*Grounded in the disk as of today: `Desktop\Research` (Manjuel, 0.1.6
 unsealed, the headless door landed today), `Desktop\Archive\atlas` (the
 spine, THE LINE, the faces — an artifact, pulled in as needed),
 `worlds\TBC` (the business: four billed visits, one estimate, the
@@ -40,41 +40,41 @@ GPU; the software is what this estate already is, finished and joined.
 
 | # | Requirement | Where it comes from |
 |---|---|---|
-| F1 | **Hold the record.** Every document, photo, note, invoice, estimate, contract and log a household or business produces, on the box, in plain files, append-only, hashed on arrival. | chain LAW 1 (fold, never delete); atlas `state = fold(record)`; TBC `Filed\{property}\{date}\` already does this by hand |
-| F2 | **Understand what the operator says, in context.** A typed or spoken line routes to the right world and pipeline by rules first, arithmetic second, a model last — and the seat that answers holds that world's standing, story and index. | chain `intent.py`, `ROUTES.md` (spec §4.4), the story block, `semantic_search` |
+| F1 | **Hold the record.** Every document, photo, note, invoice, estimate, contract and log a household or business produces, on the box, in plain files, append-only, hashed on arrival. | Manjuel LAW 1 (fold, never delete); atlas `state = fold(record)`; TBC `Filed\{property}\{date}\` already does this by hand |
+| F2 | **Understand what the operator says, in context.** A typed or spoken line routes to the right world and pipeline by rules first, arithmetic second, a model last — and the seat that answers holds that world's standing, story and index. | Manjuel `intent.py`, `ROUTES.md` (spec §4.4), the story block, `semantic_search` |
 | F3 | **Do the business's work as skills.** Intake → contract → scheduled visit → checklist + photos → report → estimate (50 % deposit) → invoice → payment → record → next visit. Each step a skill or a pipeline, each output a draft for his hand. | TBC `agents.md` §5, `TBC - ESTIMATE FORMAT.md`, `tbc_estimate` CLI |
-| F4 | **Never lie.** No claim reaches the operator, the delivery, the memory or the index without the engine having checked it against what ran; every failure travels with the answer. | chain SPEC §3 invariants, `REFUSALS.md` §7–11, the recompose |
-| F5 | **The gate is final.** Money, legal commitments, sends, posts, landings: the system prepares, the operator's hand confirms. `can_approve:false` everywhere. | chain RULE 6 / LAW 6; atlas law 5; TBC `SEAT.md` "MONEY AND LEGAL COMMITMENTS ARE THE OPERATOR'S" |
+| F4 | **Never lie.** No claim reaches the operator, the delivery, the memory or the index without the engine having checked it against what ran; every failure travels with the answer. | Manjuel SPEC §3 invariants, `REFUSALS.md` §7–11, the recompose |
+| F5 | **The gate is final.** Money, legal commitments, sends, posts, landings: the system prepares, the operator's hand confirms. `can_approve:false` everywhere. | Manjuel RULE 6 / LAW 6; atlas law 5; TBC `SEAT.md` "MONEY AND LEGAL COMMITMENTS ARE THE OPERATOR'S" |
 | F6 | **Many worlds, one discipline.** A domain is a folder with its own declarations, law copy, record, index and workspace; the origin never indexes a world; a world is written only by its own engine. | his ruling 2026-09-08; `SPEC_CONTROL_CENTER.md` §4.2 |
 | F7 | **Run it without a terminal.** A glass on the LAN: environments, run, traces, waterfall, seats, rack, record, alerts, law — and the business's own screens (clients, visits, photos, estimates, invoices, contracts). | `SPEC_CONTROL_CENTER.md`; TBC `tbc_hub_v2.html`'s eight panels |
 | F8 | **Publish on his hand only.** Marketing content drafted from released material; the release verb is the only path client material crosses; posting is a human act. | the campaign design (this afternoon); SITTING LAW 2 |
 | F9 | **Take material in from a phone.** Photos and voice notes land on the box over the LAN and become record entries with receipts, without an app store. | TBC's photo dump problem ("still working through the final photo-dump solution"); `tbc_system_core.py`'s watch-folder idea |
-| F10 | **Leave with your data.** Everything is files a stranger can read; export is byte-identical; a world moves by copying its folder. | atlas `db export`; chain's one-dependency law |
+| F10 | **Leave with your data.** Everything is files a stranger can read; export is byte-identical; a world moves by copying its folder. | atlas `db export`; Manjuel's one-dependency law |
 
 ### 1.2 Non-functional
 
 | Dimension | Number | Source / reasoning |
 |---|---|---|
-| Users | **1 operator** now; his seats (14 + 40 declarations); outside users a later phase behind a gate | chain SPEC §1 "a second user is a fork" |
+| Users | **1 operator** now; his seats (14 + 40 declarations); outside users a later phase behind a gate | Manjuel SPEC §1 "a second user is a fork" |
 | Worlds | < 10 (TBC, marketing, books, clients, manjuel, sewder, …) | his list of functions |
 | Clients (TBC) | 1 today; design for 50 | four tiers, monthly cadence |
 | Runs per day | < 50 typed turns; a handful of pipelines | sittings 86–98 measured |
 | Turn latency | ≤ **600 s** ceiling, court ~300 s, a door answer 2–30 s | `TURN_DEADLINE`, sitting 98 (300.4 s court) |
 | Inference budget | **15 GB VRAM** on a 16 GB card; per-seat timeouts 150/300/600/700 by size | `vram.py`, `agents/*.md` `Timeout:` |
 | Storage | photos dominate: ~**250 MB per job-month** today (47 photos ≈ 90 MB at 6-20; `picture\` 234 MB); text is negligible; index ~25 MB | `worlds\TBC` on disk |
-| Availability | one box; restart is seconds; the ground opens with the rack down | chain boot, "RACK UNREACHABLE — the ground is open" |
+| Availability | one box; restart is seconds; the ground opens with the rack down | Manjuel boot, "RACK UNREACHABLE — the ground is open" |
 | Durability | append-only files + hash chain + a copy of the folder; no database is the truth | atlas `SPEC_SQLITE` rule 1–4 |
 | Cost | **$0 / month.** Hardware ≤ $1k one-off (any gaming PC with a 12–16 GB GPU + disks) | his word |
-| Network | **home LAN only**; loopback for the engine; no WAN, no cloud, no key | chain RULE 4; atlas loopback doctrine |
-| Dependencies | chain: `ollama` only; atlas: none; nothing that downloads weights at first use | both charters |
-| Honesty | every claim checked; every failure delivered; every number read, never written | chain SPEC §3 |
+| Network | **home LAN only**; loopback for the engine; no WAN, no cloud, no key | Manjuel RULE 4; atlas loopback doctrine |
+| Dependencies | Manjuel: `ollama` only; atlas: none; nothing that downloads weights at first use | both charters |
+| Honesty | every claim checked; every failure delivered; every number read, never written | Manjuel SPEC §3 |
 
 ### 1.3 Constraints
 
 - **Two codebases, one operator, one afternoon at a time.** RULE 10: one piece, mirror-proved, one CHANGELOG entry, stop. The design is sized in pieces, not sprints.
-- **chain finishes its own path** (0.1.7 door/court → 0.1.8 seal). The appliance builds beside it and absorbs it stone by stone (`SPEC_CONTROL_CENTER.md` §10).
+- **Manjuel finishes its own path** (0.1.7 door/court → 0.1.8 seal). The appliance builds beside it and absorbs it stone by stone (`SPEC_CONTROL_CENTER.md` §10).
 - **atlas is an artifact now**; pieces are pulled into Research at places he names (SITTING LAW 4).
-- **Windows 11 host, RX 6800 XT 16 GB, Ollama at 127.0.0.1:11434, OLLAMA_NUM_PARALLEL=1** — sequential inference by construction (chain DESIGN §9).
+- **Windows 11 host, RX 6800 XT 16 GB, Ollama at 127.0.0.1:11434, OLLAMA_NUM_PARALLEL=1** — sequential inference by construction (Manjuel DESIGN §9).
 - **CRLF is the ruling** for what the estate writes; fixtures keep what they have.
 - **Client material is sealed** (SITTING LAW 2). The design must make the wrong thing impossible, not merely forbidden.
 
@@ -108,7 +108,7 @@ GPU; the software is what this estate already is, finished and joined.
 │  queue ·     │  stdio; no socket    │                               │
 │  tiers       │                      │                               │
 ├──────────────┴──────────────────────┴───────────────────────────────┤
-│  THE SPINE      atlas (Rust) · sha256 · canon · chain verdicts ·    │
+│  THE SPINE      atlas (Rust) · sha256 · canon · Manjuel verdicts ·    │
 │                 merkle · covenant · SQLite mirror (derived) ·       │
 │                 export byte-identical                               │
 ├─────────────────────────────────────────────────────────────────────┤
@@ -130,7 +130,7 @@ Three rules hold the picture together, and all three already exist:
 2. **The record is the truth; everything else is derived** (atlas
    `SPEC_SQLITE`): the SQLite mirror, the index, the glass's every screen —
    all `fold(record)`, all rebuildable from the files.
-3. **One executor, one writer** (chain SPEC §3, §4.2 of the spec): exactly
+3. **One executor, one writer** (Manjuel SPEC §3, §4.2 of the spec): exactly
    one seat runs tools; exactly one engine writes a world.
 
 ### 2.2 Data flow — one business day, end to end
@@ -271,7 +271,7 @@ is testimony (`routed_by: model`), never a route it invented.
 ### 3.4 The drop — photos and voice from the phone
 
 An SMB share on the box, one folder per world: `\\box\drop\TBC\`. The
-phone's Files app writes there; no app, no account. The watcher (chain
+phone's Files app writes there; no app, no account. The watcher (Manjuel
 `watch.py`, already classifying arrivals) hands each file to `drop_ingest`:
 hash via `atlas` → ledger line `{kind: photo, file, sha256, ts}` → EXIF GPS
 stripped **on arrival** (the scrub proved 150 of 266 photos carried the
@@ -297,7 +297,7 @@ where a code was.
 
 HTML from templates by string-replace (`tbc_estimate/generator.py`, as
 built), print-to-PDF from the glass (what he does today, zero
-dependencies). `weasyprint` is **not** taken on: chain's one-dependency law
+dependencies). `weasyprint` is **not** taken on: Manjuel's one-dependency law
 and atlas's zero. If a server-side PDF is ever needed, it is one hand-rolled
 writer over the seam, not a pip install.
 
@@ -339,7 +339,7 @@ the door + 3 pipelines × ~300 s + one index refresh — under an hour of GPU
 time. The card is the only contended resource; THE RACK's seat-call queue
 serializes worlds at seat granularity and shows the queue in the glass.
 There is no horizontal scaling and no need for it: **a second operator is a
-second box** (chain SPEC §1), and a world moves by copying a folder.
+second box** (Manjuel SPEC §1), and a world moves by copying a folder.
 
 ### 4.2 Failure and recovery
 
@@ -349,12 +349,12 @@ second box** (chain SPEC §1), and a world moves by copying a folder.
 | a seat past its bound | cut, named in the delivery | his call: retry, reseat smaller, raise the bound |
 | VRAM over budget | `vram.render` refuses the pipeline before it runs | override recorded, or smaller tier |
 | a world's `law/chain.jsonl` fails to verify | **no seat sits** | he re-seals or restores from the origin's copy |
-| FLIP / TAMPER on any chain | reads only; the glass alerts; no writes | the operator rules |
+| FLIP / TAMPER on any Manjuel | reads only; the glass alerts; no writes | the operator rules |
 | box dies | the record is files on NAS disks; SQLite/index are derived | copy the folder to a new box; `atlas db import`; rebuild the index |
-| power loss mid-write | JSONL append + `os.replace` counters; chain replays past `last_applied_n` | nothing to do; the record never holds a state the journal doesn't justify |
+| power loss mid-write | JSONL append + `os.replace` counters; Manjuel replays past `last_applied_n` | nothing to do; the record never holds a state the journal doesn't justify |
 
 Backup is `robocopy /MIR` of `Research\` and `worlds\` to a second disk or
-a second box; the chain verdict on the copy is the proof it is whole.
+a second box; Manjuel verdict on the copy is the proof it is whole.
 
 ### 4.3 Monitoring and alerts
 
@@ -373,14 +373,14 @@ both older than two visits today).
 | decision | chosen | over | why | cost |
 |---|---|---|---|---|
 | Truth | plain files + hash chain | a database | portable, readable by a stranger, provable, survives the vendor | joins are folds; a mirror must be maintained |
-| Engine transport | stdio JSON lines (`serve.py`) | a socket / HTTP in the engine | keeps chain's "no listening socket" and atlas's "one computer"; one process per world = one writer | THE LINE must supervise processes |
+| Engine transport | stdio JSON lines (`serve.py`) | a socket / HTTP in the engine | keeps Manjuel's "no listening socket" and atlas's "one computer"; one process per world = one writer | THE LINE must supervise processes |
 | Inference | small local models, tiered, sequential | one big model or a cloud API | $0/month, private, fits 16 GB, measured not assumed | a court takes five minutes; some tasks need the 12b tier |
 | Network posture | LAN only, one operator credential | loopback only / WAN with auth | a NAS is a network appliance; the phone must reach it | the P2 gate (auth, TLS) becomes P0-adjacent — one secret, self-signed cert |
 | Sending | never from the box | SMTP / social APIs | RULE 4 and the gate; no hallucinated invoice leaves | one more tap per message; posting is manual |
 | PDF | print-to-PDF | weasyprint | zero deps; what he does today | no unattended PDF generation |
 | Codes | `.env`-class file, never shown | fields in the client record | LAW 9 already covers it; the packets stop leaking | the visit skill must read it at the seam |
-| Second user | a fork (a second box or a second world) | multi-tenant auth now | chain SPEC §1; nothing to get wrong yet | remote/family access waits for a ruling |
-| Dependencies | chain `ollama` only; atlas none; hand-roll or refuse | pip/npm/crates | the two charters; no supply-chain surprise on a home box | more code owned; slower on the margins |
+| Second user | a fork (a second box or a second world) | multi-tenant auth now | Manjuel SPEC §1; nothing to get wrong yet | remote/family access waits for a ruling |
+| Dependencies | Manjuel `ollama` only; atlas none; hand-roll or refuse | pip/npm/crates | the two charters; no supply-Manjuel surprise on a home box | more code owned; slower on the margins |
 | The hub prototype | keep its shapes, retire its store | keep `tbc_hub_v2.html` as is | a browser tab is not a record; localStorage is not durable | the eight panels are rebuilt over THE LINE |
 
 ---

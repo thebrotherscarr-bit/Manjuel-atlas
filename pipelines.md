@@ -68,7 +68,7 @@ anything else reads it, and the result is delivered as a written briefing.
 
 ## Pipeline: estate
 
-Every seat runs — the deliberate chain, not the everyday one: inquire, hold the
+Every seat runs — the deliberate Manjuel, not the everyday one: inquire, hold the
 whole, refute, then rule.
 
 **Manjuel is last, here as in `court`.** Until 2026-09-01 this pipeline ran him

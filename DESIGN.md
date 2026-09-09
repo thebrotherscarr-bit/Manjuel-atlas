@@ -1,4 +1,4 @@
-# Chain CLI — Architecture Design
+# Manjuel CLI — Architecture Design
 
 Design target: a local, Ollama-backed multi-agent REPL where **markdown is the
 source of truth** and Python is only the engine that runs them.
@@ -46,10 +46,10 @@ Kept as the record of why the rewrite happened. Every row below is closed;
 | 3 | Persona prompts are sent as `role: user`, never `role: system` | Weaker steering, and the persona competes with the payload for the model's attention. |
 | 4 | **Security Guardian** and **Expert Coder** are defined but never invoked | Two of six agents are dead weight. The safety gate you wrote does not run. |
 | 5 | `raw_feed = input()` on multi-line paste | Line 1 becomes the feed; **remaining lines get consumed as the next loop's prompts.** Silent data loss on exactly the "paste a news feed" use case. |
-| 6 | Skills manifest is generated from `skills/*.md`, but `execute_markdown_skill` dispatches on a hardcoded if/elif chain | Drop a new `.md` in `skills/` and the router will confidently call a skill that cannot execute. Manifest and executor drift with no warning. |
-| 7 | Each stage receives only the previous stage's string | The chain is a telephone game. By step 4 the original topic is gone — the delivery agent formats a 0.5b model's rewrite of a 0.5b model's summary. |
+| 6 | Skills manifest is generated from `skills/*.md`, but `execute_markdown_skill` dispatches on a hardcoded if/elif Manjuel | Drop a new `.md` in `skills/` and the router will confidently call a skill that cannot execute. Manifest and executor drift with no warning. |
+| 7 | Each stage receives only the previous stage's string | The pipeline is a telephone game. By step 4 the original topic is gone — the delivery agent formats a 0.5b model's rewrite of a 0.5b model's summary. |
 | 8 | Inner `except` catches only connection errors | A missing model tag or a malformed response dict kills the whole REPL instead of the run. |
-| 9 | Pipeline runs entirely on 0.5b–1.5b models while 4b/7b/9b/14b tags sit unused locally | Every tag resolves, so nothing crashes — but the quality ceiling is set by the smallest model in the chain. See §9. |
+| 9 | Pipeline runs entirely on 0.5b–1.5b models while 4b/7b/9b/14b tags sit unused locally | Every tag resolves, so nothing crashes — but the quality ceiling is set by the smallest model in Manjuel. See §9. |
 | 10 | `logs/` exists and holds a prior transcript, but nothing in `manjuel.py` writes to it | Runs are unreproducible. |
 | 11 | No streaming | Dead terminal for the duration of every generation. |
 
@@ -79,10 +79,10 @@ manjuel/
   vectors.py     # the semantic index; secret-file refusal
   drift.py       # advisory cosine of each stage against the source
   mathkit.py     # dot, cosine, regression — no numpy
-  parity.py      # chain vs a bare call to the same model      (§13.3)
+  parity.py      # Manjuel vs a bare call to the same model      (§13.3)
 
   us.py          # the capability manifest, parsed and RECONCILED to code
-  lawgate.py     # the law gate: the sealed chain walked, the objective checked, every run stamped (§14.13)
+  lawgate.py     # the law gate: the sealed Manjuel walked, the objective checked, every run stamped (§14.13)
   memory.py      # memory.md, append-only + pending staging
   seatlog.py     # sittings and the toll
   transcript.py  # logs/<timestamp>_<slug>.md; demotes seat headings
@@ -399,9 +399,9 @@ Two corrections up front, because they change the shape of the answer.
 
 ### Embedders cannot be pipeline stages
 
-`nomic-embed-text`, `nomic-embed-text-v2-moe`, `bge-m3:567m`, `qwen3-embedding:0.6b` and `qwen3-embedding:4b` are **embedding models**. They emit a fixed-length vector, not text. There is no prompt that makes one "review" a draft — it has no generative head. They cannot occupy a stage slot in the chain.
+`nomic-embed-text`, `nomic-embed-text-v2-moe`, `bge-m3:567m`, `qwen3-embedding:0.6b` and `qwen3-embedding:4b` are **embedding models**. They emit a fixed-length vector, not text. There is no prompt that makes one "review" a draft — it has no generative head. They cannot occupy a stage slot in Manjuel.
 
-### You cannot chain embedders together
+### You cannot Manjuel embedders together
 
 This is the part worth being blunt about: **each model's vector space is unrelated to every other model's.** Cosine similarity between a `nomic` vector and a `bge-m3` vector is not a weak signal, it is noise — the dimensions mean different things, and the numbers are not comparable even when the dimensionality happens to match. Feeding one embedder's output into another is not a meaningful operation.
 
@@ -456,7 +456,7 @@ Close, but the distinction matters. A translation layer sits *between* two stage
 
 It also isn't needed as a translator, because **text is already the universal interface between models.** Any model's output is directly consumable by any other. There is no impedance mismatch to bridge.
 
-What the embedder does is sit *beside* the chain and measure it. Content flows stage to stage as plain text, exactly as now; the embedder is pointed at that text to answer questions like "did this drift from the source?" or "which skill is this objective closest to?" It's a measuring instrument and a card catalog — not a conveyor belt, and not a link in the chain.
+What the embedder does is sit *beside* the pipeline and measure it. Content flows stage to stage as plain text, exactly as now; the embedder is pointed at that text to answer questions like "did this drift from the source?" or "which skill is this objective closest to?" It's a measuring instrument and a card catalog — not a conveyor belt, and not a link in Manjuel.
 
 ### Where embedders genuinely belong here
 
@@ -469,13 +469,13 @@ They fix the three weakest points in §9 — as *measurement*, which is exactly 
 | **Redundancy detection** | Sentence embeddings, flag near-duplicate pairs | The "fluff sentences" the Quality Evaluator is asked to find — deterministic, no model judgment needed |
 | **Run retrieval** | Index `logs/` and `agent_workspace/`; retrieve relevant prior runs for a new objective | Nothing yet — this is new capability |
 
-**Run retrieval is the real answer to "make them work cohesively."** It's what turns a set of models that restart cold every run into a system that accumulates. The embedder isn't in the chain; it's the memory the chain reads from.
+**Run retrieval is the real answer to "make them work cohesively."** It's what turns a set of models that restart cold every run into a system that accumulates. The embedder isn't in Manjuel; it's the memory Manjuel reads from.
 
 Note that drift scoring and redundancy detection produce **numbers**, not prose. That makes them qualitatively better than a small model's opinion: a cosine score can't hallucinate, and you can set a threshold and act on it.
 
 ### Serial chains compound error; panels average it
 
-The instinct to add more review stages is right, but the current shape works against it. In a serial chain each stage rewrites the last, so **every stage's error is inherited and amplified** — and a small model's rewrite can destroy correct text as easily as fix broken text. Adding stages to a serial chain makes this worse, not better.
+The instinct to add more review stages is right, but the current shape works against it. In a serial Manjuel each stage rewrites the last, so **every stage's error is inherited and amplified** — and a small model's rewrite can destroy correct text as easily as fix broken text. Adding stages to a serial Manjuel makes this worse, not better.
 
 A review *panel* inverts that: several reviewers see the **same** input independently and never see each other's output, so errors are uncorrelated and tend to cancel rather than accumulate.
 
@@ -590,7 +590,7 @@ Grammar is a seat, not a function: `agents/proofreader.md` wakes on `prose`.
 ### 13.3 Parity — `parity.py`
 
 **Does the machinery earn its keep?** By default the reference is the *same
-model the seats run*, called once, bare. So the comparison is the whole chain
+model the seats run*, called once, bare. So the comparison is the whole Manjuel
 — Steward, Router, tools, rack, drift, closing Steward — against just asking
 the model. Several calls versus one.
 
@@ -599,7 +599,7 @@ performs. Nothing new, nothing billed, nothing leaves the box.
 
 > **The direction of the reading depends on the reference, so the report groups
 > by it and never averages across.** Against the seats' own model, HIGH means
-> the chain changed nothing and was overhead. Against a *larger* local model,
+> Manjuel changed nothing and was overhead. Against a *larger* local model,
 > HIGH means the seats kept up. Same number, opposite conclusions.
 
 And the standing caution, unchanged from drift: a cosine is topical agreement,
@@ -616,7 +616,7 @@ go and read that pair. An embedding cannot know a fact.
 
 `qwen3.5:2b` was dropped despite being the obvious choice. It is a *reasoning*
 model: it spent an entire 56-second run inside its `thinking` field and handed
-back `content: ""`, and the chain delivered a blank screen. `llama3.2` is
+back `content: ""`, and Manjuel delivered a blank screen. `llama3.2` is
 smaller (2.0 GB vs 2.7 GB), has native tool calling, and has no thinking field
 to lose the answer in.
 
@@ -655,16 +655,16 @@ be able to shape the record either.**
 
 ### 13.7 The index reads Research, and only Research
 
-`index_roots.txt` now includes `manjuel/` and `tests/`, so the chain can read
+`index_roots.txt` now includes `manjuel/` and `tests/`, so Manjuel can read
 *how it works* and not merely *how it is configured* — the strokes are the
 most precise statement of intended behaviour in the ground.
 
-Archive is reference the operator reads. It is not ground the chain indexes,
+Archive is reference the operator reads. It is not ground Manjuel indexes,
 and a stroke fails if any root ever escapes Research.
 
 ### 13.8 Open questions, session 13
 
-- **Does the chain beat a bare call?** Unmeasured until `/parity` is run. If it
+- **Does Manjuel beat a bare call?** Unmeasured until `/parity` is run. If it
   does not on ordinary questions, the spine is too long and should shrink
   further.
 - **`llama3.2` as Router across 27 skills.** It has echoed the skill keyword
@@ -692,7 +692,7 @@ was bought at their expense.
 
 ### 14.1 §13.8's open questions, answered
 
-- **Does the chain beat a bare call?** Measured. `/parity` puts the chain at
+- **Does Manjuel beat a bare call?** Measured. `/parity` puts Manjuel at
   ~0.93 against a bare call to the same model on ordinary questions, 0.82–0.88
   against larger references — "the seats kept up". The spine did not need to
   shrink; the answer was better gates, not fewer stages.
@@ -759,7 +759,7 @@ judgement, and names itself in the record when it fires.
 
     gibberish gate      noise never reaches a seat (s22)
     injection gate      hostile feed refused BEFORE the Guardian model (s39)
-    LAW 8 path gate     one write-path per chain, checked at execute() on the
+    LAW 8 path gate     one write-path per Manjuel, checked at execute() on the
                         DECLARED **Path Args:** -- 5 of 26 handlers had been
                         jailing their own paths, and nothing could tell "no
                         path" from "forgot to jail it"
@@ -892,9 +892,9 @@ a thumb on the scale rather than a second opinion. The doctrine is exempt --
 the founding documents are old by nature, and decaying them would bury the
 ground's own law under whatever ran this morning.
 
-### 14.9 Context does not chain by summary
+### 14.9 Context does not Manjuel by summary
 
-The operator asked whether the chain could "expand" context from model to
+The operator asked whether Manjuel could "expand" context from model to
 model. It cannot widen a window. It can widen the MATERIAL COVERED, and
 only one of the two ways of trying works:
 
@@ -1104,7 +1104,7 @@ GATE, not a prompt line, because the estate already knew what a prompt
 line is worth (sitting 46: instructions in a prompt are parrot food) and
 what a gate is worth (§14.5, the shield; §14.10, the AST).*
 
-`manjuel/lawgate.py`, first in `run_pipeline`. Four acts: the chain is
+`manjuel/lawgate.py`, first in `run_pipeline`. Four acts: Manjuel is
 walked with the pen and every sealed law's fingerprint checked (a tampered
 law refuses every run -- LAW 4's rule for a red suite, applied to the law
 itself); the objective is checked against the laws a regex can decide
@@ -1124,7 +1124,7 @@ door should be told the block is not source material.
 ### 14.14 THE CLAUDE.md SYSTEM, for the seats (built 2026-09-07)
 
 *The operator, the Monday after: "make sure we are looking at how the
-claude.md works and implementing that system into the chain." CLAUDE.md
+claude.md works and implementing that system into Manjuel." CLAUDE.md
 works on the hand by five mechanisms; four of them had no counterpart for
 the seats, and the record of sittings 86–87 showed each absence.*
 

@@ -35,7 +35,7 @@ a suite ends up testing the room instead of the code.
     AUDIT     tests/audit_record.py    is the RECORD honest?
               Reads the real logs. REPORTS, never gates.
 
-    PARITY    /parity in the REPL      does the chain earn its keep?
+    PARITY    /parity in the REPL      does Manjuel earn its keep?
               Real models. Measures, never rules. See parity.md.
 
     SITTINGS  running manjuel.py         the E2E tier. Real models, real

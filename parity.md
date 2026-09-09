@@ -1,6 +1,6 @@
 # Parity cases
 
-What the local chain is measured against. Each case is run twice — once
+What the local Manjuel is measured against. Each case is run twice — once
 through this machine's seats, once as a single bare call to a reference
 model on the same rack — and the two answers are compared with the embedder
 already resident. Nothing leaves the machine.
@@ -41,7 +41,7 @@ the default question; it is one case, kept, and labelled.
 
 That flips how a score reads, and the report says so per reference model:
 
-- **vs the seats' own model** — HIGH means the chain produced roughly what a
+- **vs the seats' own model** — HIGH means Manjuel produced roughly what a
   bare call did, so on that case the machinery is overhead. LOW means it
   diverged; go read whether it diverged into something better or worse.
 - **vs a larger model** (`**Model:** qwen3.5:9b`, `qwen2.5-coder:14b`) — HIGH
@@ -155,7 +155,7 @@ to the largest head on the rack. `/use court` first. LOW is the interesting read
 - **Objective:** A tool ran, failed, and the seat that read the result reported success. Say in three sentences why that is worse than reporting nothing, and what would prevent it.
 - **Model:** qwen2.5-coder:14b
 
-## Case: same weights, bare — the chain's overhead
+## Case: same weights, bare — Manjuel's overhead
 
 Kept from the old default. The Steward on `phi4-mini` against `phi4-mini`
 called once. HIGH here means the machinery changed nothing on this case.

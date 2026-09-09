@@ -1,7 +1,7 @@
 # Tasks
 
 The list, hung off BUILDPATH's layers so a task says WHERE it lives, not just
-what it is. Opened 2026-09-03, sitting 78, because sitting 77 asked the chain
+what it is. Opened 2026-09-03, sitting 78, because sitting 77 asked Manjuel
 whether it had a todo list and the honest answer was no.
 
 **What belongs here.** Work the RECORD already owes — a toll that named it, a
@@ -164,19 +164,19 @@ when a seat says so.
          PARTS 2 AND 3 REMAIN AND ARE NOT SCHEDULED: the matrix generator
          (Layer 8) and making REFUSALS.md reliably retrievable.
 
-    [-]  (original entry) AN INTERNAL, REVIEWABLE TEST SUITE THE CHAIN CAN RUN ON ITSELF.
+    [-]  (original entry) AN INTERNAL, REVIEWABLE TEST SUITE MANJUEL CAN RUN ON ITSELF.
          Sitting 81's WHAT PROVED: "we need a test suite, pipeline, and
          info for the system to understand its limitations for context."
 
          The gap is real and it is NOT the strokes. 1,375 strokes test the
-         ENGINE from outside, offline, stubbed. What the chain cannot do is
+         ENGINE from outside, offline, stubbed. What Manjuel cannot do is
          answer "have you run a full test suite on these skills?" — asked
          in that sitting and answered from nothing. It has no reviewable
          account OF ITSELF to read.
 
          Three parts, and the first is nearly free:
            1. `tests/last_run.md` + run_history + the manifest report are
-              already on disk. A skill that READS them would let the chain
+              already on disk. A skill that READS them would let Manjuel
               answer that question with fact instead of guessing.
            2. the synthetic matrix generator (BUILDPATH Layer 8) — phrasing
               variance through run_pipeline, scored on signals already
@@ -186,7 +186,7 @@ when a seat says so.
            3. limitations as READABLE GROUND: REFUSALS.md is already the
               document; it is not reliably retrieved when asked.
 
-         DONE WHEN: the chain, asked what it has proved, answers from
+         DONE WHEN: Manjuel, asked what it has proved, answers from
          last_run.md rather than from its own head. Part 1 only. Parts 2
          and 3 are separate and neither is scheduled.
 
@@ -450,7 +450,7 @@ when a seat says so.
          and it is the shape that no existing guard can see.
 
          THE HONEST LIMIT, stated so nobody oversells it: this reaches
-         seats inside the chain. It does nothing about an agent working on
+         seats inside Manjuel. It does nothing about an agent working on
          the ground from outside, whose tool calls no gate here can touch.
          For that there is LAW 3 and the record, which is how the operator
          caught it both times today.
@@ -539,12 +539,12 @@ when a seat says so.
          mattered, and that is now fixed (below). Read correctly:
 
            0.82 vs llama3.2 -- a model the seats do NOT run. High topical
-           agreement between the chain-on-phi4-mini and a bare llama3.2
+           agreement between Manjuel-on-phi4-mini and a bare llama3.2
            call. Evidence about the two models agreeing, NOT about whether
-           the chain earns its keep.
+           Manjuel earns its keep.
 
            0.53 vs phi4-mini -- the seats' OWN model, so LOW means the
-           chain DIVERGED from a bare call. On "summarise a feed" the
+           Manjuel DIVERGED from a bare call. On "summarise a feed" the
            machinery did something a plain call did not. Go read that pair
            before concluding it was better; the score cannot say.
 
@@ -672,7 +672,7 @@ when a seat says so.
 
               Also corrected in the prose: embedder tag (v2-moe), tool cap
               (4 -> 5), and the THIN paragraph about `logs/` not being a
-              chain -- resolved, with the distinction kept between an
+              Manjuel -- resolved, with the distinction kept between an
               append-only sitting record and the hash-chained law ledger.
 
     [x]  8.2  us.py PARSE — landed 2026-09-03. `us.load()` returns every
@@ -739,7 +739,7 @@ when a seat says so.
               engine only — no SEAT_LOG, no memory, no logs, no sessions,
               no .env, no bin/ binaries. `law/` is unpackaged too: it is a
               ledger bound to this ground by sha256, and a copy in
-              site-packages would be a second chain nobody walks.
+              site-packages would be a second Manjuel nobody walks.
 
     [x]  9.2  CI — landed 2026-09-03. `.github/workflows/prove.yml`: both
               suites plus `law.py --prove`, on Windows AND Ubuntu, Python

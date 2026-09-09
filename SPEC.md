@@ -75,7 +75,7 @@ A proposal that needs a word uses the nearest one below.
 | **a pipeline** | ONE TURN's running order of seats and tools: who sits, in what order, who wakes on which flag, which seat hands to which. The Steward handing to the Router, the Router calling the index, Jesster reviewing what the Router read -- all inside one pipeline. Declared in `pipelines.md`. | pipelines.md; ruled 2026-09-07 |
 | **a workflow** | SEVERAL TURNS strung into one task: a list of objectives, each run through a pipeline, checked between steps, reported at the end. The standup is the first one. Not yet declared in a file. | the operator, 2026-09-04 and 2026-09-07 |
 | **a flag** | a seat's one-word signal to the engine (`needs_tool`, `technical`, `worked`); wakes a racked seat. | DESIGN.md §5 |
-| **a sitting** | one launch of the REPL, numbered by the chain. Never the hand's session. | seatlog.py; LAW 10 |
+| **a sitting** | one launch of the REPL, numbered by Manjuel. Never the hand's session. | seatlog.py; LAW 10 |
 | **the toll** | what a sitting pays at close: what proved, what is thin, what is owed. | LAW 10 |
 | **the record** | everything written down: transcripts, SEAT_LOG, DAYBOOK, HANDOFF, CHANGELOG, memory.md, sessions. | LAW 1, LAW 10 |
 | **the standing** | what this sitting is for, from DAYBOOK's last entry, handed to the door and the court. | 2026-09-07 |

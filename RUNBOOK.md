@@ -16,7 +16,7 @@ for anything it names: BUILDMAP.md.
 
 ---
 
-## The chain will not start
+## Manjuel will not start
 
 **`RACK UNREACHABLE — the ground is open, the models are not.`**
 
@@ -46,7 +46,7 @@ network, and a parse error or a bad seat file shows up there in a second.
 **`Unable to create '.git/index.lock': File exists`**
 
 An interrupted `add` or `init` left a lock behind. Git never cleans these up.
-The chain names it with its age and the exact removal command rather than
+Manjuel names it with its age and the exact removal command rather than
 inventing a cure (that fix is from sitting 6). A lock older than two minutes
 with no git process behind it is stale, not contended:
 

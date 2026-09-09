@@ -24,7 +24,7 @@ checkout artifact.
 not a config change. Agents prepare; a person lands. That is RULE 6 in
 `CLAUDE.md` and LAW 6 in the ledger, and it is not a setting.
 
-If a change would let the chain commit, approve, or write outside its
+If a change would let Manjuel commit, approve, or write outside its
 declared wall, it is not a feature with a flag — it is a different project.
 
 ## Every guard is named after the failure that earned it

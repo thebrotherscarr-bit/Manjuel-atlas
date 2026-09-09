@@ -78,7 +78,7 @@ knows Ollama; nothing else knows either.**
                   secret-named files whatever their extension.
     drift.py      each stage scored against the source; a low score is a
                   flag to read, never a verdict.
-    parity.py     the chain vs one bare call to the same local model;
+    parity.py     Manjuel vs one bare call to the same local model;
                   grouped by reference, expected refusals honored.
     vram.py       footprint planning, foreign-model detection, budget.
     rack.py       rack.md -- what is on this machine, written down with the
@@ -93,7 +93,7 @@ knows Ollama; nothing else knows either.**
                   history, and whether the manifest still agrees with the
                   disk. Added 2026-09-03 (sitting 81) because the operator
                   asked "have you run a full test suite on these skills?"
-                  and the chain answered out of its own head. The strokes (a count
+                  and Manjuel answered out of its own head. The strokes (a count
                   the suite prints; none is written here)
                   test the ENGINE from outside; none let the ESTATE say what
                   it had proved. It reports its own limits every time and
@@ -140,7 +140,7 @@ knows Ollama; nothing else knows either.**
                       lands         may it write the operator's record
                       can_approve   may it authorise anything (always false)
                       covenant      the hash binding a record to its office
-                      reports_to    the chain of answerability
+                      reports_to    Manjuel of answerability
 
     THE MANIFEST IS THE SAFETY CLAIM. Every other harness answers "what
     can this tool do?" with prose. This one answers "what may it reach?"
@@ -199,7 +199,7 @@ knows Ollama; nothing else knows either.**
                       logs, no sessions, no .env, no bin/. `law/` is
                       unpackaged: it is a ledger bound to this ground by
                       sha256, and a copy in site-packages would be a
-                      second chain nobody walks.
+                      second Manjuel nobody walks.
     SPEC.md           LANDED 2026-09-04. What this IS and when it is DONE,
                       line by line: MET with the stroke, or OPEN with whose
                       call it is. The contract; DESIGN is the reasoning.

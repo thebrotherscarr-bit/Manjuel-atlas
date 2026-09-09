@@ -9,7 +9,7 @@ exists. Use `/reload` in the REPL to pick up edits without restarting.
 **There is no seat table in this file, on purpose.** One lived here until
 2026-09-02 and every row of it had gone stale: seats that no longer existed,
 seats missing, and a model tag (`llama3.2`) that by then carried nothing. It
-was not parsed by anything, but it *was* indexed — so the chain could retrieve
+was not parsed by anything, but it *was* indexed — so Manjuel could retrieve
 a confident, wrong account of itself. A roster is inventory, and inventory
 belongs to the thing that holds it:
 
@@ -76,7 +76,7 @@ Laws every seat carries:
 - The gate is final (LAW 6). No seat commits, pushes, lands, approves, or exiles.
 - Fold, never delete (LAW 1). Corrections append; they never overwrite.
 
-> **CLOSED 2026-09-01 — the order of the chain.** THE LAW has the court read
+> **CLOSED 2026-09-01 — the order of Manjuel.** THE LAW has the court read
 > the counsel and then rule, which puts Manjuel *last*. `estate` had been
 > running him third, ruling without having heard Jesster. It now runs him
 > last, as `court` always did; both pipelines carry the foundation order.

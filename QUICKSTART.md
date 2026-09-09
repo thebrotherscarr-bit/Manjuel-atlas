@@ -101,4 +101,4 @@ estate refused on purpose, and why.
 
 Every run is transcribed in `logs/` with per-stage timings, prompts kept
 apart in `logs/_prompts/`. Read the transcript before blaming a seat — the
-record outranks any model's account of itself, including the chain's own.
+record outranks any model's account of itself, including Manjuel's own.

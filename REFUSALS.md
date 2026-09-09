@@ -35,14 +35,14 @@ is still language.
 ## 2. Pasted material is refused before the Guardian reads it
 
 **Trigger.** Injection markers in a `/paste` feed — instructions to ignore
-prior instructions, attempts to re-instruct the chain, reaches for `.env` or
+prior instructions, attempts to re-instruct Manjuel, reaches for `.env` or
 credentials, fishing for system prompts.
 
 **Action.** The run is refused outright. **No seat reads the material**, and
 the markers are named in the record.
 
 **Why.** Sitting 39: an injection test feed sailed past the *model* Guardian
-and moved the chain's hands — a skill ran, and 76 characters were spoken
+and moved Manjuel's hands — a skill ran, and 76 characters were spoken
 aloud. A model gate rolls dice; this one does not. The Guardian model still
 sits behind it for everything softer.
 
@@ -62,7 +62,7 @@ rather than requested.
 
 ---
 
-## 4. One write-path per chain (LAW 8)
+## 4. One write-path per Manjuel (LAW 8)
 
 **Trigger.** A skill handler resolves a caller-supplied path. Every handler
 that does so must declare it (`**Path Args:**`), and the gate checks the
@@ -235,7 +235,7 @@ the file's contents were invented on top of the failure.
 
 ---
 
-## 12. The chain never lands anything (LAW 6 / RULE 6)
+## 12. Manjuel never lands anything (LAW 6 / RULE 6)
 
 **Trigger.** Any act that commits the operator: a git commit or push, a memory
 entry, a spend.
@@ -403,7 +403,7 @@ intent decides anything.
    fingerprint is checked against the file on disk. A law that does not
    verify refuses **every** run: "no seat sits on a law that cannot be
    trusted (LAW 4: a red blocks the road)." A ground with no ledger at all
-   (a bare clone, a test workspace) is not a broken chain; the gate says so
+   (a bare clone, a test workspace) is not a broken Manjuel; the gate says so
    in the record and runs on the rules alone.
 2. **Checks the objective** against what a regex can decide: a reach
    outside the ground (`..`, a drive letter, `~`, `/home` -- RULE 1 / LAW
@@ -414,7 +414,7 @@ intent decides anything.
    (`vault/`, `.client.` -- SITTING LAW 2). A hit refuses the run with the
    law named. No seat read it.
 3. **Hands every seat the law as fact** -- a `## The law` block, the
-   chain verified, at which head, and which checks this request passed.
+   Manjuel verified, at which head, and which checks this request passed.
    Appended to the user prompt until 2026-09-07; in the SYSTEM role since
    (§20), where a small model does not recite it as content. A seat cannot
    claim it was not told; a reader of the transcript can see it was.
@@ -436,7 +436,7 @@ ledger-less ground passes on the rules and says so.
 ## 20. THE CLAUDE.md SYSTEM, and THE RULING LOOP — what a seat is handed beside its prompt, and how long it may think
 
 **The operator, 2026-09-07:** "make sure we are looking at how the
-claude.md works and implementing that system into the chain", and, on
+claude.md works and implementing that system into Manjuel", and, on
 Manjuel: "expanding his context and letting him give some room for
 thinking, but limit his turns ... kind of like the router is limited."
 
@@ -533,7 +533,7 @@ clock or a lock; no model is asked.
   green and after the newest edit, buildmap, the standup live, the law,
   the manifest, SPEC-vs-CHANGELOG, DAYBOOK closed, HANDOFF today, the
   hands ledger closed. Reads only. RUNBOOK "Before a tag".
-- Smaller, the same day (the REPL read): the chain's own writes
+- Smaller, the same day (the REPL read): Manjuel's own writes
   (`sessions/`, SEAT_LOG.md, memory.md, rack.md, the suites' stamps) no
   longer queue a re-embed every turn (`watch._SELF_WRITTEN`); a palette
   command whose Runs: is a command is refused before it re-enters the

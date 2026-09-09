@@ -1,4 +1,4 @@
-# Chain
+# Manjuel
 
 A local multi-agent CLI. One REPL, a rack of seats that rest until called,
 markdown as the source of truth, and a git-versioned ground. Everything runs
@@ -61,7 +61,7 @@ widen a window, only cover more ground with each one.
   the card — answered by the harness from ground truth, never by a model.
 - **Keys are silent.** `.env` is never printed, indexed, or passed on a
   command line. Secret-shaped files are refused by name.
-- **The gate is final.** The chain prepares commits, memory entries and
+- **The gate is final.** Manjuel prepares commits, memory entries and
   spends; the operator lands them.
 - **The ground is this folder.** Nothing reaches outside `Research`, and a
   test fails if anything tries.
@@ -140,7 +140,7 @@ no earlier doc named: `deep_research`, `ground_report`, `skill_report`,
   at the top of it.
 - `REFUSALS.md`   — every gate: what it refuses, and the failure that earned it
 - `TESTING.md`    — the tiers, how to run them, and the discipline
-- `parity.md`     — what the chain is measured against, and how to read a score
+- `parity.md`     — what Manjuel is measured against, and how to read a score
 - `RUNBOOK.md`    — when the machine misbehaves: rack down, locks, VRAM, voice
 - `BUILDPATH.md`  — every module, what it owns, and the order it was built
 - `DESIGN.md`     — the architecture record, including what was tried and superseded

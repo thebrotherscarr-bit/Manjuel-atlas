@@ -34,6 +34,57 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — THE DOCS SAY MANJUEL AND ATLAS (operator: "needs to all be reconciled for the manjuel-merger. remove the chainkit references, as well. just manjuel and atlas from here on out.")
+- **180 lines renamed across the live docs.** Three passes: the root docs
+  (50 lines), the bare `chain`/`chain's` the first pass required a "the" to
+  catch (115 more — `SPEC_CONTROL_CENTER` 72, `SYSTEM_DESIGN` 23; that file is
+  the reconciliation doc, written while `chain` still WAS the name), and the
+  atlas docs (15 across 7 files). Every pass ran the same guard.
+- **THE GUARD IS LINE-LEVEL, BECAUSE `chain` HAS TWO MEANINGS HERE.** The
+  PRODUCT ("the chain prepares commits") and the LAW CHAIN ("law.py verify walks
+  the chain"). Any line naming `law.py`, a hash-chained ledger, `chain.jsonl`,
+  `verify_chain`, sealed links or chain-of-custody was skipped WHOLE, even where
+  it also carried the product name. 23 such lines stand in the root docs and 57
+  in atlas, exactly as written. Under-renaming a line is recoverable; corrupting
+  a reference to the sealed law makes a doc lie about the one thing this estate
+  checks. `tests/fixtures/` was never opened at all — byte-exact goldens.
+- **Two lines were not the product either.** DESIGN.md's "The chain is a
+  telephone game" and "sit *beside* the chain and measure it" are the SEAT
+  PIPELINE, and the estate's own word for that is `pipeline`. Renaming them to
+  Manjuel would have kept the name and lost the meaning.
+- **A LIVE DIVERGENCE, NOT A STALE NAME.** The rack_pull wall was read TWO ways:
+  the core `MANJUEL_RACK_PULL in ("1","true","yes","on")`, atlas
+  `CHAINKIT_RACK_PULL == "1"`. Different name AND different truthiness — set the
+  documented dial and the core permitted a pull while atlas refused it, the same
+  shape as the git wall an hour earlier. `remoteAllowed` is now `dial(home,
+  name)`: the process environment first, then the ground's `.env`, honouring the
+  `CHAINKIT_` twin, with the core's truthiness. Both walls read one way. RULE 7
+  holds — one key looked up, a boolean back, no value returned or logged.
+- **A rename hazard, caught.** Renaming `python -m chainkit.seatlog hand-close`
+  mechanically would have made a DEAD command look live. `LAUNCH_PLAN.md` marks
+  it MOOT instead, and the Morning routine now says `python manjuel.py`.
+- Also: `SPEC_CONTROL_CENTER:364`'s covenant label carried a digest where the
+  name belongs; `atlas/tools/cut_rack_plan_vectors.py` read `CHAINKIT_VRAM_GB`;
+  `prove.go`'s stroke named the old system. All three now say Manjuel.
+- **THREE THINGS DELIBERATELY LEFT ALONE, each for a reason that outranks
+  tidiness** — and each the operator's call, not a hand's:
+  - `law/ESTATE_LAWS.md` and `law/SITTING_LAWS_2.md` carry the old name and are
+    SEALED. `law.py --prove` walks 9 strokes and a tampered law refuses every
+    run; their own Amendment clause says a new law is a NEW LINK, not an edit.
+  - `SEAT_LOG.md`'s title says the old name because that is what it was called
+    when the log was opened. Its second line: "Append below; never rewrite above."
+  - CHANGELOG / DAYBOOK / HANDOFF entries were written when it WAS that name.
+    Rewriting them would make the record say something untrue on the day (LAW 1).
+- **FOUND, NOT FIXED (reported instead, RULE 10):** four tests in
+  `atlas/line/internal/rack` fail on a fixture ground
+  (`atlas/tests/fixtures/rack_open_ground`) that never landed — untracked, not
+  ignored, never committed. They arrived with atlas in `164ea2c`; this sweep
+  touched nothing under `internal/rack`. Pre-existing.
+- Proven: 1915/1915 strokes, 60/60 smoke, `law prove` 9 strokes exit 0,
+  `go build` + `go vet` clean on both atlas trees, BUILDMAP regenerated (1245
+  lines). No file in `manjuel/` moved; no restart required.
+
+
 
 ### 2026-09-09 — THE WALL IS OPEN AND THE COUNCIL PUSHES ITS OWN WORK (operator: "pull that wall and push it out to the repo")
 - **The wall is his and he opened it.** `MANJUEL_GIT_REMOTE=1` lives in the
