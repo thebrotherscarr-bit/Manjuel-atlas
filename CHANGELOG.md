@@ -34,6 +34,35 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.6 (23a6a38, 2026-09-09 12:00)
 
+### 2026-09-09 — THE MIC: PROTOCOL 1 gains a fifth command (operator: "i can click the little mic icon, ask it for some stuff"; "i have the whisper stuff set up already ... in the REPL it's a local thing that works")
+- **Nothing was built to hear.** `manjuel/voice.py` already holds it: compiled
+  whisper.cpp on `ggml-base.en.bin`, offline, with room calibration, the estate
+  vocabulary bias (`correct_hearing`) and a 120s ceiling so a left-open mic
+  cannot record forever. `cli.py`'s `/chat` has driven it all along. The glass
+  now reaches THAT, so the CLI and the glass hear identically and cannot drift.
+- **`{"cmd":"listen"}` is the fifth command**, and `heard` the eighteenth event.
+  serve.py said voice "is not carried through the wire"; that line is REWRITTEN
+  rather than quietly contradicted. Half of it still holds: `/chat`'s
+  interactive loop reads the keyboard to cut off an answer, and a keypress has
+  no meaning down a pipe. The other half never did -- the engine runs on the
+  operator's own machine, so the microphone is right there.
+- **The words are NOT run.** `listen` returns `heard` and stops; the glass puts
+  them in the box for him to read, fix and send. A microphone that fired
+  objectives at the council on its own is a gate nobody holds (RULE 6), and a
+  misheard word would run before he ever saw it.
+- `Engine.Listen` pumps until `heard` or `error` and deliberately does not use
+  `pump()`: a capture is not a turn, produces no delivery and costs no toll, so
+  waiting on a turn's terminal events would hang the door indefinitely. It
+  holds `runMu` -- one microphone, and a capture racing a run would interleave
+  two conversations in one ledger.
+- `GET /run/listen` (SSE) and `/api/council/listen`; the mic sits on both the
+  launchpad and the chat box. voice.py's own progress lines are shown verbatim.
+- No audio touches the browser, the webapp or the network. The engine holds the
+  microphone; there is no `getUserMedia`, no upload, and nothing to leak.
+- Proven live end to end: click -> "listening — speak; the turn ends when you go
+  quiet" -> (silence) -> "heard nothing — is the right input device selected?"
+  -> box empty, nothing sent. Both of those sentences are voice.py's own.
+
 ### 2026-09-09 — the record caught up to the day, so the gate can be asked
 - HANDOFF.md gains **HANDOFF FOR 2026-09-09**: the frontend, the vibe coding
   loop, what 0.1.6 cut and what it did not, and the two known reds that are

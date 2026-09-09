@@ -50,12 +50,15 @@ THE WIRE (protocol 1). One JSON object per line, UTF-8.
 
   in   {"cmd":"objective","text":"...","feed":"...?","method":"...?"}
        {"cmd":"answer","text":"..."}      the reply to a needs_answer
+       {"cmd":"listen","seconds":N?}      capture one spoken turn; the
+                                          text comes back as `heard` and
+                                          is NOT run -- the hand sends it
        {"cmd":"cancel"}                   the run, or the pending question
        {"cmd":"close"}                    close the sitting (the toll is paid
                                           unattended if runs happened, as
                                           on exit)
   out  opened · text · run · report · seat · token · tool · tool_result ·
-       needs_answer · delivery · refused · aborted · cancelled ·
+       needs_answer · heard · delivery · refused · aborted · cancelled ·
        unreachable · error · note · closed
 
 An `objective` is anything the REPL would take at its prompt: a plain
@@ -68,8 +71,14 @@ WHAT IT IS NOT. Not a second executor, not a second engine, not
 multi-session: one process, one ground, one sitting, one writer -- the
 same shape as the REPL it stands beside. Environments (grounds under
 agent_workspace/) are THE LINE's to open, one door each (SPEC_CONTROL_CENTER
-§4.2). Voice (/chat, /listen) needs a microphone and a keyboard and is not
-carried through the wire.
+§4.2). Voice: ONE HALF crosses the wire, and one does not. `listen` (below)
+captures a single spoken turn through voice.py -- the same compiled
+whisper.cpp, the same vocabulary bias, the same call the REPL's /chat
+makes -- because the engine runs on the operator's own machine and the
+microphone is right there. What does NOT cross is /chat's interactive
+loop: it reads the keyboard to cut off an answer mid-sentence, and a
+keypress has no meaning down a pipe. A captured turn is returned, never
+run: the hand sends it, or edits it first (RULE 6).
 """
 
 from __future__ import annotations
@@ -87,10 +96,10 @@ from pathlib import Path
 PROTOCOL = 1
 
 # The wire's vocabulary, spelled once so a stroke can hold the door to it.
-COMMANDS = ("objective", "answer", "cancel", "close")
+COMMANDS = ("objective", "answer", "listen", "cancel", "close")
 EVENTS = ("opened", "text", "run", "report", "seat", "token", "tool",
           "tool_result", "needs_answer", "delivery", "refused", "aborted",
-          "cancelled", "unreachable", "error", "note", "closed")
+          "cancelled", "unreachable", "error", "note", "heard", "closed")
 
 # The first characters of a tool result that mean it failed -- the
 # pipeline's own test (pipeline.py, the tool loop), repeated here so the
@@ -358,6 +367,43 @@ class Door:
         finally:
             self.inbox.set_state(Inbox.RUNNING)
 
+    def _listen(self, row: dict) -> None:
+        """One spoken turn, captured and transcribed, and NOT run.
+
+        voice.listen() is the REPL's own call: it calibrates against the
+        room, ends the turn when the operator goes quiet, transcribes on
+        the compiled whisper.cpp and applies correct_hearing() so the
+        estate's proper nouns survive. Nothing is reimplemented here; if
+        the REPL can hear, so can the glass, and neither can drift.
+
+        The text comes back as `heard` and stops there. A microphone that
+        fired objectives at the council on its own would be a gate nobody
+        holds, and a misheard word would run before he had read it.
+
+        Every failure is voice.py's own sentence on an `error` event,
+        which is NOT terminal on this wire: a bad capture ends the
+        capture, never the sitting.
+        """
+        from . import voice
+        seconds = voice.MAX_TURN_SECONDS
+        try:
+            asked = int(row.get("seconds") or 0)
+            if asked > 0:
+                seconds = min(asked, voice.MAX_TURN_SECONDS)
+        except (TypeError, ValueError):
+            pass
+        try:
+            said = voice.listen(
+                seconds,
+                report=lambda m: self.wire.emit("note", text=str(m).strip()))
+        except voice.VoiceError as exc:
+            self.wire.emit("error", text=str(exc))
+            return
+        except Exception as exc:                      # a dead device, a bad driver
+            self.wire.emit("error", text=f"the microphone failed: {exc}")
+            return
+        self.wire.emit("heard", text=said)
+
     def _next(self) -> dict | None:
         if self._deferred:
             return self._deferred.pop(0)
@@ -381,6 +427,9 @@ class Door:
                 if cmd == "close":
                     self._close("closed by the client")
                     return 0
+                if cmd == "listen":
+                    self._listen(row)
+                    continue
                 if cmd == "cancel":
                     self.wire.emit("note", text="nothing is running; nothing to cancel")
                     continue
