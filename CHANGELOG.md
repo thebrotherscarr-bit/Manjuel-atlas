@@ -34,6 +34,63 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — EVERY DOCUMENT THE ESTATE IS BOUND BY IS NOW RETRIEVABLE (operator: "then run a sitting and index everything, the embedding model is already there in the manjuel core")
+- **THE GAP, MEASURED FIRST.** 11 of 24 root documents were in NO index root:
+  SPEC.md among them, so a seat asked what DONE means could not retrieve the
+  file that says what done means, and commands.md, so it could not retrieve
+  what it can be told to do. Four of the five law documents were absent too.
+  And it drifted the OTHER way as well — seven documents were IN the index
+  while declared nowhere (BUILDMAP, CHANGELOG, CLAUDE, DAYBOOK, HANDOFF, TASKS,
+  law/ESTATE_LAWS): a rebuild would not refresh them and a prune would evict
+  them, exactly the condition vectors.py warns about.
+- **`index_roots.txt`: 17 roots → 39.** Every root .md and the five law
+  documents, named ONE BY ONE rather than by folder, twice for reason: listing
+  `.` would sweep worlds/ in by inheritance (this list is the FIRST line of the
+  vault shield, the vectors.py vault rule is the second), and listing `law`
+  would index chain.jsonl — hundreds of hash lines — plus law.py as retrievable
+  prose, because TEXT_SUFFIXES takes .jsonl and .py. The laws are documents;
+  the chain is a ledger, proved by `law.py --prove`, not retrieved.
+- **The index: 828 → 994 documents, 6579 passages.** All 31 declared file-roots
+  present. Run through the council in a live sitting, not by hand.
+- **THE REBUILD DOES NOT FIT INSIDE A SKILL TIMEOUT.** `index_ground rebuild`
+  was refused at 300s (MANJUEL_SKILL_TIMEOUT) with the build still running
+  behind it, and it stopped 9 roots short — SYSTEM_DESIGN, TASKS, TESTING,
+  commands and all five laws. The incremental pass finished them in one turn
+  (996 files scanned, 12 embedded). A full rebuild over ~1000 documents is a
+  long job standing behind a short job's bound; that is the finding, not the
+  workaround.
+- **A REBUILT BINARY NOW REACHES A TAB THAT IS ALREADY OPEN.** His words: "my
+  browser isn't looking like yours". Measured: `curl -D -` on /js/home.js
+  returned 200, Content-Length, and NOTHING ELSE — no ETag, no Last-Modified,
+  no Cache-Control. An embed.FS reports the zero time as ModTime so
+  http.FileServer emits no Last-Modified, and it never emits an ETag; a
+  response with no validator and no freshness header may be cached
+  HEURISTICALLY and served without ever revalidating. One open tab kept the
+  same bytes across four rebuilds while a freshly navigated one saw every
+  change — which is why two people were looking at two different
+  applications. Every static file now carries a strong ETag (sha256 of the
+  bytes embedded in THIS binary, hashed once at startup) and `Cache-Control:
+  no-cache`, which does not mean do-not-store: the browser still caches, still
+  sends If-None-Match, and an unchanged file still answers **304 with 0 bytes**.
+  It simply may not serve a stale copy without asking. Proven end to end: the
+  page fetched `855ae646…d465` and the server's ETag is the same string.
+- **SITTINGS 113, 114 AND 115, all closed and tolled**; no orphan left in the
+  record. 115 was mine and it held the lock while he tried to open his own —
+  closed the moment he said so.
+- Proven: 1915/1915 strokes (the roots edit is asserted by strokes on
+  PROPERTIES — manjuel listed, foundation listed, rack.md listed, nothing
+  outside Research, no "Archive", every root exists, no root under worlds/),
+  60/60 smoke, `go build` + `go vet` clean.
+- **FOUND, NOT FIXED (reported, RULE 10):** `tests/release.py` is a nine-check
+  gate — strokes, smoke, buildmap, standup, law chain, manifest,
+  SPEC↔CHANGELOG, daybook, handoff — that reads and never writes, and is called
+  from NOTHING: not prove.yml, not the standup, not boot. Run by hand today:
+  8 ok, 1 refused (the standup predates the newest edit), exit 1. TASKS has
+  carried `[ ] the release gate in prove.yml` since 2026-09-08. Also: boot
+  never walks the law chain (zero mentions of law in boot.py) and never flags
+  the 22 never-closed sittings.
+
+
 ### 2026-09-09 — RECORDS: the estate's own documents, sorted by what they are (operator: "add a tab to the sidebar for the sittings and the logs from the evals … the records will hold all the docs for quick lookup"; "the logs and the function/command docs should all be separated out. like doctrine/agents/function/tools/skills")
 - **A NEW TOOL, BECAUSE NOTHING COULD REACH THEM.** `read_doctrine` serves only
   what the carried manifest declares (ONE file in this ground), `read_plan` maps
