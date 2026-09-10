@@ -8187,16 +8187,30 @@ def test_the_boot_reports_what_was_proved(reg, lib, book):
         "strokes": {"passed": 900, "total": 900, "green": True, "at": now},
         "smoke": {"passed": 59, "total": 59, "green": True, "at": now},
     }), encoding="utf-8")
-    # the source above is OLDER than the run, so this is a fresh green
+    # THE SOURCE IS STAMPED A MINUTE OLDER, RATHER THAN MERELY WRITTEN FIRST.
+    # suite_tally compares the newest source mtime against the run's `at`, and
+    # writing the file before reading time.time() is not enough on Windows: an
+    # mtime and time.time() do not come from the same clock at the same
+    # resolution, so a file written microseconds EARLIER can read as LATER.
+    # This failed on windows-latest 3.10 alone while the other three legs
+    # passed (2026-09-10); locally the gap measured -0.00063s, the right sign
+    # by a hair, which is how a flake hides. A minute is outside any
+    # filesystem's granularity, so the stroke tests the RULE, not the machine.
+    import os as _os
+    _os.utime(g / "manjuel" / "x.py", (now - 60, now - 60))
+    # the source is now plainly OLDER than the run, so this is a fresh green
     out = suite_tally(g)
     check("a fresh green run reports both tallies and when",
           "900/900 strokes" in out and "59/59 smoke" in out
           and "ago" in out, out)
     check("and a fresh run is not called stale", "STALE" not in out, out)
 
-    # touch the ground AFTER the run -- the number is now about old code
-    time.sleep(0.01)
+    # touch the ground AFTER the run -- the number is now about old code.
+    # Stamped a minute FORWARD for the same reason the fresh case is stamped a
+    # minute back: a sleep is a guess about how much clock skew is enough, and
+    # this needs no guess.
     (g / "manjuel" / "x.py").write_text("# changed\n", encoding="utf-8")
+    _os.utime(g / "manjuel" / "x.py", (now + 60, now + 60))
     check("a run older than the ground is named STALE",
           "STALE" in suite_tally(g), suite_tally(g))
 

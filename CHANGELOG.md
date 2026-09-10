@@ -34,6 +34,31 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — A STALENESS STROKE WAS RACING THE CLOCK, ON ONE LEG
+- **windows-latest 3.10 alone** went red on `and a fresh run is not called
+  stale` while the other three legs passed. Not the workflow change, and not
+  the jail: a sixth fault, and a FLAKE, which is the kind that outlives every
+  fix around it.
+- **THE RACE.** `suite_tally` decides `touched > newest_run` — newest source
+  mtime against the run's stamp. The fixture wrote `manjuel/x.py` and THEN read
+  `time.time()` into the stamp, so the file is genuinely older and the stroke
+  should hold. On Windows it does not reliably: an mtime and `time.time()` do
+  not come from the same clock at the same resolution, so a file written
+  microseconds EARLIER can read as LATER. Measured locally: the gap was
+  **-0.00063s** — the right sign by a hair, which is exactly how a flake hides
+  on the machine that writes it.
+- **BOTH DIRECTIONS NOW SET THEIR OWN TIMESTAMPS** with `os.utime`: the fresh
+  case stamps the source a minute BEFORE the run, the stale case a minute
+  AFTER. A minute is outside any filesystem's granularity or clock skew, so the
+  stroke tests THE RULE rather than the machine. The `time.sleep(0.01)` that
+  propped up the second case is gone with it — a sleep is a guess about how
+  much skew is enough, and this needs no guess.
+- **THE PRODUCTION RULE IS UNTOUCHED.** `touched > newest_run` is correct; the
+  FIXTURE was fragile. Fixing the rule to accommodate a bad fixture would have
+  weakened the one check that catches a green number older than the code.
+- Proven: the strokes run FIVE TIMES, 1965/1965 every time — a flake shows as
+  an inconsistent result, so a single green proves nothing about one.
+
 ### 2026-09-10 — CI IS GREEN ON ALL FOUR LEGS, AND THE WORKFLOW ITSELF AUDITED
 - **GREEN.** windows 3.10, windows 3.13, ubuntu 3.10, ubuntu 3.13 — the first
   green run this repository has had. It took FIVE stacked faults: numpy absent,
