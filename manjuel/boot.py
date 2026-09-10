@@ -84,6 +84,49 @@ def _models(sess, EMBED_MODEL: str) -> list[str]:
     return out
 
 
+# THE CODE DIRS, AND THE FILES A RUN WRITES INTO THEM.
+#
+# tests/release.py holds its own copy of this on purpose -- the release gate
+# must still be able to report on a tree where manjuel/ will not import, and
+# importing the engine into the gate would mean a broken engine kills the gate
+# instead of being reported by it. A stroke proves the two agree, because a
+# comment claiming they agree is exactly what failed here.
+CODE_DIRS = ("manjuel", "agents", "skills", "tests")
+STAMPS = {"last_run.md", "last_run.json", "run_history.jsonl", "last_audit.md"}
+
+
+def source_files(root: Path):
+    """Every file under the code dirs whose mtime counts as an EDIT.
+
+    THE FAULT THIS CLOSES, measured on the operator's ground 2026-09-10 and
+    seen by him "for a while": three copies of this rule existed -- here, in
+    `proved`, and in tests/release.py -- and only release.py excluded the
+    stamps. tests/last_run.md is a .md under tests/ that THE SUITE ITSELF
+    WRITES as it finishes, so `touched > newest_run` held the instant any
+    green run ended. The boot report announced STALE after EVERY successful
+    suite, and `proved` went further and NAMED last_run.md as a file that had
+    changed since the run that wrote it.
+
+    Boot's newest edit measured 0.0s after the run; release.py read the same
+    tree as 86s OLDER. Not a timing flake -- structural.
+
+    A WARNING THAT ALWAYS FIRES IS ONE HE STOPS READING, which makes it worse
+    than no warning: STALE is the line that would have told him a green number
+    was about old code.
+
+    last_run.json and run_history.jsonl are not .py/.md and so were never
+    caught by the suffix filter anyway. They are named regardless, because
+    relying on a suffix filter to exclude them is luck, and luck is what this
+    whole report exists to stop presenting as proof.
+    """
+    for d in CODE_DIRS:
+        for f in (root / d).rglob("*"):
+            if f.name in STAMPS or "__pycache__" in f.parts:
+                continue
+            if f.suffix in (".py", ".md"):
+                yield f
+
+
 def suite_tally(ROOT: Path) -> str:
     """What the suites last proved, and WHEN -- read from the stamp they
     write themselves (tests/last_run.json). No count is written into a doc
@@ -122,13 +165,11 @@ def suite_tally(ROOT: Path) -> str:
         red = red or not r.get("green")
 
     touched = 0.0
-    for d in ("manjuel", "agents", "skills", "tests"):
-        for f in (ROOT / d).rglob("*"):
-            if f.suffix in (".py", ".md"):
-                try:
-                    touched = max(touched, f.stat().st_mtime)
-                except OSError:
-                    pass
+    for f in source_files(ROOT):
+        try:
+            touched = max(touched, f.stat().st_mtime)
+        except OSError:
+            pass
 
     ago = max(0.0, time.time() - newest_run)
     when = (f"{int(ago // 60)}m ago" if ago < 5400

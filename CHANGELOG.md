@@ -34,6 +34,140 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE TWO DOC REPORTS LEAVE THE ROSTER: ARITHMETIC IS NOT A SKILL (operator: "you have too many knobs")
+- **THE COST OF A SKILL IS PAID ON EVERY TURN, BY EVERY QUESTION.** `doc_pass`
+  and `doctrine_check` were skills for about an hour. Both describe the record
+  — DAYBOOK, CHANGELOG, law chain, doctrine, foundational docs — and this
+  estate's commonest question IS about the record, so the moment they existed
+  they owned the Router's shortlist for every doc question:
+
+        what does the covenant say?  ->  doc_pass, doctrine_check, git_commit,
+                                         skill_search, git_cycle, inspect
+        what do the laws say         ->  search_transcripts, doc_pass,
+                                         doctrine_check, git_commit, git_cycle
+        read the spec                ->  doc_pass, git_cycle, inspect, read_file
+
+- **`semantic_search` — the right answer — was not offered at all.** The Router
+  reached it only by reasoning off the raw keyword line, and burned its whole
+  thinking budget doing it: **1,625 chars against the 7,400–9,400 of every run
+  that had worked that morning**, cut off mid-sentence just after concluding it
+  should search. The standup case `what does the covenant say?` was green at
+  09:05 and 09:33 and ran NO TOOL at 09:59 and 10:10.
+- **THE FIRST FIX WAS ONE MORE KNOB.** Narrowing the description helped — the
+  Router stopped naming `doc_pass` — and the case still failed. The operator
+  named the real fault: the core was being tuned to carry a control-plane
+  feature, and every turn the engine will ever run was paying for it.
+- **SO THEY ARE NOT SKILLS.** Both bodies moved to `manjuel/doctrine.py` beside
+  the arithmetic they already used; the declarations, the `us/manjuel.us`
+  records and the Router's clearance are gone. They call no model, make no
+  judgement, and read only files — nothing about them ever needed a seat.
+  Run directly, and by atlas:
+
+        python -m manjuel.doctrine            where the estate stands
+        python -m manjuel.doctrine --check    the doctrine check
+
+- **PROVEN CLOSED, not asserted.** The shortlist for `what does the covenant
+  say?` and `what do the laws say` no longer contains either name, and a
+  single-case standup run (`--only "question about the ground"`) went **1/1**.
+- Five strokes hold the line: neither report is in the roster, neither left an
+  unreachable handler, neither doc question is offered one, both still return a
+  report, and neither writes a file.
+- **A PRE-EXISTING WEAKNESS NAMED, NOT FIXED.** `semantic_search` is still not
+  in the shortlist for those questions and never was — the passing runs always
+  reached it by reasoning. That is the shortlist's ranking, not this change, and
+  it is left alone deliberately: the lesson of this entry is that the core is
+  not the place to tune for a feature.
+- **LAW 6.** `RUNBOOK.md` now documents both as commands rather than skills, and
+  says why they are not skills.
+- Proven: 2027/2027 strokes, 60/60 smoke, 39 skills, 0 load warnings.
+
+### 2026-09-10 — `**Says:**` WAS EATING THE PARAGRAPH BELOW IT, AND `|` KILLED TWO SKILLS' ALIASES OUTRIGHT
+- Found while fixing the boot report, by COUNTING what the library actually
+  claimed rather than reading what the files declared. Neither fault could ever
+  have failed a stroke: both produce phrases that are well-formed in isolation.
+- **THE PATTERN RAN TO END OF FILE.** `_SAYS_RE` stopped at the next `- **`
+  bullet or `\Z`, so a skill whose `Says:` was the LAST bullet swallowed every
+  word of prose beneath it and claimed it — comma AND newline split — as
+  trigger phrases. `doc_pass` claimed **35 phrases where 8 were declared**, and
+  among the 27 it invented was `what does the covenant say?`, lifted out of a
+  paragraph that was EXPLAINING that very failure. It would have hijacked the
+  standup case it was written about. `doctrine_check` claimed 21 for 7.
+- **WHY THAT IS NOT COSMETIC.** Every claimed phrase is weighed by the Router
+  on every single turn. Prose in that list is a permanent tax on routing, and
+  nothing surfaced it. In markdown a bullet list ends at a blank line; the
+  parser now agrees.
+- **AND `|` WAS NEVER A SEPARATOR HERE.** `git_cycle` and `search_transcripts`
+  — both written this morning — separated their phrases with `|`, which belongs
+  to `Takes:`. The parser read each whole line as ONE phrase, and a phrase of
+  eleven clauses matches nothing. **Both skills' aliases were dead from the day
+  they were written**: `git_cycle` routed only when its name was typed
+  outright, which is exactly why `git_cycle the whole version-control turn`
+  reached no tool at 09:07. `|` is accepted beside the comma now — neither
+  character can occur inside a phrase an operator would say, so the leniency
+  costs nothing and turns a silent misdeclaration into a working one.
+  git_cycle 1 → 7 live aliases, search_transcripts 1 → 6.
+- **A LEAKED SENTENCE IS REPORTED, NEVER DROPPED.** The loader warns when a
+  claimed phrase is longer than 45 characters or ends in a full stop, and names
+  the file and the blank-line rule. The hand that wrote the file fixes it; the
+  loader does not guess what was meant.
+- **AND THE STANDUP REGRESSION THAT EXPOSED IT.** `what does the covenant say?`
+  — green at 09:05 and 09:33 — went to NO TOOL at 09:59, the first standup
+  after `doc_pass` landed. The Router's own deliberation names the cause:
+  "`doc_pass` shows what's on the table ... this might show the most recent
+  entries including any relevant covenant docs", weighed against
+  `semantic_search`, and "(deliberation only, no conclusion reached)".
+  `doc_pass`'s description promised more than it does. It now states what it is
+  NOT — the STATE of the record, never its contents — and sends a question
+  about what a document SAYS to `semantic_search` or `ground_read` by name.
+  A skill that sounds like it might answer a question costs the Router the turn.
+- Nine strokes: the list ends at a blank line; prose beneath is never claimed;
+  `|` and `,` both separate; a following bullet still ends the list; a leaked
+  sentence warns at load; and this ground claims no prose phrase, no
+  sentence-length phrase, and git_cycle's aliases are live.
+- Proven: 2038/2038 strokes, 60/60 smoke, 41 skills, 0 load warnings, 61
+  claimed phrases (was 67, of which 30 were prose).
+
+### 2026-09-10 — THE BOOT REPORT CRIED STALE AFTER EVERY GREEN RUN (operator: "ive noticed that for a while. how do we fix it?")
+- **THE FAULT.** `suite_tally` took the newest `.py`/`.md` under manjuel,
+  agents, skills and tests with NO exclusions — and `tests/last_run.md` is a
+  `.md` under `tests/` that THE SUITE ITSELF WRITES as it finishes. So
+  `touched > newest_run` held the instant any green run ended, and the boot
+  report announced STALE every single time. Measured: boot's newest edit was
+  `tests/last_run.md` at **0.0s after the run**, while `tests/release.py` read
+  the same tree as **86s OLDER** than the run. Not a timing flake — structural,
+  and he had been seeing it "for a while".
+- **A WARNING THAT ALWAYS FIRES IS ONE HE STOPS READING**, which makes this
+  worse than no warning at all: STALE is the one line that would have told him
+  a green number was about old code.
+- **THERE WERE THREE COPIES OF ONE RULE, AND ONLY ONE WAS RIGHT.** `boot.py`,
+  the `proved` skill, and `tests/release.py` each walked the tree themselves;
+  only release.py excluded the stamps — and its own docstring calls the rule
+  "boot.suite_tally's rule", so they were meant to be one and had silently
+  separated. **`proved` was the worse of the two**: it did not merely say
+  CHANGED SINCE, it LISTED the offending files, and the file it listed was
+  `last_run.md` — the stamp of the very run it was reporting on.
+- **THE FIX.** `boot.source_files()` is now the single rule for which files
+  count as an edit (`CODE_DIRS` + `STAMPS`, `__pycache__` skipped); `boot` and
+  `proved` both use it. `tests/release.py` deliberately KEEPS its own copy: the
+  release gate must still report on a tree where `manjuel/` will not import,
+  and importing the engine into the gate would mean a broken engine kills the
+  gate instead of being reported by it.
+- **THE AGREEMENT IS PROVED, NOT ASSERTED IN A COMMENT** — a comment claiming
+  they matched is exactly what failed here. Six strokes: a suite that just
+  wrote its own stamp is not called stale; the fresh tally is still reported; a
+  REAL source edit after the run is still named STALE; `proved` does not call a
+  fresh run changed-since and never names the suite's own stamp; and both
+  surviving copies agree on the same tree, on the real ground, on the same
+  STAMPS set and the same directories.
+- Both directions use `os.utime` a full minute out rather than `time.sleep` —
+  the lesson from this morning's windows-latest 3.10 clock race.
+- **LAW 6.** `RUNBOOK.md`'s "The boot report says STALE" section now says what
+  changed and why, and states plainly that **a STALE line now means what it
+  says**.
+- Proven: 2035/2035 strokes, 60/60 smoke. Verified live on the operator's
+  ground: boot, `proved` and the release gate all read the same tree the same
+  way, with no STALE after a green run.
+
 ### 2026-09-10 — THE DOC PASS AND THE DOCTRINE CHECK, AS ARITHMETIC (operator: "write the whole doc pass workflow into a skill ... additionally a skill for the review of the doctrine and foundational/functional docs")
 - **`doc_pass`** — where the estate stands and what is on the table, in one
   act: the DAYBOOK's newest entry and whether it carries **At close**, the

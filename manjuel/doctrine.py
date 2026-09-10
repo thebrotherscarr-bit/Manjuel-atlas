@@ -44,6 +44,8 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+from manjuel import gitstate
+
 # ---- which docs may hold a claim about NOW ------------------------------
 #
 # LEDGERS are dated, append-only history. A number in one of these is a record
@@ -261,7 +263,7 @@ def proofs(ground: Path) -> tuple[list, str]:
     checks.append(mod.daybook(Path(ground)))
     checks.append(mod.handoff(Path(ground)))
     return checks, ("buildmap, law and manifest need a child process or the "
-                    "rack and are not asked from inside the engine")
+                    "rack; this report spawns nothing and asks neither")
 
 
 def open_tasks(ground: Path) -> list[tuple[str, str]]:
@@ -288,3 +290,249 @@ def open_tasks(ground: Path) -> list[tuple[str, str]]:
                 out.append((mark, s[3:].strip()[:120]))
                 break
     return out
+
+
+# =====================================================================
+# THE TWO REPORTS
+#
+# THESE ARE NOT SKILLS, AND THAT IS THE POINT.
+#
+# They were skills for about an hour on 2026-09-10 and the cost landed
+# somewhere nobody would look for it: THE ROUTER'S SHORTLIST. Both describe
+# the record -- DAYBOOK, CHANGELOG, law chain, doctrine, foundational docs --
+# and this estate's commonest question IS about the record, so they outranked
+# the right answer on every doc question the moment they existed:
+#
+#     what does the covenant say?  ->  doc_pass, doctrine_check, git_commit,
+#                                      skill_search, git_cycle, inspect
+#     what do the laws say         ->  search_transcripts, doc_pass,
+#                                      doctrine_check, git_commit, git_cycle
+#     read the spec                ->  doc_pass, git_cycle, inspect, read_file
+#
+# `semantic_search` -- the correct tool -- was not offered AT ALL. The Router
+# reached it only by reasoning off the raw keyword line, and burned its whole
+# thinking budget doing so: 1,625 chars against the 7,400-9,400 of every run
+# that had worked that morning, cut off mid-sentence just after concluding it
+# should search. A standup case green at 09:05 and 09:33 went to no tool at
+# 09:59 and 10:10.
+#
+# THE OPERATOR NAMED THE FAULT BEFORE I DID: "you have too many knobs" --
+# the core was being tuned to serve a control-plane feature, and every turn
+# the engine will ever run was paying for it. Tuning the descriptions was one
+# more knob on the same screw.
+#
+# So they are arithmetic that atlas calls, not skills the Router weighs. No
+# model, no judgement, no roster cost, no seat. Run them directly:
+#
+#     python -m manjuel.doctrine            where the estate stands
+#     python -m manjuel.doctrine --check    the doctrine check
+# =====================================================================
+
+def doc_pass_report(ground: Path) -> str:
+    """WHERE THIS ESTATE STANDS, AND WHAT IS ON THE TABLE.
+
+    His ask, 2026-09-10: "a review of the current daybook runbook, etc. and
+    then a check of where the repo is at, and a short brief about whats on the
+    table." That is a pass a hand did by opening six files in order, and a pass
+    done by hand is a pass that gets skipped on the day it matters.
+
+    EVERY LINE IS READ. The DAYBOOK's newest heading and whether it was closed,
+    the HANDOFF's newest block, the CHANGELOG's Unreleased entries, the OPEN
+    lines of TASKS, the repository through gitstate, and the six proofs the
+    boot report reads. Nothing here is generated, and no seat is asked what it
+    thinks the state is -- which is the whole reason the skill exists rather
+    than a prompt.
+
+    IT NEVER WRITES TASKS.md. READ FIRST, item 6, is explicit that a hand does
+    not add work to that file; a tool that could would be the fastest possible
+    way to break it.
+    """
+    import datetime as _dt
+
+    ground = Path(ground)
+    out: list[str] = []
+
+    # ---- 1. THE RECORD --------------------------------------------------
+    out.append("THE RECORD")
+    entry, closed = daybook_last(ground)
+    if entry:
+        out.append(f"  DAYBOOK    {entry[:88]}")
+        out.append("             " + ("closed (**At close** is written)" if closed
+                                       else "NOT CLOSED -- the last entry has no **At close**"))
+    else:
+        out.append("  DAYBOOK    no entry found")
+    today = _dt.date.today().isoformat()
+    text = read(ground / "HANDOFF.md")
+    newest = handoff_today(ground, today)
+    out.append(f"  HANDOFF    newest block: {newest or 'none'}"
+               + ("" if f"HANDOFF FOR {today}" in text
+                  else f"   (nothing for {today})"))
+    rel = unreleased(ground)
+    out.append(f"  CHANGELOG  {len(rel)} entries under Unreleased")
+    tasks = open_tasks(ground)
+    in_hand = sum(1 for m, _ in tasks if m == "[~]")
+    out.append(f"  TASKS      {len(tasks)} on the table"
+               + (f" ({in_hand} in hand)" if in_hand else ""))
+
+    # ---- 2. THE REPO ----------------------------------------------------
+    out.append("")
+    out.append("THE REPO")
+    st = gitstate.read(ground)
+    out.append(f"  {st.stamp()}")
+    local, remote, why = gitstate.head_and_remote(ground)
+    if remote and local:
+        agree = "they agree" if local == remote else "** THEY DISAGREE **"
+        out.append(f"  local {local} · remote {remote} — {agree}")
+    else:
+        out.append(f"  the remote head could not be read"
+                   + (f" ({why})" if why else ""))
+    _v, version = versions(ground)
+    out.append(f"  version {version}")
+
+    # ---- 3. THE PROOFS --------------------------------------------------
+    out.append("")
+    try:
+        checks, caveat = proofs(ground)
+    except Exception as exc:
+        out.append(f"THE PROOFS  could not be read ({type(exc).__name__}: {exc})")
+    else:
+        bad = [c for c in checks if not c.ok]
+        out.append(f"THE PROOFS  {len(checks) - len(bad)}/{len(checks)} read here "
+                   f"({caveat})")
+        for c in checks:
+            out.append(f"  {'ok     ' if c.ok else 'REFUSED'} {c.name:9} {c.why}")
+
+    # ---- 4. ON THE TABLE ------------------------------------------------
+    out.append("")
+    out.append("ON THE TABLE")
+    if rel:
+        out.append(f"  landed since the last tag ({len(rel)}):")
+        for e in rel:
+            out.append(f"    · {e[:96]}")
+    else:
+        out.append("  nothing under Unreleased -- the last tag is current.")
+    if tasks:
+        out.append(f"  open in TASKS ({len(tasks)}) — his list, read and never written:")
+        for mark, t in tasks[:12]:
+            out.append(f"    {mark} {t}")
+        if len(tasks) > 12:
+            out.append(f"    … and {len(tasks) - 12} more in TASKS.md")
+    else:
+        out.append("  TASKS has nothing on the table.")
+    return "\n".join(out)
+
+
+def doctrine_report(ground: Path) -> str:
+    """DOES THE RECORD STILL DESCRIBE WHAT THE SYSTEM PERFORMS?
+
+    HIS LAW 6, made mechanical: "all version bumps and iterative changes come
+    with an update to the documentation and reflection within the system,
+    ensuring a review pass is made so that there are no conflicts within what
+    the system states and actually performs."
+
+    IT IS ARITHMETIC, NOT A READING. `deep_research` would seat the Deep
+    Researcher and ask it to reason about the corpus; that is the wrong engine
+    and a dangerous one, because a model asked to find discrepancies it cannot
+    verify will invent them. Every finding here is a comparison between two
+    things on disk, and each one prints its own address so he can check it.
+
+    WHAT IT DOES NOT DUPLICATE. release.py already gates the law chain, the
+    manifest, SPEC against the CHANGELOG, the DAYBOOK and the HANDOFF, and
+    `proved` already reports the suites. This asks the axis nothing else does:
+    whether the LIVING docs -- the ones speaking in the present tense -- still
+    match the ground under them.
+    """
+    ground = Path(ground)
+    out: list[str] = []
+    findings = 0
+
+    docs = living(ground)
+    out.append("THE DOCTRINE CHECK — what the docs state vs what the ground performs")
+    out.append(f"  read across {len(docs)} living docs; {len(LEDGERS)} dated "
+               f"ledgers skipped, because a number in a ledger is a true record "
+               f"of its day, not a claim about now")
+
+    # ---- the sealed laws ------------------------------------------------
+    out.append("")
+    try:
+        state, unsealed = laws(ground)
+    except Exception as exc:
+        out.append(f"THE LAW CHAIN   could not be read ({type(exc).__name__}: {exc})")
+    else:
+        out.append(f"THE LAW CHAIN   {state}")
+        if unsealed:
+            out.append(f"  drafted but NOT SEALED: {', '.join(unsealed)}")
+            out.append("  (not a fault — a law may be written before it is ruled. "
+                       "Sealing is his, RULE 6.)")
+
+    # ---- the skills -----------------------------------------------------
+    try:
+        faults = skills_axis(ground)
+    except Exception as exc:
+        out.append(f"THE SKILLS      could not be read ({type(exc).__name__}: {exc})")
+    else:
+        if faults:
+            findings += len(faults)
+            out.append("THE SKILLS      DISAGREE with the code behind them:")
+            for f in faults:
+                out.append(f"  {f}")
+        else:
+            out.append("THE SKILLS      the library and the handlers agree")
+
+    # ---- the version ----------------------------------------------------
+    vfaults, version = versions(ground)
+    if vfaults:
+        findings += len(vfaults)
+        for f in vfaults:
+            out.append(f"THE VERSION     {f}")
+    else:
+        out.append(f"THE VERSION     {version}, said the same by every file that holds it")
+
+    # ---- a tally in a living doc ----------------------------------------
+    out.append("")
+    tallies = stale_tallies(ground)
+    if tallies:
+        findings += len(tallies)
+        out.append(f"A SUITE TALLY IN A LIVING DOC ({len(tallies)})")
+        out.append("  His ruling, sitting 79: no doc names a suite tally, because "
+                   "the suites grow and the doc does not — so a once-real number "
+                   "comes to read as a claim.")
+        for f, n, line in tallies:
+            out.append(f"  {f}:{n}")
+            out.append(f"      {line}")
+    else:
+        out.append("A SUITE TALLY IN A LIVING DOC   none — the sitting-79 ruling holds")
+
+    # ---- a path that is not there ---------------------------------------
+    out.append("")
+    dead = dead_paths(ground)
+    if dead:
+        findings += len(dead)
+        out.append(f"A PATH THAT IS NOT THERE ({len(dead)})")
+        out.append("  Resolved against the ground, atlas/ and atlas/line/ before "
+                   "being called dead, because the Go docs address their own tree.")
+        for f, n, rel in dead:
+            out.append(f"  {f}:{n}   {rel}")
+    else:
+        out.append("A PATH THAT IS NOT THERE   none — every address in the living docs resolves")
+
+    out.append("")
+    out.append(f"{findings} finding(s). Each names its file and line; none is a judgement."
+               if findings else
+               "No findings. What the docs state and what the ground performs agree.")
+    return "\n".join(out)
+
+def main(argv: list[str] | None = None) -> int:
+    """Both reports, from the command line and from atlas. Reads; never writes."""
+    import sys
+    argv = list(sys.argv[1:] if argv is None else argv)
+    ground = Path(".")
+    if "--ground" in argv:
+        ground = Path(argv[argv.index("--ground") + 1])
+    print(doctrine_report(ground) if "--check" in argv
+          else doc_pass_report(ground))
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

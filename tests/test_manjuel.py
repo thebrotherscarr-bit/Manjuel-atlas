@@ -10489,6 +10489,185 @@ def test_math():
           refuses(lambda: M.matmul([[1, 2]], [[1, 2]]), M.MathError))
 
 
+def test_says_is_a_phrase_list_not_a_paragraph():
+    """**Says:** ENDS AT A BLANK LINE, AND `|` SEPARATES LIKE A COMMA.
+
+    TWO FAULTS, BOTH SILENT, BOTH FOUND 2026-09-10 ONLY BY COUNTING.
+
+    ONE: the pattern ran to the next `- **` bullet or to END OF FILE, so a
+    skill whose `Says:` was the last bullet swallowed every word beneath it and
+    claimed it -- comma AND newline split -- as trigger phrases. `doc_pass`
+    claimed 35 phrases where 8 were declared, and among the 27 it invented was
+    `what does the covenant say?`, lifted out of a paragraph explaining that
+    exact failure. It would have hijacked the standup case it was written
+    about. Every claimed phrase is weighed by the Router on every turn, so this
+    is a permanent tax on routing that nothing surfaced.
+
+    TWO: `git_cycle` and `search_transcripts` separated their phrases with `|`,
+    which is `Takes:`'s separator, not this one. The parser read each whole
+    line as ONE phrase; a phrase of eleven clauses matches nothing. BOTH
+    SKILLS' ALIASES WERE DEAD from the day they were written -- `git_cycle`
+    routed only when its name was typed outright, which is precisely why
+    `git_cycle the whole version-control turn` reached no tool that morning.
+
+    Neither fault could fail a stroke, because both produce phrases that are
+    well-formed in isolation. Only the COUNT gives them away, so the count is
+    what is asserted.
+    """
+    from manjuel.skills import parse_says, SkillLibrary
+
+    body = ("- **Action Keyword:** x\n"
+            "- **Says:** alpha one, beta two\n"
+            "\n"
+            "This paragraph explains the skill and must not be claimed. It\n"
+            "even quotes what does the covenant say? and names a, b, c.\n")
+    said = parse_says(body)
+    check("Says stops at the blank line", said == ("alpha one", "beta two"), said)
+    check("prose under the list is never claimed",
+          not any("covenant" in p for p in said), said)
+
+    check("a pipe separates phrases the way a comma does",
+          parse_says("- **Says:** ship it | land this | push it up\n")
+          == ("ship it", "land this", "push it up"))
+    check("a comma list still parses",
+          parse_says("- **Says:** one two, three four\n")
+          == ("one two", "three four"))
+    check("a following bullet still ends the list",
+          parse_says("- **Says:** only this\n- **Takes:** a -> content\n")
+          == ("only this",))
+
+    # The loader REPORTS a leaked sentence rather than dropping it: the hand
+    # that wrote the file fixes it, and the loader does not guess.
+    g = Path(tempfile.mkdtemp())
+    (g / "s.md").write_text(
+        "# Skill: Leak\n- **Action Keyword:** leaky\n- **Description:** d\n"
+        "- **Says:** fine phrase, this one is a whole sentence that plainly "
+        "leaked out of a paragraph somewhere.\n", encoding="utf-8")
+    warned = SkillLibrary.load(g).warnings
+    check("a prose-shaped phrase is warned about at load",
+          any("reads like prose" in w for w in warned), warned)
+
+    # And the real ground carries none of either fault.
+    lib = SkillLibrary.load("skills")
+    check("no skill on this ground claims a prose phrase",
+          lib.warnings == [], lib.warnings)
+    fat = [(s.keyword, p) for s in lib.specs for p in s.says if len(p) > 45]
+    check("no claimed phrase on this ground is sentence-length", fat == [], fat)
+    check("git_cycle's aliases are live, not one dead mega-phrase",
+          len([s for s in lib.specs if s.keyword == "git_cycle"][0].says) > 3)
+
+
+def test_the_stamp_is_not_an_edit():
+    """A SUITE THAT JUST WROTE ITS OWN STAMP IS NOT CALLED STALE.
+
+    THE FAULT, measured on the operator's ground 2026-09-10 and seen by him
+    "for a while": boot.suite_tally took the newest .py/.md under manjuel,
+    agents, skills and tests with NO exclusions -- and tests/last_run.md is a
+    .md under tests/ that THE SUITE WRITES as it finishes. `touched >
+    newest_run` therefore held after every green run, so the boot report
+    announced STALE every single time. boot's newest edit measured 0.0s after
+    the run (tests/last_run.md); release.py read the same tree as 86s OLDER.
+
+    A WARNING THAT ALWAYS FIRES IS ONE HE STOPS READING, which makes this
+    worse than no warning: the STALE line is the one that would have told him
+    a green number was about old code.
+
+    THE SECOND STROKE IS THE POINT. release.py's newest_edit already had the
+    exclusion and its docstring calls itself "boot.suite_tally's rule" -- two
+    copies of one rule that silently separated. Proving they agree is what
+    stops them separating again; the comment claiming they matched is exactly
+    what failed.
+
+    TIMES ARE SET, NEVER SLEPT FOR. Both directions use os.utime a full minute
+    out, the lesson from the windows-latest 3.10 flake earlier today: a sleep
+    is a guess about how much clock skew is enough, and a filesystem's mtime
+    and time.time() do not come from one clock.
+    """
+    import json as _json
+    from manjuel.boot import suite_tally
+
+    g = Path(tempfile.mkdtemp())
+    for d in ("manjuel", "agents", "skills", "tests"):
+        (g / d).mkdir()
+    (g / "manjuel" / "x.py").write_text("# code\n", encoding="utf-8")
+
+    now = time.time()
+    (g / "tests" / "last_run.json").write_text(_json.dumps({
+        "strokes": {"passed": 900, "total": 900, "green": True, "at": now},
+        "smoke": {"passed": 59, "total": 59, "green": True, "at": now},
+    }), encoding="utf-8")
+    # The source is a minute OLDER than the run: this is a fresh green.
+    os.utime(g / "manjuel" / "x.py", (now - 60, now - 60))
+
+    # Now the suite writes its own stamps, AFTER the run, exactly as a real
+    # run does. Every one of these is a file a run produced, not an edit.
+    for name in ("last_run.md", "run_history.jsonl", "last_audit.md"):
+        p = g / "tests" / name
+        p.write_text("written by the run\n", encoding="utf-8")
+        os.utime(p, (now + 60, now + 60))
+    os.utime(g / "tests" / "last_run.json", (now + 60, now + 60))
+
+    out = suite_tally(g)
+    check("a suite that just wrote its own stamp is not called stale",
+          "STALE" not in out, out)
+    check("the fresh tally is still reported", "900/900 strokes" in out, out)
+
+    # And the rule still WORKS -- a real source edit after the run is stale.
+    os.utime(g / "manjuel" / "x.py", (now + 120, now + 120))
+    check("a real source edit after the run is still named STALE",
+          "STALE" in suite_tally(g), suite_tally(g))
+
+    # ---- `proved` was the THIRD copy, and it named the stamp out loud ------
+    # It did not just say CHANGED SINCE after every green run; it listed the
+    # offending files, and the file it listed was `last_run.md` -- the stamp
+    # of the very run it was reporting on.
+    # The step above deliberately aged the source FORWARD to prove STALE still
+    # fires. Put it back behind the run before asking this question, or the
+    # stroke measures the fixture instead of the rule.
+    os.utime(g / "manjuel" / "x.py", (now - 60, now - 60))
+    import types as _types
+    from manjuel.skills import _HANDLERS as _H
+    said = _H["proved"](_types.SimpleNamespace(ground=str(g)), {})
+    check("`proved` does not call a fresh run changed-since",
+          "CHANGED SINCE" not in said, said[:200])
+    check("`proved` never names the suite's own stamp as an edit",
+          "last_run.md" not in said.split("history")[0], said[:200])
+
+    # ---- the drift guard, over ALL THREE copies ---------------------------
+    # Three copies of one rule existed -- boot, `proved`, and release.py --
+    # and only release.py had it right. boot and `proved` now share
+    # boot.source_files; release.py deliberately keeps its own so the gate can
+    # still report on a tree where manjuel/ will not import. That leaves two
+    # implementations, which is exactly the condition that produced this bug,
+    # so the agreement is proved rather than asserted in a comment.
+    import importlib.util as _ilu
+    from manjuel.boot import source_files as _sf, STAMPS as _BOOT_STAMPS
+    spec = _ilu.spec_from_file_location("_rel_for_drift", Path("tests/release.py"))
+    rel = _ilu.module_from_spec(spec)
+    spec.loader.exec_module(rel)
+
+    def boot_touched(root):
+        t = 0.0
+        for f in _sf(root):
+            t = max(t, f.stat().st_mtime)
+        return t
+
+    check("boot's staleness rule and release.py's agree on the same tree",
+          abs(boot_touched(g) - rel.newest_edit(g)) < 1e-6,
+          f"boot {boot_touched(g)} vs release {rel.newest_edit(g)}")
+    check("and they agree on the real ground too",
+          abs(boot_touched(Path(".")) - rel.newest_edit(Path("."))) < 1e-6,
+          f"boot {boot_touched(Path('.'))} vs release {rel.newest_edit(Path('.'))}")
+
+    # The SET is the thing that drifts. Naming it on both sides means adding a
+    # stamp to one and not the other goes red instead of going unnoticed.
+    check("both copies exclude the same stamps", rel.STAMPS == _BOOT_STAMPS,
+          f"release {rel.STAMPS} vs boot {_BOOT_STAMPS}")
+    check("and they walk the same directories",
+          tuple(rel.CODE_DIRS) == tuple(__import__("manjuel.boot",
+                fromlist=["CODE_DIRS"]).CODE_DIRS))
+
+
 def test_doctrine():
     """THE DOC PASS AND THE DOCTRINE CHECK.
 
@@ -10593,18 +10772,35 @@ def test_doctrine():
     faults, _v = D.versions(g)
     check("two files disagreeing about the version is a fault", len(faults) == 1, faults)
 
-    # ---- neither skill writes anything ------------------------------------
+    # ---- neither report writes anything -----------------------------------
     # doc_pass reads TASKS.md, and READ FIRST item 6 says no hand adds work to
     # it. A tool that could write it would be the fastest way to break that.
-    import types as _types
-    from manjuel.skills import _HANDLERS as _H
     before = {p.name: p.read_bytes() for p in g.iterdir() if p.is_file()}
-    env = _types.SimpleNamespace(ground=str(Path(".")))
-    for kw in ("doc_pass", "doctrine_check"):
-        out = _H[kw](env, {})
-        check(f"`{kw}` returns a report", isinstance(out, str) and len(out) > 80)
+    for name, fn in (("doc_pass", D.doc_pass_report),
+                     ("doctrine_check", D.doctrine_report)):
+        out = fn(Path("."))
+        check(f"`{name}` returns a report", isinstance(out, str) and len(out) > 80)
     after = {p.name: p.read_bytes() for p in g.iterdir() if p.is_file()}
-    check("neither skill wrote a single file", before == after)
+    check("neither report wrote a single file", before == after)
+
+    # ---- AND NEITHER IS IN THE ROUTER'S ROSTER ----------------------------
+    # They were skills for an hour on 2026-09-10 and the cost landed on the
+    # SHORTLIST: both describe the record, and this estate's commonest question
+    # is about the record, so they outranked `semantic_search` on every doc
+    # question and it stopped being offered at all. The operator: "you have too
+    # many knobs." This is the stroke that keeps them out.
+    from manjuel.skills import SkillLibrary as _SL, _HANDLERS as _H
+    lib = _SL.load("skills")
+    roster = {s.keyword for s in lib.specs}
+    check("neither report is a skill the Router can be offered",
+          not (roster & {"doc_pass", "doctrine_check"}), sorted(roster))
+    check("and neither left an unreachable handler behind",
+          not (set(_H) & {"doc_pass", "doctrine_check"}))
+    for q in ("what does the covenant say?", "what do the laws say"):
+        short = lib.shortlist(q)
+        check(f"`{q}` is not offered a doc report",
+              "doc_pass" not in short and "doctrine_check" not in short,
+              short[:160])
 
 
 def test_record_and_git():
@@ -10903,6 +11099,8 @@ def main() -> int:
     test_flags_are_not_speech(reg, lib, book)
     test_ink()
     test_math()
+    test_says_is_a_phrase_list_not_a_paragraph()
+    test_the_stamp_is_not_an_edit()
     test_doctrine()
     test_record_and_git()
 

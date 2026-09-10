@@ -18,7 +18,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 |---|---|---|---|
 | def | `carry_old_dials` | 10-31 | Map any CHAINKIT_* to its MANJUEL_* twin. Idempotent: only an |
 
-### manjuel/boot.py — 420 lines
+### manjuel/boot.py — 461 lines
 
 *The boot report: what is actually here, before you ask for anything.*
 
@@ -26,17 +26,18 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 |---|---|---|---|
 | def | `_rule` | 27-28 |  |
 | def | `_models` | 31-84 |  |
-| def | `suite_tally` | 87-142 | What the suites last proved, and WHEN -- read from the stamp they |
-| def | `_record` | 145-173 |  |
-| def | `_clip` | 193-195 |  |
-| def | `_last_toll` | 198-215 |  |
-| def | `_handoff_head` | 218-228 |  |
-| def | `_open_tasks` | 231-244 |  |
-| def | `_last_standup` | 247-260 |  |
-| def | `_arrivals` | 263-286 | Files in the workspace newer than the previous sitting's close. |
-| def | `brief_facts` | 289-327 | The brief's facts, one block, read off the record. |
-| def | `_gate` | 330-385 | The release gate's verdict, from what can be READ. Never raises. |
-| def | `report` | 388-420 |  |
+| def | `source_files` | 98-127 | Every file under the code dirs whose mtime counts as an EDIT. |
+| def | `suite_tally` | 130-183 | What the suites last proved, and WHEN -- read from the stamp they |
+| def | `_record` | 186-214 |  |
+| def | `_clip` | 234-236 |  |
+| def | `_last_toll` | 239-256 |  |
+| def | `_handoff_head` | 259-269 |  |
+| def | `_open_tasks` | 272-285 |  |
+| def | `_last_standup` | 288-301 |  |
+| def | `_arrivals` | 304-327 | Files in the workspace newer than the previous sitting's close. |
+| def | `brief_facts` | 330-368 | The brief's facts, one block, read off the record. |
+| def | `_gate` | 371-426 | The release gate's verdict, from what can be READ. Never raises. |
+| def | `report` | 429-461 |  |
 
 ### manjuel/cli.py — 1986 lines
 
@@ -114,24 +115,27 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `RunContext.history_block` | 365-374 | Prior stage outputs, oldest first. |
 | def | `RunContext.slug` | 376-379 |  |
 
-### manjuel/doctrine.py — 290 lines
+### manjuel/doctrine.py — 538 lines
 
 *THE RECORD, AND WHETHER IT STILL AGREES WITH THE GROUND. Reads; never writes.*
 
 | kind | name | lines | says |
 |---|---|---|---|
-| def | `living` | 69-71 | Every root doc that speaks in the present tense. |
-| def | `read` | 74-78 |  |
-| def | `stale_tallies` | 83-100 | A living doc naming a suite tally. |
-| def | `dead_paths` | 112-133 | A living doc pointing at a file that is not there. |
-| def | `skills_axis` | 136-156 | Does the skill library agree with the code behind it? |
-| def | `versions` | 159-180 | pyproject and the package must say the same number. |
-| def | `laws` | 183-202 | The chain, and any law sitting in law/ that it does not seal. |
-| def | `daybook_last` | 207-220 | The DAYBOOK's newest entry heading, and whether it was closed. |
-| def | `handoff_today` | 223-229 | Is there a HANDOFF block for today, and what is the newest one? |
-| def | `unreleased` | 232-239 | The CHANGELOG entry headings that have landed since the last tag. |
-| def | `proofs` | 242-264 | The file-readable half of the release gate, and why the rest is absent. |
-| def | `open_tasks` | 267-290 | The lines of TASKS.md that are still on the table, as (mark, text). |
+| def | `living` | 71-73 | Every root doc that speaks in the present tense. |
+| def | `read` | 76-80 |  |
+| def | `stale_tallies` | 85-102 | A living doc naming a suite tally. |
+| def | `dead_paths` | 114-135 | A living doc pointing at a file that is not there. |
+| def | `skills_axis` | 138-158 | Does the skill library agree with the code behind it? |
+| def | `versions` | 161-182 | pyproject and the package must say the same number. |
+| def | `laws` | 185-204 | The chain, and any law sitting in law/ that it does not seal. |
+| def | `daybook_last` | 209-222 | The DAYBOOK's newest entry heading, and whether it was closed. |
+| def | `handoff_today` | 225-231 | Is there a HANDOFF block for today, and what is the newest one? |
+| def | `unreleased` | 234-241 | The CHANGELOG entry headings that have landed since the last tag. |
+| def | `proofs` | 244-266 | The file-readable half of the release gate, and why the rest is absent. |
+| def | `open_tasks` | 269-292 | The lines of TASKS.md that are still on the table, as (mark, text). |
+| def | `doc_pass_report` | 331-422 | WHERE THIS ESTATE STANDS, AND WHAT IS ON THE TABLE. |
+| def | `doctrine_report` | 425-523 | DOES THE RECORD STILL DESCRIBE WHAT THE SYSTEM PERFORMS? |
+| def | `main` | 525-534 | Both reports, from the command line and from atlas. Reads; never writes. |
 
 ### manjuel/dotenv.py — 110 lines
 
@@ -532,7 +536,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `open_wire` | 671-688 | The real stdout and stdin as the wire. stdout is swapped for the |
 | def | `main` | 691-790 |  |
 
-### manjuel/skills.py — 3147 lines
+### manjuel/skills.py — 3000 lines
 
 *Skills: markdown declares the interface, Python registers the implementation.*
 
@@ -540,91 +544,89 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 |---|---|---|---|
 | def | `_run_bounded` | 86-115 | Run a handler with a bound on the WAIT. Raises TimeoutError past it. |
 | def | `parse_path_args` | 144-150 | (argument, jail) pairs a skill declares. Empty tuple when it names none. |
-| def | `parse_says` | 185-196 | Alias phrases a skill claims for itself. Lowercased, deduped. |
-| def | `parse_takes` | 199-219 | ((trigger words...), argument) rules a skill declares. |
-| def | `args_from_words` | 222-236 | The arguments a skill's own **Takes:** rules find in a sentence. |
-| class | `SkillError` | 239-240 |  |
-| def | `skill` | 243-250 | Register a handler for an action keyword declared in skills/*.md. |
-| class | `SkillSpec` | 254-308 |  |
-| def | `SkillSpec.is_prompt_skill` | 264-265 |  |
-| def | `SkillSpec.declared_args` | 268-286 | The argument names this skill SAYS it takes, read off its own |
-| def | `SkillSpec.summary` | 289-308 | The ROUTING view: keyword, what it does, what it takes. |
-| class | `SkillExecutionEnv` | 347-407 | Everything a skill handler is allowed to touch. |
-| def | `SkillExecutionEnv.__post_init__` | 374-380 |  |
-| def | `SkillExecutionEnv.safe_path` | 382-407 | Jail file access to the workspace -- SUBDIRECTORIES included. |
-| def | `unjail` | 425-437 | Strip the jail's own name(s) off the front of a relative path. |
-| def | `find_by_name` | 440-469 | Real files in the ground whose basename matches `name`, case- |
-| def | `_inside_ground` | 472-481 | Resolve a relative path and refuse anything that escapes the ground. |
-| def | `gate_paths` | 484-546 | LAW 8 -- one write-path per chain. Refuse a declared path argument that |
-| def | `_ground_list` | 550-614 | The ground as it stands on disk. Live, read-only. |
-| def | `_windowed_python` | 622-689 | A .py cut by definition. None => caller falls back to the char path. |
-| def | `_windowed_chars` | 692-704 | The original character-window path, unchanged, reachable on its own. |
-| def | `windowed` | 707-794 | A big file as a MOVABLE WINDOW, never a silent first slice. |
-| def | `_sitting` | 806-873 | Resolve a SITTING NUMBER to the runs it held and their transcripts. |
-| def | `_when` | 896-980 | What ran in a WINDOW OF TIME, from the transcript filenames. |
-| def | `_describe` | 983-987 | A skill's own words about itself, whole -- not the routing stub. |
-| def | `_skill_search` | 991-1041 | What the chain can do about a subject, from the skills' own files. |
-| def | `_subtask` | 1045-1067 | Hand one scoped piece of work to a fresh run of its own. |
-| def | `_ground_read` | 1071-1121 | One real file, as it is right now. Read-only; secrets refused. |
-| def | `_file_type` | 1142-1154 |  |
-| def | `_terminator` | 1157-1166 |  |
-| def | `_git_tracks` | 1169-1178 |  |
-| def | `_indexed` | 1181-1192 |  |
-| def | `_age` | 1195-1204 |  |
-| def | `inspect_file` | 1207-1275 | The facts about one file, as a block. The workspace is tried first, |
-| def | `inspect_line` | 1278-1292 | One line of the facts, for the stamp a workspace read carries. |
-| def | `_inspect` | 1296-1332 |  |
-| def | `_skill_report` | 1336-1357 | The chain's actual reach, read from the loaded library. |
-| def | `_ground_report` | 1361-1380 | Where the chain stands. Read, not generated -- a guessed path is a |
-| def | `_list_directory` | 1384-1394 |  |
-| def | `_read_file` | 1398-1430 |  |
-| def | `_write_file` | 1434-1443 |  |
-| def | `_embed_text` | 1447-1491 | Index ONE workspace file now, without a full sweep. |
-| def | `_remember` | 1495-1520 | PROPOSE a memory entry. Staged, not landed. |
-| def | `_git_status` | 1524-1544 |  |
-| def | `_commit_subject` | 1547-1679 | Pick a commit subject a human will still understand in six months. |
-| def | `_git_commit` | 1683-1710 | Local, additive, recoverable -- so a seat may do it. |
-| def | `_doc_pass` | 1714-1806 | WHERE THIS ESTATE STANDS, AND WHAT IS ON THE TABLE. |
-| def | `_doctrine_check` | 1810-1910 | DOES THE RECORD STILL DESCRIBE WHAT THE SYSTEM PERFORMS? |
-| def | `_proved` | 1914-2030 | What the suites last proved, read from what they stamped. |
-| def | `_speak` | 2034-2056 |  |
-| def | `_git_init` | 2060-2064 |  |
-| def | `_git_pull` | 2068-2072 |  |
-| def | `_git_push` | 2076-2080 |  |
-| def | `_git_cycle` | 2084-2186 | The whole version-control turn: prove, status, commit, push, VERIFY. |
-| def | `_linear_regression` | 2190-2223 | Ordinary least squares over numbers found in the text. |
-| def | `_statistics` | 2227-2245 | Descriptive statistics over numbers found in the text. |
-| def | `_pipeline_models` | 2255-2257 | Tags this ground declares -- seats, prompt skills, and the embedder. |
-| def | `_rack_list` | 2261-2310 | Read-only: the shelf and the card. |
-| def | `_rack_report` | 2314-2384 | The rack's OBSERVED state. FACTS ONLY unless a judgement is asked for. |
-| def | `_rack_sync` | 2388-2419 | Pull a current list from Ollama and rewrite rack.md. |
-| def | `_rack_load` | 2423-2435 | Bring a model into VRAM so the next call does not pay the load. |
-| def | `_rack_unload` | 2439-2458 | Free VRAM. REFUSES a model this ground does not declare, because it |
-| def | `_rack_pull` | 2462-2477 | Download a model. Crosses the wall and can move gigabytes, so it is |
-| def | `_index_busy` | 2492-2500 | The refusal for a second build while one is running, or "". |
-| def | `_open_index` | 2503-2523 |  |
-| def | `_wants_rebuild` | 2526-2544 | Did the operator ask for the index to be built from scratch? |
-| def | `_index_ground` | 2548-2570 | Build or refresh the semantic index over the configured roots. |
-| def | `_index_ground_locked` | 2573-2629 | The build itself; the caller holds _INDEX_BUSY for its whole life. |
-| def | `_age_of` | 2632-2650 | How old a file is, in the units a person thinks in. |
-| def | `_semantic_search` | 2654-2655 |  |
-| def | `_search_transcripts` | 2659-2661 | What was SAID on a past run, as opposed to what the estate holds. |
-| def | `_search_scoped` | 2664-2764 |  |
-| def | `_deep_research` | 2768-2790 | Delegate to the Deep Researcher persona defined in agents.md. |
-| class | `SkillLibrary` | 2798-3032 |  |
-| def | `SkillLibrary.__init__` | 2799-2802 |  |
-| def | `SkillLibrary.load` | 2805-2831 |  |
-| def | `SkillLibrary.validate` | 2833-2857 | Return (errors, warnings) for the md <-> handler binding. |
-| def | `SkillLibrary.manifest` | 2859-2870 | Compact by default -- this is what the router reads to pick a tool. |
-| def | `SkillLibrary.shortlist` | 2872-2928 | The manifest, narrowed to what bears on THIS objective. |
-| def | `SkillLibrary.keywords` | 2930-2931 |  |
-| def | `SkillLibrary.spec` | 2933-2935 |  |
-| def | `SkillLibrary.models` | 2937-2939 | Model tags prompt skills depend on, for the startup check. |
-| def | `SkillLibrary.tool_schemas` | 2941-2980 | Ollama `tools=` schemas for the skills a seat may call. |
-| def | `SkillLibrary.execute` | 2982-3032 |  |
-| def | `_run_prompt_skill` | 3035-3087 | Send <content> to the skill's own model, with its markdown as the rules. |
-| def | `_json_call` | 3113-3131 |  |
-| def | `extract_tool_call` | 3134-3147 |  |
+| def | `parse_says` | 201-225 | Alias phrases a skill claims for itself. Lowercased, deduped. |
+| def | `parse_takes` | 228-248 | ((trigger words...), argument) rules a skill declares. |
+| def | `args_from_words` | 251-265 | The arguments a skill's own **Takes:** rules find in a sentence. |
+| class | `SkillError` | 268-269 |  |
+| def | `skill` | 272-279 | Register a handler for an action keyword declared in skills/*.md. |
+| class | `SkillSpec` | 283-337 |  |
+| def | `SkillSpec.is_prompt_skill` | 293-294 |  |
+| def | `SkillSpec.declared_args` | 297-315 | The argument names this skill SAYS it takes, read off its own |
+| def | `SkillSpec.summary` | 318-337 | The ROUTING view: keyword, what it does, what it takes. |
+| class | `SkillExecutionEnv` | 376-436 | Everything a skill handler is allowed to touch. |
+| def | `SkillExecutionEnv.__post_init__` | 403-409 |  |
+| def | `SkillExecutionEnv.safe_path` | 411-436 | Jail file access to the workspace -- SUBDIRECTORIES included. |
+| def | `unjail` | 454-466 | Strip the jail's own name(s) off the front of a relative path. |
+| def | `find_by_name` | 469-498 | Real files in the ground whose basename matches `name`, case- |
+| def | `_inside_ground` | 501-510 | Resolve a relative path and refuse anything that escapes the ground. |
+| def | `gate_paths` | 513-575 | LAW 8 -- one write-path per chain. Refuse a declared path argument that |
+| def | `_ground_list` | 579-643 | The ground as it stands on disk. Live, read-only. |
+| def | `_windowed_python` | 651-718 | A .py cut by definition. None => caller falls back to the char path. |
+| def | `_windowed_chars` | 721-733 | The original character-window path, unchanged, reachable on its own. |
+| def | `windowed` | 736-823 | A big file as a MOVABLE WINDOW, never a silent first slice. |
+| def | `_sitting` | 835-902 | Resolve a SITTING NUMBER to the runs it held and their transcripts. |
+| def | `_when` | 925-1009 | What ran in a WINDOW OF TIME, from the transcript filenames. |
+| def | `_describe` | 1012-1016 | A skill's own words about itself, whole -- not the routing stub. |
+| def | `_skill_search` | 1020-1070 | What the chain can do about a subject, from the skills' own files. |
+| def | `_subtask` | 1074-1096 | Hand one scoped piece of work to a fresh run of its own. |
+| def | `_ground_read` | 1100-1150 | One real file, as it is right now. Read-only; secrets refused. |
+| def | `_file_type` | 1171-1183 |  |
+| def | `_terminator` | 1186-1195 |  |
+| def | `_git_tracks` | 1198-1207 |  |
+| def | `_indexed` | 1210-1221 |  |
+| def | `_age` | 1224-1233 |  |
+| def | `inspect_file` | 1236-1304 | The facts about one file, as a block. The workspace is tried first, |
+| def | `inspect_line` | 1307-1321 | One line of the facts, for the stamp a workspace read carries. |
+| def | `_inspect` | 1325-1361 |  |
+| def | `_skill_report` | 1365-1386 | The chain's actual reach, read from the loaded library. |
+| def | `_ground_report` | 1390-1409 | Where the chain stands. Read, not generated -- a guessed path is a |
+| def | `_list_directory` | 1413-1423 |  |
+| def | `_read_file` | 1427-1459 |  |
+| def | `_write_file` | 1463-1472 |  |
+| def | `_embed_text` | 1476-1520 | Index ONE workspace file now, without a full sweep. |
+| def | `_remember` | 1524-1549 | PROPOSE a memory entry. Staged, not landed. |
+| def | `_git_status` | 1553-1573 |  |
+| def | `_commit_subject` | 1576-1708 | Pick a commit subject a human will still understand in six months. |
+| def | `_git_commit` | 1712-1739 | Local, additive, recoverable -- so a seat may do it. |
+| def | `_proved` | 1743-1866 | What the suites last proved, read from what they stamped. |
+| def | `_speak` | 1870-1892 |  |
+| def | `_git_init` | 1896-1900 |  |
+| def | `_git_pull` | 1904-1908 |  |
+| def | `_git_push` | 1912-1916 |  |
+| def | `_git_cycle` | 1920-2022 | The whole version-control turn: prove, status, commit, push, VERIFY. |
+| def | `_linear_regression` | 2026-2059 | Ordinary least squares over numbers found in the text. |
+| def | `_statistics` | 2063-2081 | Descriptive statistics over numbers found in the text. |
+| def | `_pipeline_models` | 2091-2093 | Tags this ground declares -- seats, prompt skills, and the embedder. |
+| def | `_rack_list` | 2097-2146 | Read-only: the shelf and the card. |
+| def | `_rack_report` | 2150-2220 | The rack's OBSERVED state. FACTS ONLY unless a judgement is asked for. |
+| def | `_rack_sync` | 2224-2255 | Pull a current list from Ollama and rewrite rack.md. |
+| def | `_rack_load` | 2259-2271 | Bring a model into VRAM so the next call does not pay the load. |
+| def | `_rack_unload` | 2275-2294 | Free VRAM. REFUSES a model this ground does not declare, because it |
+| def | `_rack_pull` | 2298-2313 | Download a model. Crosses the wall and can move gigabytes, so it is |
+| def | `_index_busy` | 2328-2336 | The refusal for a second build while one is running, or "". |
+| def | `_open_index` | 2339-2359 |  |
+| def | `_wants_rebuild` | 2362-2380 | Did the operator ask for the index to be built from scratch? |
+| def | `_index_ground` | 2384-2406 | Build or refresh the semantic index over the configured roots. |
+| def | `_index_ground_locked` | 2409-2465 | The build itself; the caller holds _INDEX_BUSY for its whole life. |
+| def | `_age_of` | 2468-2486 | How old a file is, in the units a person thinks in. |
+| def | `_semantic_search` | 2490-2491 |  |
+| def | `_search_transcripts` | 2495-2497 | What was SAID on a past run, as opposed to what the estate holds. |
+| def | `_search_scoped` | 2500-2600 |  |
+| def | `_deep_research` | 2604-2626 | Delegate to the Deep Researcher persona defined in agents.md. |
+| class | `SkillLibrary` | 2634-2885 |  |
+| def | `SkillLibrary.__init__` | 2635-2638 |  |
+| def | `SkillLibrary.load` | 2641-2684 |  |
+| def | `SkillLibrary.validate` | 2686-2710 | Return (errors, warnings) for the md <-> handler binding. |
+| def | `SkillLibrary.manifest` | 2712-2723 | Compact by default -- this is what the router reads to pick a tool. |
+| def | `SkillLibrary.shortlist` | 2725-2781 | The manifest, narrowed to what bears on THIS objective. |
+| def | `SkillLibrary.keywords` | 2783-2784 |  |
+| def | `SkillLibrary.spec` | 2786-2788 |  |
+| def | `SkillLibrary.models` | 2790-2792 | Model tags prompt skills depend on, for the startup check. |
+| def | `SkillLibrary.tool_schemas` | 2794-2833 | Ollama `tools=` schemas for the skills a seat may call. |
+| def | `SkillLibrary.execute` | 2835-2885 |  |
+| def | `_run_prompt_skill` | 2888-2940 | Send <content> to the skill's own model, with its markdown as the rules. |
+| def | `_json_call` | 2966-2984 |  |
+| def | `extract_tool_call` | 2987-3000 |  |
 
 ### manjuel/spelling.py — 157 lines
 
@@ -761,7 +763,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `GroundWatch.start` | 109-134 |  |
 | def | `GroundWatch.stop` | 136-142 |  |
 
-manjuel/: 29 files, 16577 lines.
+manjuel/: 29 files, 16719 lines.
 
 ## GUARDS — by the failure that earned them
 
@@ -779,8 +781,8 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 
 | line | in | marker |
 |---|---|---|
-| 115 | `suite_tally` | was reported as green to the operator (2026-09-02, twice in one |
-| 180 | `(module)` | The operator, 2026-09-07: the standup "needs to ... actually give me some |
+| 158 | `suite_tally` | was reported as green to the operator (2026-09-02, twice in one |
+| 221 | `(module)` | The operator, 2026-09-07: the standup "needs to ... actually give me some |
 
 ### manjuel/cli.py
 
@@ -830,7 +832,9 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 
 | line | in | marker |
 |---|---|---|
-| 86 | `stale_tallies` | HIS RULING, sitting 79, after he swept six of these by hand: "No doc now |
+| 88 | `stale_tallies` | HIS RULING, sitting 79, after he swept six of these by hand: "No doc now |
+| 300 | `(module)` | They were skills for about an hour on 2026-09-10 and the cost landed |
+| 497 | `doctrine_report` | out.append("  His ruling, sitting 79: no doc names a suite tally, because " |
 
 ### manjuel/gitstate.py
 
@@ -1057,56 +1061,57 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 | 122 | `(module)` | 240 -> 170 -> 130 -> 112. The last cut is 2026-09-02, when `sitting`, |
 | 132 | `(module)` | in 2026-09-01 (79% of dispatch is already deterministic), and to be |
 | 153 | `(module)` | A SKILL OWNS ITS OWN DISPATCH (the operator's ruling, sitting 66). |
-| 225 | `args_from_words` | This is the payload surviving the moment of recognition. Sitting 66: |
-| 272 | `declared_args` | Sitting 77 needed this and did not have it: the tool loop's dedup was |
-| 312 | `(module)` | sitting 39: "give it the ability to review, never write." |
-| 320 | `(module)` | and writes nothing. It was left out when it was added on 2026-09-03, |
-| 326 | `(module)` | `inspect` reads a file's FACTS and never its contents (2026-09-07). |
-| 330 | `(module)` | What actually puts something on disk. The write-claim check (sitting 70) |
-| 339 | `(module)` | 2026-09-08 (the REPL read): pull and push were missing, so the |
-| 385 | `safe_path` | Sitting 32: the operator put python-3.14-docs-text/ in the workspace |
-| 406 | `safe_path` | legs were red and both Ubuntu legs passed (2026-09-10). |
-| 415 | `(module)` | THE JAIL'S OWN NAME IS NOT A PATH INTO IT (sitting 88, 2026-09-07). The |
-| 443 | `find_by_name` | file" error (sitting 88: the Router asked for `estate_laws.md` at the |
-| 509 | `gate_paths` | PROSE IS NOT A PATH (sitting 70, and the third time this month). |
-| 511 | `gate_paths` | in ground'; earlier it asked ground_read for 'review sitting 63 |
-| 557 | `_ground_list` | Sitting 77: the Router passed the WHOLE OBJECTIVE as the folder -- |
-| 603 | `_ground_list` | the lines itself, and on 2026-09-08 and 2026-09-09 it counted 35 and |
-| 809 | `_sitting` | Sitting 63 asked the chain to review sitting 63 and it could not: runs |
-| 997 | `_skill_search` | than by RUNNING it -- which is what sitting 69 did, before reporting |
-| 1086 | `_ground_read` | Sitting 30: the Router quoted the filename -- '"pipelines.md"' -- and |
-| 1103 | `_ground_read` | NAME THE CURE (sitting 88). The file may exist elsewhere in the |
-| 1124 | `(module)` | THE INSPECTION (2026-09-07, the operator: "a skill that is able to review |
-| 1129 | `(module)` | github"). The ruling it makes into a tool is from 2026-08-29, sittings |
-| 1423 | `_read_file` | names the part when both are given. THE STAMP (2026-09-07): a |
-| 1526 | `_git_status` | Sitting 38: the closer read counts from two moments and narrated a |
-| 1563 | `_commit_subject` | SITTING 72: the previous subject was in the Router's results (git_status |
-| 1566 | `_commit_subject` | description of different work. Same disease as sitting 61's lifted |
-| 1575 | `_commit_subject` | ever made and tells a reader nothing. Sitting 6's guard caught a bare |
-| 1609 | `_commit_subject` | SITTING 80, and the operator caught it from the transcripts: two |
-| 1639 | `_commit_subject` | Sitting 81: `git commit " i ran a session, found a bug in the router.` |
-| 1655 | `_commit_subject` | SITTING 85 (2026-09-04): `git commit -m parity ran, review the models |
-| 1698 | `_git_commit` | SAY WHICH DIRECTION THE COUNT POINTS. Sitting 81: the result carried |
-| 1884 | `_doctrine_check` | out.append("  His ruling, sitting 79: no doc names a suite tally, because " |
-| 1917 | `_proved` | SITTING 81. The operator asked "have you run a full test suite on these |
-| 2044 | `_speak` | SITTING 70, THE OPERATOR: "speak ran, it just doesnt put the output |
-| 2323 | `_rack_report` | labelled after sitting 59, but the Router still summarised THE READING |
-| 2324 | `_rack_report` | rather than the facts, three times in sitting 85. A reading nobody asked |
-| 2364 | `_rack_report` | 2026-09-02, sitting 59: this returned ONLY the Quartermaster's prose, and |
-| 2480 | `(module)` | ONE BUILD AT A TIME (sitting 94, 2026-09-08). `_run_bounded` cannot kill |
-| 2498 | `_index_busy` | "vectors.db corrupt both (sitting 94). Wait for it, or " |
-| 2515 | `_open_index` | HELD. Sitting 94: this was `pass`, the old file stayed |
-| 2529 | `_wants_rebuild` | Sitting 66, and this is the fault worth naming: the index refused -- |
-| 2581 | `_index_ground_locked` | SITTING 81: this banner was appended to `lines` -- which is then |
-| 2592 | `_index_ground_locked` | account of it. Same fault as git_commit's count (sitting 80). |
-| 2667 | `_search_scoped` | Sitting 26: the Router called search with no query, the error came |
-| 2694 | `_search_scoped` | Doctrine outranks plumbing. Sitting 28 asked "what is the covenant" |
-| 2709 | `_rank` | RECENCY, added 2026-09-02. Age was DISPLAYED on every hit and |
-| 2733 | `_search_scoped` | Sitting 26: passages from an old run transcript were narrated as if |
-| 2776 | `_deep_research` | The standing ruling: the objective IS the payload. Sitting 39 |
-| 3047 | `_run_prompt_skill` | sitting 39 waiting for a <content> nobody was going to type twice. |
-| 3053 | `_run_prompt_skill` | 2026-09-08). Sitting 95: "time align the logs" -- four words, no log |
-| 3103 | `(module)` | `<|python_tag|>`. Sitting 84 (2026-09-04): the closing Steward on llama3.2 |
+| 177 | `(module)` | and newline split, as trigger phrases. Measured 2026-09-10: `doc_pass` |
+| 254 | `args_from_words` | This is the payload surviving the moment of recognition. Sitting 66: |
+| 301 | `declared_args` | Sitting 77 needed this and did not have it: the tool loop's dedup was |
+| 341 | `(module)` | sitting 39: "give it the ability to review, never write." |
+| 349 | `(module)` | and writes nothing. It was left out when it was added on 2026-09-03, |
+| 355 | `(module)` | `inspect` reads a file's FACTS and never its contents (2026-09-07). |
+| 359 | `(module)` | What actually puts something on disk. The write-claim check (sitting 70) |
+| 368 | `(module)` | 2026-09-08 (the REPL read): pull and push were missing, so the |
+| 414 | `safe_path` | Sitting 32: the operator put python-3.14-docs-text/ in the workspace |
+| 435 | `safe_path` | legs were red and both Ubuntu legs passed (2026-09-10). |
+| 444 | `(module)` | THE JAIL'S OWN NAME IS NOT A PATH INTO IT (sitting 88, 2026-09-07). The |
+| 472 | `find_by_name` | file" error (sitting 88: the Router asked for `estate_laws.md` at the |
+| 538 | `gate_paths` | PROSE IS NOT A PATH (sitting 70, and the third time this month). |
+| 540 | `gate_paths` | in ground'; earlier it asked ground_read for 'review sitting 63 |
+| 586 | `_ground_list` | Sitting 77: the Router passed the WHOLE OBJECTIVE as the folder -- |
+| 632 | `_ground_list` | the lines itself, and on 2026-09-08 and 2026-09-09 it counted 35 and |
+| 838 | `_sitting` | Sitting 63 asked the chain to review sitting 63 and it could not: runs |
+| 1026 | `_skill_search` | than by RUNNING it -- which is what sitting 69 did, before reporting |
+| 1115 | `_ground_read` | Sitting 30: the Router quoted the filename -- '"pipelines.md"' -- and |
+| 1132 | `_ground_read` | NAME THE CURE (sitting 88). The file may exist elsewhere in the |
+| 1153 | `(module)` | THE INSPECTION (2026-09-07, the operator: "a skill that is able to review |
+| 1158 | `(module)` | github"). The ruling it makes into a tool is from 2026-08-29, sittings |
+| 1452 | `_read_file` | names the part when both are given. THE STAMP (2026-09-07): a |
+| 1555 | `_git_status` | Sitting 38: the closer read counts from two moments and narrated a |
+| 1592 | `_commit_subject` | SITTING 72: the previous subject was in the Router's results (git_status |
+| 1595 | `_commit_subject` | description of different work. Same disease as sitting 61's lifted |
+| 1604 | `_commit_subject` | ever made and tells a reader nothing. Sitting 6's guard caught a bare |
+| 1638 | `_commit_subject` | SITTING 80, and the operator caught it from the transcripts: two |
+| 1668 | `_commit_subject` | Sitting 81: `git commit " i ran a session, found a bug in the router.` |
+| 1684 | `_commit_subject` | SITTING 85 (2026-09-04): `git commit -m parity ran, review the models |
+| 1727 | `_git_commit` | SAY WHICH DIRECTION THE COUNT POINTS. Sitting 81: the result carried |
+| 1746 | `_proved` | SITTING 81. The operator asked "have you run a full test suite on these |
+| 1880 | `_speak` | SITTING 70, THE OPERATOR: "speak ran, it just doesnt put the output |
+| 2159 | `_rack_report` | labelled after sitting 59, but the Router still summarised THE READING |
+| 2160 | `_rack_report` | rather than the facts, three times in sitting 85. A reading nobody asked |
+| 2200 | `_rack_report` | 2026-09-02, sitting 59: this returned ONLY the Quartermaster's prose, and |
+| 2316 | `(module)` | ONE BUILD AT A TIME (sitting 94, 2026-09-08). `_run_bounded` cannot kill |
+| 2334 | `_index_busy` | "vectors.db corrupt both (sitting 94). Wait for it, or " |
+| 2351 | `_open_index` | HELD. Sitting 94: this was `pass`, the old file stayed |
+| 2365 | `_wants_rebuild` | Sitting 66, and this is the fault worth naming: the index refused -- |
+| 2417 | `_index_ground_locked` | SITTING 81: this banner was appended to `lines` -- which is then |
+| 2428 | `_index_ground_locked` | account of it. Same fault as git_commit's count (sitting 80). |
+| 2503 | `_search_scoped` | Sitting 26: the Router called search with no query, the error came |
+| 2530 | `_search_scoped` | Doctrine outranks plumbing. Sitting 28 asked "what is the covenant" |
+| 2545 | `_rank` | RECENCY, added 2026-09-02. Age was DISPLAYED on every hit and |
+| 2569 | `_search_scoped` | Sitting 26: passages from an old run transcript were narrated as if |
+| 2612 | `_deep_research` | The standing ruling: the objective IS the payload. Sitting 39 |
+| 2668 | `load` | 2026-09-10 `doc_pass` claimed 35 phrases where 8 were declared, |
+| 2900 | `_run_prompt_skill` | sitting 39 waiting for a <content> nobody was going to type twice. |
+| 2906 | `_run_prompt_skill` | 2026-09-08). Sitting 95: "time align the logs" -- four words, no log |
+| 2956 | `(module)` | `<|python_tag|>`. Sitting 84 (2026-09-04): the closing Steward on llama3.2 |
 
 ### manjuel/transcript.py
 
@@ -1143,7 +1148,7 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 Every `test_*` function in tests/, the manjuel names it touches, and
 its line range. The suites are the memory (HANDOFF: test discipline).
 
-### tests/test_manjuel.py — 158 test functions
+### tests/test_manjuel.py — 160 test functions
 
 | test | lines | touches |
 |---|---|---|
@@ -1303,6 +1308,8 @@ its line range. The suites are the memory (HANDOFF: test discipline).
 | `test_flags_are_not_speech` | 10372-10412 | `RunContext`, `build_prompt`, `read_flags`, `run_pipeline`, `strip_control` |
 | `test_ink` | 10415-10463 | `ink`, `ink.RESET`, `ink.Spinner`, `ink._STATE`, `ink.bad`, `ink.body`, `ink.dim`, `ink.enabled`, `ink.good`, `ink.seat`, `ink.seat_color`, `ink.warn` |
 | `test_math` | 10466-10489 | `M`, `M.MathError`, `M.cosine`, `M.linear_regression`, `M.matmul`, `M.parse_numbers`, `M.stdev`, `M.transpose`, `M.variance` |
-| `test_doctrine` | 10492-10607 | `D`, `D.dead_paths`, `D.living`, `D.open_tasks`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_v` |
-| `test_record_and_git` | 10610-10714 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
+| `test_says_is_a_phrase_list_not_a_paragraph` | 10492-10557 | `SkillLibrary`, `SkillLibrary.load`, `parse_says` |
+| `test_the_stamp_is_not_an_edit` | 10560-10668 | `_BOOT_STAMPS`, `_H`, `_sf`, `suite_tally` |
+| `test_doctrine` | 10671-10803 | `D`, `D.dead_paths`, `D.doc_pass_report`, `D.doctrine_report`, `D.living`, `D.open_tasks`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_SL`, `_SL.load` |
+| `test_record_and_git` | 10806-10910 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
 

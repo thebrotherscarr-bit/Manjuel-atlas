@@ -138,32 +138,39 @@ It does five things and reports what each one said:
 It refuses rather than guesses: no message, a red proof, nothing to commit, the
 wall shut, not a repository -- each names itself and stops. Nothing half-runs.
 
-**Before you start, and before you tag.** Two read-only skills answer the two
+**Before you start, and before you tag.** Two read-only reports answer the two
 questions that used to mean opening six files in order. Neither writes
-anything.
+anything, and neither is a skill — they are run directly:
 
-    doc_pass          Where the estate stands and what is on the table: the
-                      DAYBOOK's newest entry and whether it was closed, the
-                      HANDOFF's newest block, the CHANGELOG's Unreleased
-                      entries, the lines still open in TASKS, the repository
-                      (head, dirty, local against remote, version), and the
-                      same six proofs git_cycle reads. It reads TASKS.md and
-                      NEVER writes it -- a hand does not add work to your list.
+    python -m manjuel.doctrine            where the estate stands
+    python -m manjuel.doctrine --check    the doctrine check
 
-    doctrine_check    Whether the docs still describe what the system performs
-                      -- LAW 6, made mechanical. The law chain and any law
-                      drafted but unsealed; whether the skill library agrees
-                      with the handlers behind it; whether every file holding
-                      the version says the same number; any suite tally left
-                      standing in a living doc; any backticked path that
-                      resolves to nothing. Every finding names its file and
-                      line.
+`doc_pass` — the STATE of the record: which DAYBOOK entry is newest and whether
+it was closed, whether there is a HANDOFF for today, how many CHANGELOG entries
+stand under Unreleased, how many TASKS lines are still on the table, the
+repository (head, dirty, local against remote, version), and whether the proofs
+are green. It reads TASKS.md and NEVER writes it — a hand does not add work to
+your list.
 
-Both are arithmetic. Neither seats a model, and that is deliberate: asked to
-find discrepancies it cannot verify, a model invents them. Dated ledgers
-(HANDOFF, SEAT_LOG, DAYBOOK, CHANGELOG, TASKS, REFUSALS, memory, BUILDMAP) are
-skipped on purpose -- a number in a ledger is a true record of its day, not a
-claim about now.
+`doctrine_check` — whether the docs still describe what the system performs
+(LAW 6): the law chain and any law drafted but unsealed; whether the skill
+library agrees with the handlers behind it; whether every file holding the
+version says the same number; any suite tally left standing in a living doc;
+any backticked path that resolves to nothing. Every finding names its file and
+line.
+
+**WHY THEY ARE NOT SKILLS.** They were, for about an hour on 2026-09-10, and
+the cost landed on the ROUTER'S SHORTLIST. Both describe the record, and this
+estate's commonest question is about the record — so they outranked the right
+answer on every doc question, and `semantic_search` stopped being offered at
+all. A standup case green all morning went to no tool at 09:59: the Router
+burned its whole thinking budget weighing them. Arithmetic that calls no model
+and makes no judgement has no business in a roster the Router reads on every
+turn. The operator named it: "you have too many knobs."
+
+Both are arithmetic. Dated ledgers (HANDOFF, SEAT_LOG, DAYBOOK, CHANGELOG,
+TASKS, REFUSALS, memory, BUILDMAP) are skipped on purpose — a number in a
+ledger is a true record of its day, not a claim about now.
 
 Push is disabled unless the wall is open (`MANJUEL_GIT_REMOTE` in `.env`) and
 there is something to push; hover it and it says which.
@@ -494,6 +501,19 @@ job, not an error.
 
 `not run here yet` means no run has ever stamped `tests/last_run.json` on this
 machine — the same instruction applies.
+
+**If you saw this after EVERY green run, that was a bug, and it is fixed.**
+Until 2026-09-10 the check took the newest `.py`/`.md` under `manjuel`,
+`agents`, `skills` and `tests` with no exclusions — and `tests/last_run.md` is
+a `.md` under `tests/` that the suite itself writes as it finishes. So the
+ground always looked "changed since" the moment a run ended, and the line fired
+every time. Measured: boot's newest edit was `tests/last_run.md` at 0.0s after
+the run, while the release gate read the same tree as 86 seconds *older*.
+
+The suites' own stamps (`last_run.md`, `last_run.json`, `run_history.jsonl`,
+`last_audit.md`) are now excluded, which is the rule `tests/release.py` already
+used. A stroke proves both copies agree, so they cannot separate again. **A
+STALE line now means what it says.**
 
 ---
 

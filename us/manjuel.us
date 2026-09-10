@@ -214,36 +214,6 @@ other (LAW 5); now a record that lies is a finding.
 {
   "can_approve": false,
   "covenant": "1512741580b7239b",
-  "id": "doc_pass",
-  "kind": "skill",
-  "office": "MANJUEL",
-  "reports_to": "manjuel",
-  "source": "skills/doc_pass.md",
-  "us": 1,
-  "wall": "reads the record (DAYBOOK, HANDOFF, CHANGELOG, TASKS), the repository and the suites' stamps; writes nothing, and never TASKS.md",
-  "writes": false
-}
-```
-
-```json
-{
-  "can_approve": false,
-  "covenant": "1512741580b7239b",
-  "id": "doctrine_check",
-  "kind": "skill",
-  "office": "MANJUEL",
-  "reports_to": "manjuel",
-  "source": "skills/doctrine_check.md",
-  "us": 1,
-  "wall": "reads the living docs, the law chain, the skill library and the version files; compares them and writes nothing",
-  "writes": false
-}
-```
-
-```json
-{
-  "can_approve": false,
-  "covenant": "1512741580b7239b",
   "id": "embed_text",
   "kind": "skill",
   "office": "MANJUEL",

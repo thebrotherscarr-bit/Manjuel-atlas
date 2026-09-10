@@ -245,3 +245,20 @@
 {"suite": "strokes", "at": 1789057725.6017027, "state": "finished", "passed": 2026, "total": 2026, "green": true, "failed": []}
 {"suite": "smoke", "at": 1789057783.2994707, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
 {"suite": "standup", "at": 1789058002.426032, "state": "finished", "passed": 9, "total": 9, "green": true, "failed": [], "report": "logs/standup_2026-09-10_093322.md"}
+{"suite": "strokes", "at": 1789059270.5173714, "state": "finished", "passed": 2032, "total": 2032, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789059283.0251238, "state": "finished", "passed": 2032, "total": 2032, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789059394.482202, "state": "finished", "passed": 2034, "total": 2035, "green": false, "failed": ["`proved` does not call a fresh run changed-since"]}
+{"suite": "strokes", "at": 1789059407.1993482, "state": "finished", "passed": 2034, "total": 2035, "green": false, "failed": ["`proved` does not call a fresh run changed-since"]}
+{"suite": "strokes", "at": 1789059431.922208, "state": "finished", "passed": 2035, "total": 2035, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789059444.5801754, "state": "finished", "passed": 2035, "total": 2035, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789059454.6993341, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "standup", "at": 1789059553.3236375, "state": "finished", "passed": 8, "total": 9, "green": false, "failed": ["a question about the ground"], "report": "logs/standup_2026-09-10_095913.md"}
+{"suite": "strokes", "at": 1789060124.3544483, "state": "finished", "passed": 2038, "total": 2038, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789060137.6748967, "state": "finished", "passed": 2038, "total": 2038, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789060167.4140606, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "partial", "at": 1789060216.5976648, "state": "finished", "passed": 0, "total": 0, "green": true, "failed": [], "report": "logs/standup_2026-09-10_101016.md"}
+{"suite": "partial", "at": 1789060234.1942823, "state": "finished", "passed": 0, "total": 1, "green": false, "failed": ["a question about the ground"], "report": "logs/standup_2026-09-10_101034.md"}
+{"suite": "strokes", "at": 1789060662.4171548, "state": "finished", "passed": 2027, "total": 2027, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789060674.7076557, "state": "finished", "passed": 2027, "total": 2027, "green": true, "failed": []}
+{"suite": "partial", "at": 1789060728.8719099, "state": "finished", "passed": 1, "total": 1, "green": true, "failed": [], "report": "logs/standup_2026-09-10_101848.md"}
+{"suite": "smoke", "at": 1789060766.6258836, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}

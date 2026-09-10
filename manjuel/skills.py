@@ -171,8 +171,17 @@ def parse_path_args(body: str) -> tuple[tuple[str, str], ...]:
 # the ARGUMENT that should carry them, so the payload survives the moment
 # of recognition instead of being thrown away with the rest of the
 # sentence. Markdown declares; Python only runs it.
-_SAYS_RE = re.compile(r"\*\*Says:\*\*\s*(?P<p>.*?)(?=\n[ \t]*[-*][ \t]*\*\*|\Z)",
-                      re.DOTALL)
+# A BLANK LINE ENDS THE LIST, and that is not cosmetic. This used to run to
+# the next `- **` bullet or to END OF FILE, so a skill whose `Says:` was the
+# LAST bullet swallowed every word of prose beneath it and claimed it, comma
+# and newline split, as trigger phrases. Measured 2026-09-10: `doc_pass`
+# claimed 35 phrases where 8 were declared, and among the 27 it invented was
+# `what does the covenant say?` -- lifted out of a paragraph EXPLAINING that
+# very failure. It would have hijacked the standup case it was written about.
+# In markdown a bullet list ends at a blank line; the parser now agrees.
+_SAYS_RE = re.compile(
+    r"\*\*Says:\*\*\s*(?P<p>.*?)(?=\n[ \t]*[-*][ \t]*\*\*|\n[ \t]*\n|\Z)",
+    re.DOTALL)
 _TAKES_RE = re.compile(r"\*\*Takes:\*\*\s*(?P<p>.*?)(?=\n[ \t]*[-*][ \t]*\*\*|\Z)",
                        re.DOTALL)
 # "rebuild | from scratch -> content"  /  "2, part N -> content"
@@ -182,13 +191,33 @@ _TAKES_RULE_RE = re.compile(
 TAKES_ARGS = ("content", "filepath")
 
 
+# A phrase this long, or ending in a full stop, is a SENTENCE that leaked out
+# of a paragraph -- not something an operator says at a door. It is reported at
+# load rather than silently claimed, because a claimed sentence is a phrase the
+# Router weighs on every single turn.
+_PROSE_PHRASE = 45
+
+
 def parse_says(body: str) -> tuple[str, ...]:
-    """Alias phrases a skill claims for itself. Lowercased, deduped."""
+    """Alias phrases a skill claims for itself. Lowercased, deduped.
+
+    `|` IS ACCEPTED BESIDE THE COMMA. The declared format is comma-separated
+    (the header above this module's parsers shows it), and `|` is `Takes:`'s
+    separator -- but two skills written on 2026-09-10, `git_cycle` and
+    `search_transcripts`, used `|` here by mistake and the parser read the
+    whole line as ONE phrase. A phrase of eleven clauses matches nothing, so
+    BOTH SKILLS' ALIASES WERE DEAD from the day they were written, silently:
+    `git_cycle` routed only when its name was typed outright, which is exactly
+    why `git_cycle the whole version-control turn` reached no tool that
+    morning. Accepting both separators costs nothing -- neither character can
+    appear inside a phrase an operator would say -- and turns a silent
+    misdeclaration into a working one.
+    """
     m = _SAYS_RE.search(body)
     if not m:
         return ()
     seen, out = set(), []
-    for raw in re.split(r"[,\n]", m.group("p")):
+    for raw in re.split(r"[,|\n]", m.group("p")):
         phrase = " ".join(raw.strip().strip("`'\"").split()).lower()
         if phrase and phrase not in seen:
             seen.add(phrase)
@@ -1710,206 +1739,6 @@ def _git_commit(env: SkillExecutionEnv, args: dict) -> str:
     return out
 
 
-@skill("doc_pass")
-def _doc_pass(env: SkillExecutionEnv, args: dict) -> str:
-    """WHERE THIS ESTATE STANDS, AND WHAT IS ON THE TABLE.
-
-    His ask, 2026-09-10: "a review of the current daybook runbook, etc. and
-    then a check of where the repo is at, and a short brief about whats on the
-    table." That is a pass a hand did by opening six files in order, and a pass
-    done by hand is a pass that gets skipped on the day it matters.
-
-    EVERY LINE IS READ. The DAYBOOK's newest heading and whether it was closed,
-    the HANDOFF's newest block, the CHANGELOG's Unreleased entries, the OPEN
-    lines of TASKS, the repository through gitstate, and the six proofs the
-    boot report reads. Nothing here is generated, and no seat is asked what it
-    thinks the state is -- which is the whole reason the skill exists rather
-    than a prompt.
-
-    IT NEVER WRITES TASKS.md. READ FIRST, item 6, is explicit that a hand does
-    not add work to that file; a tool that could would be the fastest possible
-    way to break it.
-    """
-    from manjuel import doctrine as _doc
-    import datetime as _dt
-
-    ground = Path(env.ground)
-    out: list[str] = []
-
-    # ---- 1. THE RECORD --------------------------------------------------
-    out.append("THE RECORD")
-    entry, closed = _doc.daybook_last(ground)
-    if entry:
-        out.append(f"  DAYBOOK    {entry[:88]}")
-        out.append("             " + ("closed (**At close** is written)" if closed
-                                       else "NOT CLOSED -- the last entry has no **At close**"))
-    else:
-        out.append("  DAYBOOK    no entry found")
-    today = _dt.date.today().isoformat()
-    text = _doc.read(ground / "HANDOFF.md")
-    newest = _doc.handoff_today(ground, today)
-    out.append(f"  HANDOFF    newest block: {newest or 'none'}"
-               + ("" if f"HANDOFF FOR {today}" in text
-                  else f"   (nothing for {today})"))
-    rel = _doc.unreleased(ground)
-    out.append(f"  CHANGELOG  {len(rel)} entries under Unreleased")
-    tasks = _doc.open_tasks(ground)
-    in_hand = sum(1 for m, _ in tasks if m == "[~]")
-    out.append(f"  TASKS      {len(tasks)} on the table"
-               + (f" ({in_hand} in hand)" if in_hand else ""))
-
-    # ---- 2. THE REPO ----------------------------------------------------
-    out.append("")
-    out.append("THE REPO")
-    st = _git.read(ground)
-    out.append(f"  {st.stamp()}")
-    local, remote, why = _git.head_and_remote(ground)
-    if remote and local:
-        agree = "they agree" if local == remote else "** THEY DISAGREE **"
-        out.append(f"  local {local} · remote {remote} — {agree}")
-    else:
-        out.append(f"  the remote head could not be read"
-                   + (f" ({why})" if why else ""))
-    _v, version = _doc.versions(ground)
-    out.append(f"  version {version}")
-
-    # ---- 3. THE PROOFS --------------------------------------------------
-    out.append("")
-    try:
-        checks, caveat = _doc.proofs(ground)
-    except Exception as exc:
-        out.append(f"THE PROOFS  could not be read ({type(exc).__name__}: {exc})")
-    else:
-        bad = [c for c in checks if not c.ok]
-        out.append(f"THE PROOFS  {len(checks) - len(bad)}/{len(checks)} read here "
-                   f"({caveat})")
-        for c in checks:
-            out.append(f"  {'ok     ' if c.ok else 'REFUSED'} {c.name:9} {c.why}")
-
-    # ---- 4. ON THE TABLE ------------------------------------------------
-    out.append("")
-    out.append("ON THE TABLE")
-    if rel:
-        out.append(f"  landed since the last tag ({len(rel)}):")
-        for e in rel:
-            out.append(f"    · {e[:96]}")
-    else:
-        out.append("  nothing under Unreleased -- the last tag is current.")
-    if tasks:
-        out.append(f"  open in TASKS ({len(tasks)}) — his list, read and never written:")
-        for mark, t in tasks[:12]:
-            out.append(f"    {mark} {t}")
-        if len(tasks) > 12:
-            out.append(f"    … and {len(tasks) - 12} more in TASKS.md")
-    else:
-        out.append("  TASKS has nothing on the table.")
-    return "\n".join(out)
-
-
-@skill("doctrine_check")
-def _doctrine_check(env: SkillExecutionEnv, args: dict) -> str:
-    """DOES THE RECORD STILL DESCRIBE WHAT THE SYSTEM PERFORMS?
-
-    HIS LAW 6, made mechanical: "all version bumps and iterative changes come
-    with an update to the documentation and reflection within the system,
-    ensuring a review pass is made so that there are no conflicts within what
-    the system states and actually performs."
-
-    IT IS ARITHMETIC, NOT A READING. `deep_research` would seat the Deep
-    Researcher and ask it to reason about the corpus; that is the wrong engine
-    and a dangerous one, because a model asked to find discrepancies it cannot
-    verify will invent them. Every finding here is a comparison between two
-    things on disk, and each one prints its own address so he can check it.
-
-    WHAT IT DOES NOT DUPLICATE. release.py already gates the law chain, the
-    manifest, SPEC against the CHANGELOG, the DAYBOOK and the HANDOFF, and
-    `proved` already reports the suites. This asks the axis nothing else does:
-    whether the LIVING docs -- the ones speaking in the present tense -- still
-    match the ground under them.
-    """
-    from manjuel import doctrine as _doc
-
-    ground = Path(env.ground)
-    out: list[str] = []
-    findings = 0
-
-    docs = _doc.living(ground)
-    out.append("THE DOCTRINE CHECK — what the docs state vs what the ground performs")
-    out.append(f"  read across {len(docs)} living docs; {len(_doc.LEDGERS)} dated "
-               f"ledgers skipped, because a number in a ledger is a true record "
-               f"of its day, not a claim about now")
-
-    # ---- the sealed laws ------------------------------------------------
-    out.append("")
-    try:
-        state, unsealed = _doc.laws(ground)
-    except Exception as exc:
-        out.append(f"THE LAW CHAIN   could not be read ({type(exc).__name__}: {exc})")
-    else:
-        out.append(f"THE LAW CHAIN   {state}")
-        if unsealed:
-            out.append(f"  drafted but NOT SEALED: {', '.join(unsealed)}")
-            out.append("  (not a fault — a law may be written before it is ruled. "
-                       "Sealing is his, RULE 6.)")
-
-    # ---- the skills -----------------------------------------------------
-    try:
-        faults = _doc.skills_axis(ground)
-    except Exception as exc:
-        out.append(f"THE SKILLS      could not be read ({type(exc).__name__}: {exc})")
-    else:
-        if faults:
-            findings += len(faults)
-            out.append("THE SKILLS      DISAGREE with the code behind them:")
-            for f in faults:
-                out.append(f"  {f}")
-        else:
-            out.append("THE SKILLS      the library and the handlers agree")
-
-    # ---- the version ----------------------------------------------------
-    vfaults, version = _doc.versions(ground)
-    if vfaults:
-        findings += len(vfaults)
-        for f in vfaults:
-            out.append(f"THE VERSION     {f}")
-    else:
-        out.append(f"THE VERSION     {version}, said the same by every file that holds it")
-
-    # ---- a tally in a living doc ----------------------------------------
-    out.append("")
-    tallies = _doc.stale_tallies(ground)
-    if tallies:
-        findings += len(tallies)
-        out.append(f"A SUITE TALLY IN A LIVING DOC ({len(tallies)})")
-        out.append("  His ruling, sitting 79: no doc names a suite tally, because "
-                   "the suites grow and the doc does not — so a once-real number "
-                   "comes to read as a claim.")
-        for f, n, line in tallies:
-            out.append(f"  {f}:{n}")
-            out.append(f"      {line}")
-    else:
-        out.append("A SUITE TALLY IN A LIVING DOC   none — the sitting-79 ruling holds")
-
-    # ---- a path that is not there ---------------------------------------
-    out.append("")
-    dead = _doc.dead_paths(ground)
-    if dead:
-        findings += len(dead)
-        out.append(f"A PATH THAT IS NOT THERE ({len(dead)})")
-        out.append("  Resolved against the ground, atlas/ and atlas/line/ before "
-                   "being called dead, because the Go docs address their own tree.")
-        for f, n, rel in dead:
-            out.append(f"  {f}:{n}   {rel}")
-    else:
-        out.append("A PATH THAT IS NOT THERE   none — every address in the living docs resolves")
-
-    out.append("")
-    out.append(f"{findings} finding(s). Each names its file and line; none is a judgement."
-               if findings else
-               "No findings. What the docs state and what the ground performs agree.")
-    return "\n".join(out)
-
-
 @skill("proved")
 def _proved(env: SkillExecutionEnv, args: dict) -> str:
     """What the suites last proved, read from what they stamped.
@@ -1963,18 +1792,25 @@ def _proved(env: SkillExecutionEnv, args: dict) -> str:
             out.append(f"             failed: {name}")
 
     # STALE: is anything on disk younger than the run that proved it?
+    #
+    # WHICH FILES COUNT IS boot.source_files' RULE, not a third copy of it.
+    # This loop used to walk the code dirs itself with no exclusions, and
+    # tests/last_run.md is a .md under tests/ that the SUITE WRITES as it
+    # finishes -- so this said CHANGED SINCE after every green run and then
+    # named `last_run.md` as the file that had changed, which is the stamp of
+    # the very run it was reporting on. Three copies of one rule existed and
+    # only tests/release.py had it right; a stroke now proves all three agree.
+    from manjuel.boot import source_files as _source_files
     touched, newer = 0.0, []
-    for d in ("manjuel", "agents", "skills", "tests"):
-        for f in (ground / d).rglob("*"):
-            if f.suffix in (".py", ".md"):
-                try:
-                    m = f.stat().st_mtime
-                except OSError:
-                    continue
-                if m > touched:
-                    touched = m
-                if m > newest:
-                    newer.append(f.name)
+    for f in _source_files(ground):
+        try:
+            m = f.stat().st_mtime
+        except OSError:
+            continue
+        if m > touched:
+            touched = m
+        if m > newest:
+            newer.append(f.name)
     ago = max(0.0, _time.time() - newest)
     when = (f"{int(ago // 60)} minutes ago" if ago < 5400 else
             f"{int(ago // 3600)} hours ago" if ago < 172800 else
@@ -2824,9 +2660,26 @@ class SkillLibrary:
             model = mm.group("m").strip() if mm else ""
             if model and ":" not in model:
                 model = f"{model}:latest"
+            says = parse_says(body)
+            # A SENTENCE IS NOT A PHRASE. Every claimed phrase is weighed by
+            # the Router on every turn, so prose that leaks out of a paragraph
+            # and into this list is not a cosmetic fault -- it is a permanent
+            # tax on routing, and it is invisible unless somebody counts. On
+            # 2026-09-10 `doc_pass` claimed 35 phrases where 8 were declared,
+            # and one of the 27 it invented was the standup question it had
+            # just broken. Reported, never dropped: the hand that wrote the
+            # file fixes it, the loader does not guess what was meant.
+            for p in says:
+                if len(p) > _PROSE_PHRASE or p.endswith("."):
+                    warnings.append(
+                        f"{path.name}: `**Says:**` claims a phrase that reads "
+                        f"like prose, not something said at a door: "
+                        f"\"{p[:60]}{'...' if len(p) > 60 else ''}\". The list "
+                        f"ends at the first BLANK LINE -- put commentary below "
+                        f"one.")
             specs.append(SkillSpec(m.group("kw").strip().lower(), path.name, body,
                                    model, parse_path_args(body),
-                                   parse_says(body), parse_takes(body)))
+                                   says, parse_takes(body)))
 
         return cls(specs, warnings, skills_dir)
 
