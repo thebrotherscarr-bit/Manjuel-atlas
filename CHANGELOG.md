@@ -34,6 +34,57 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — SPEC SECTION 4 SAYS WHAT THE DISK SAYS (operator: "then finish up spec 4")
+- **WHAT FINISHING COULD AND COULD NOT MEAN.** Four of the nine OPEN lines say
+  IN THE LINE ITSELF that the decision is his, and one says it is a record note
+  nobody should "fix". Section 4 is this estate's answer to "is it done", and it
+  is worth nothing if anything but evidence moves a status. So every line was
+  re-measured against the disk, and only measurement moved anything.
+- **§4.1 CLOSED, by his own call.** `BUILDMAP.md` was not in `index_roots.txt`
+  and the line said "the operator's call". He made it the same day — "index
+  everything" — so the line now reads MET: 17 roots → 39, 828 → 995 indexed
+  documents, BUILDMAP and the five law files among them.
+- **§4.5 the client token, NARROWED by measurement:** 12 log filenames → **0**,
+  and **0** indexed documents. What remains is `sessions.jsonl` (24) and the git
+  pack. Counted, never printed (RULE 7). The pack cannot change without
+  rewriting history, which was refused once already, and the ledger is
+  append-only — so both remaining places are his call, not a hand's.
+- **§4.5 the terminators, RE-COUNTED after atlas landed in the ground:** 144 LF
+  / 14 CRLF / 1 MIXED → **528 / 84 / 4**. And the four MIXED are not one thing:
+  three are atlas's byte-exact `chains/*.jsonl` goldens, deliberately never
+  rewritten, and the fourth is `tests/run_history.jsonl`, where `standup.py`
+  appends CRLF lines into an LF file — the only one of the four that is a defect
+  rather than a golden. The ruling stays his.
+- **§4.5 SEAT_LOG numbering, RECOMPUTED as the line itself instructs:** 13 gaps
+  / 11 unmarked duplicates → **14 / 10**, over 119 headings to a maximum of 123.
+  Gap 118 is today's own: the sitting a wedged boot opened and a killed process
+  left standing, closed by appending and never tolled. The line carries its
+  recipe precisely so this is maintenance and not a rewrite (LAW 1).
+- **§4.7 A FRESH SIGHTING, AND IT IS INTERMITTENT.** The standup's `a folder`
+  case had Steward (llama3.2) report the skills dir holds "37 markdown files,
+  ranging from 300 to 1200 bytes in size" with 300 and 1200 in NO tool result
+  that run (16:53). The same objective through the same seat passed seventeen
+  minutes later (17:10). The count was right; the range was invented. A
+  coin-flip, not a fixed fault — which is exactly why a green release gate is
+  not evidence the fault is gone.
+- **§4.2 CHECKED AGAINST THE CODE AND LEFT ALONE.** "a tool named with no
+  argument (`git status`): the Router still writes the call" is not doc drift —
+  `decided_call`'s own docstring says a decided call needs the tool AND an
+  argument checked on disk, and "a tool named with no argument ... still goes to
+  the Router to choose." Correctly stated; still open by design.
+- **NINE LINES REMAIN OPEN, and none of them is a hand's to close:**
+  - **His ruling:** §4.3 `rack_report` facts-only; §4.4 SITTING LAW 5 as a sealed
+    file (its name and place are his to give); §4.5 the terminators; §4.5 the
+    client token's last two places.
+  - **A record note, not a task:** §4.5 SEAT_LOG numbering — whether it should
+    carry an OPEN status at all is itself his call.
+  - **Real builds, unstarted:** §4.2 phrases for the door instead of the bare
+    keyword list; §4.3 the citation check ("the harder half; still the one real
+    build left from sitting 82"); §4.4 ESTATE LAW 2 as a gate and mechanisms for
+    LAWS 3 and 4; §4.7 llama3.2 at the door, which closes by reseating a model
+    rather than by building anything.
+
+
 ### 2026-09-09 — THE DOCS SAY WHAT THE BUILD IS, AT 0.1.8 (operator: "review all the docs within the research dir and update everything with the latest state of the build. 0.1.8")
 - **`__version__` 0.1.7 → 0.1.8**, on his word. `python manjuel.py --version`
   reports it; the banner and the door read the same constant. THE TAG IS STILL
