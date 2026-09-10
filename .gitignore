@@ -53,23 +53,27 @@ sessions/*.jsonl
 SEAT_LOG.md
 memory.md
 
-# atlas's build output, from H0 (2026-09-09). The source is 4.5 MB; a cargo
-# build drops a 456 MB target/ beside it and `go build` leaves .exe in
-# line/ and webapp/. None of that is source and none of it goes in the
-# record. The provers were run with CARGO_TARGET_DIR pointed at scratch so
-# the ground never saw them; these lines are here for the first in-place
-# build, which would otherwise put half a gigabyte into the repo.
-atlas/target/
+# Build leavings. whisper.cpp's binaries live under bin/ above; these catch
+# anything a compiler drops in the ground itself.
 *.exe
 *.exe~
-
-# The two servers' own stdout. atlas-mcp and atlas-webapp are started by
-# hand (RUNBOOK, 'Starting the system'), and a doc that tells him to run a
-# command which dirties his repo is a bad doc. The binaries beside them are
-# already covered by *.exe above.
-atlas/line/mcp.log
-atlas/webapp/web.log
 *.obj
-atlas/webapp/data/
 node_modules/
 .venv/
+
+# ATLAS IS ITS OWN REPOSITORY (2026-09-10, the operator's word: "let's get the
+# core and atlas split"). It was 509 of this repo's 682 tracked files -- three
+# quarters of the ground -- versioned on its own VERSION (0.1.1+f1) against the
+# core's 0.1.9, with its own CHANGELOG, HANDOFF, SEAT_LOG, roster, go.mod and
+# Cargo.toml. Two projects sharing one history, and only one of them was ever
+# proven by this repo's CI.
+#
+# It STAYS AT atlas/ -- RULE 1, the ground is Research and nothing leaves it --
+# but it carries its own .git, its own history (extracted whole with
+# `git subtree split`, 20 commits, nothing rewritten) and its own ignores.
+# The seam between them is a runtime path, not a build dependency: atlas reads
+# the ground through `t.Home`, and manjuel/ imports nothing from atlas.
+#
+# The files were untracked here with `git rm -r --cached atlas`; the history
+# that holds them is untouched, as LAW 1 requires.
+atlas/

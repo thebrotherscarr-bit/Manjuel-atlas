@@ -34,6 +34,40 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE CORE AND ATLAS ARE TWO REPOSITORIES (operator: "two smaller repos, one for the core and one for atlas ... they are two seperate systems that are symbiotic")
+- **THE DISK ALREADY AGREED WITH HIM.** atlas was **509 of this repository's
+  682 tracked files — three quarters of the ground** — carrying its own
+  `VERSION` (0.1.1+f1) against the core's 0.1.9, its own CHANGELOG, HANDOFF,
+  SEAT_LOG, LICENSE, `go.mod`, `Cargo.toml`, `release.ps1`, and a roster of 40
+  agents that shares not one name with the estate's seats. Two projects wearing
+  one history. The single repository was the anomaly, not the split.
+- **AND THE COUPLING ONLY EVER RAN ONE WAY.** atlas reads the ground
+  constantly; `manjuel/` mentions atlas five times, all comments, and imports
+  nothing from it. atlas binds at RUNTIME through `t.Home`, never at build
+  time, and no Go file under atlas/ reaches above its own directory. Nothing
+  technical ever required them to share a repository.
+- **A SYMPTOM THAT HAD BEEN HIDING IN IT:** this repository's CI proves the
+  Python and **has never proved a line of atlas**. One gate silently covering
+  half a tree. Now each side owns its own.
+- **HISTORY WAS EXTRACTED, NEVER REWRITTEN.** `git subtree split --prefix=atlas`
+  lifted all 20 commits that touched atlas into `atlas/` as its own root, and
+  `git rm -r --cached atlas` untracked them here. The commits that hold them are
+  untouched — LAW 1 cuts against rewriting history, and nothing was.
+- **IT STAYS AT `atlas/`.** RULE 1: the ground is Research and nothing leaves
+  it. atlas is a separate repository living in the same ground, not a directory
+  moved off it.
+- **THE IGNORES HAD TO TRAVEL, and nearly did not.** atlas had NO `.gitignore`
+  of its own; every rule protecting it — `atlas/target/`, `*.exe`,
+  `atlas/line/mcp.log`, `atlas/webapp/web.log`, `atlas/webapp/data/`,
+  `SEAT_LOG.md` — lived in this file, one directory up. The moment atlas became
+  its own repository that file stopped applying, and its next `git add -A` would
+  have committed two binaries, three logs, a server's data directory and the
+  seat log. `atlas/.gitignore` now carries them, rewritten relative to its own
+  root, as atlas's first commit after the split.
+- Core: **682 tracked files -> 173**. atlas: 21 commits, clean tree, no remote
+  yet — naming and publishing it are his (RULE 6).
+- Proven after the split: 2027/2027 strokes, 60/60 smoke, BUILDMAP regenerated.
+
 ### 2026-09-10 — THE TWO DOC REPORTS LEAVE THE ROSTER: ARITHMETIC IS NOT A SKILL (operator: "you have too many knobs")
 - **THE COST OF A SKILL IS PAID ON EVERY TURN, BY EVERY QUESTION.** `doc_pass`
   and `doctrine_check` were skills for about an hour. Both describe the record
