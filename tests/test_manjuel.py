@@ -1140,6 +1140,62 @@ def test_rack(reg, lib):
           "models installed" in quiet and "returned nothing" in quiet, quiet[:160])
 
 
+def test_an_uncited_claim_is_measured(reg, lib, book):
+    """A TOOL RESULT IS SOURCE MATERIAL (SPEC 4.3, built 2026-09-10).
+
+    Measured before it was: drift scored on 31 transcripts and said "no usable
+    source" on 733 -- dormant 96% of the time, because it primed only on a
+    feed. A claim about what a tool result SAID was measured against nothing,
+    which is the finding sitting 82 left open.
+    """
+    from manjuel.drift import DriftChecker, MIN_SOURCE_CHARS
+
+    class Embedder:
+        """Returns a vector that depends on the text, so cosine means
+        something here rather than being 1.0 for everything."""
+        def __init__(self):
+            self.calls = []
+
+        def embed(self, model, text):
+            self.calls.append(text)
+            t = (text or "").lower()
+            return [float(t.count("covenant")), float(t.count("rack")), 1.0]
+
+    r = Embedder()
+    d = DriftChecker(runtime=r, model="stub")
+
+    # ---- a short source must not poison the object ---------------------
+    check("a source under the floor does not prime",
+          not d.prime("x" * (MIN_SOURCE_CHARS - 1)))
+    check("and it does NOT poison the run -- a longer source still primes",
+          d.prime("the covenant binds one operator and one machine, at length"),
+          "this was the bug: _failed is permanent and a short string set it")
+
+    # ---- the score is against THAT source ------------------------------
+    near = d.score("the covenant binds one operator and one machine" + " ." * 40)
+    far = d.score("the rack holds seven models across four tiers" + " ." * 40)
+    check("a stage that stayed with the source scores above one that wandered",
+          near is not None and far is not None and near.score > far.score,
+          f"{near and round(near.score, 3)} vs {far and round(far.score, 3)}")
+
+    # ---- re-priming moves the source, which is what a tool result does --
+    d.prime("the rack holds seven models across four tiers, tiered by size")
+    again = d.score("the rack holds seven models across four tiers" + " ." * 40)
+    check("re-priming moves the measurement to the NEW source",
+          again is not None and again.score > far.score,
+          "the same words score higher once the rack is the source")
+
+    # ---- an embedder that dies IS permanent -----------------------------
+    class Dead:
+        def embed(self, model, text):
+            raise RuntimeError("no embedder")
+    dead = DriftChecker(runtime=Dead(), model="stub")
+    check("an embedder that dies fails the object for good",
+          not dead.prime("a source long enough to try") and not dead.prime("another"))
+    check("and a dead embedder never scores, it does not raise",
+          dead.score("anything at all, at length" + " ." * 40) is None)
+
+
 def test_the_corpus_is_split(reg, lib, book):
     """SOURCES answer questions; TRANSCRIPTS are an explicit ask (2026-09-10).
 
@@ -10318,6 +10374,7 @@ def main() -> int:
     test_vram(reg, book)
     test_shared_card(reg, book)
     test_rack(reg, lib)
+    test_an_uncited_claim_is_measured(reg, lib, book)
     test_the_corpus_is_split(reg, lib, book)
     test_rack_sync(reg, lib)
     test_steward_hands_off(reg, lib, book)

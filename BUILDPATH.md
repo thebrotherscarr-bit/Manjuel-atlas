@@ -345,6 +345,22 @@ different clothes -- A SEAT SAYING SOMETHING IT DID NOT GET FROM A TOOL:
     5. the tool-loop dedup is per Router sitting, not per run (TASKS) -- the
        Router's half of the same split.
 
+    WHY THE TRANSCRIPTS ARE INDEXED AT ALL, in his words (2026-09-10) and
+    recorded because it is the reason the split has two halves rather than
+    one deletion: "indexing the logs for drift between responses, and then an
+    index for fast searching the codebase and cwd, with a drift check from
+    previous responses ... i am very much about building redundant security
+    loops within the system to ensure i am not being bypassed or missing
+    anything. I don't trust the system, thus i want to see everything and
+    make sure its all logged and recorded. the idea is to go back and measure
+    from one task to the next kind of as a subprocess so i can go back and
+    tune the system where needed."
+
+    So the two corpora have two JOBS, not one job and a nuisance: sources
+    answer a question, and the transcripts are the material a drift
+    measurement is taken against. That is a better reason to keep logs
+    indexed than the one this plan first gave.
+
     THE GATE IS UNCHANGED: `python tests/release.py --check` must pass before
     any of these is tagged, and the tag is his (RULE 6).
 

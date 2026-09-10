@@ -1475,6 +1475,12 @@ def run_pipeline(
     # none, sitting 27 scored a reply against the words "good job stew",
     # found it "drifted", and woke the Quality Evaluator to review a
     # compliment. An objective alone is a request, not a source.
+    #
+    # A TOOL RESULT IS ALSO SOURCE MATERIAL, and is primed as one when it
+    # arrives -- see `_prime_on_tool_result` below. That is the citation
+    # check (SPEC 4.3): a claim about what a tool result SAID, measured
+    # against what it actually said. It does not weaken the rule above; an
+    # objective is still a request, and a tool result is still material.
     if drift is not None and ctx.feed.strip():
         drift.prime(f"{ctx.objective}\n\n{ctx.feed}")
 
@@ -1828,6 +1834,19 @@ def run_pipeline(
                     # opened" and the file's contents were invented. A failure
                     # wears a sign no seat can misread or quietly omit.
                     tool_results.append(str(result))
+
+                    # THE CITATION CHECK (SPEC 4.3). A tool result is source
+                    # material -- text handed to a seat, which the seat then
+                    # speaks about -- so from here the stages after it are
+                    # measured against WHAT THE TOOL ACTUALLY SAID, not
+                    # against the objective. A failed result is never primed:
+                    # scoring a seat's words against "Error: no such file"
+                    # would call every honest report of a failure a drift.
+                    if (drift is not None
+                            and not result.lstrip().startswith(
+                                ("Error", "Refused", "Cannot"))):
+                        drift.prime(str(result))
+
                     if result.lstrip().startswith(("Error", "Refused", "Cannot")):
                         # Recorded as a FACT the moment it happens, so the
                         # recompose does not depend on any seat remembering

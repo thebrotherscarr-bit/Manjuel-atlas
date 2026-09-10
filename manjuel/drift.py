@@ -65,12 +65,22 @@ class DriftChecker:
         self._short_source = False
 
     def prime(self, source_text: str) -> bool:
-        """Embed the source material. False if it cannot be scored at all."""
+        """Embed the source material. False if it cannot be scored at all.
+
+        RE-PRIMABLE, and that is what the citation check needs: a run's source
+        changes when a tool returns, and the stages after it are speaking
+        about the RESULT, not about the feed.
+
+        A SHORT SOURCE IS NOT A DEAD EMBEDDER. Until 2026-09-10 this set
+        `_failed = True` for a source under MIN_SOURCE_CHARS, and `_failed` is
+        permanent -- so one short string poisoned the object and no later,
+        longer source could ever prime it. The embedder failing IS permanent;
+        a string being too short is a fact about that string.
+        """
         if self._failed:
             return False
         text = (source_text or "").strip()
         if len(text) < MIN_SOURCE_CHARS:
-            self._failed = True
             return False
         self._short_source = len(text) < 200
         try:

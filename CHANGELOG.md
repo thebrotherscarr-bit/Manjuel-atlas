@@ -34,6 +34,55 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-10 — THE CITATION CHECK: a tool result is source material (operator: "citation check next" / "i think that was part of the drift system as well")
+- **HIS POINTER IS WHAT MADE THIS SMALL.** SPEC 4.3 had carried "the harder
+  half; still the one real build left from sitting 82" since sitting 82, and he
+  named where it belonged: "a measurement of the drift from foundational docs
+  within the response windows." The estate already owned the measurement —
+  embed the source, embed what a stage produced, take the cosine, report it,
+  never act on it. What it did not own was THE SOURCE.
+- **MEASURED FIRST: drift was dormant 96% of the time.** It scored on 31
+  transcripts and reported "no usable source" on **733**, because
+  `pipeline.py:1478` primed it only when there was a feed.
+- **AND THAT GUARD IS RIGHT, so it stays.** Its comment earns it: sitting 27
+  scored a reply against the words "good job stew", found it "drifted", and
+  woke the Quality Evaluator to review a compliment. "An objective alone is a
+  request, not a source." A TOOL RESULT IS NOT A REQUEST — it is text handed to
+  a seat which the seat then speaks about, which is exactly what drift's own
+  docstring calls source material. So a tool result primes it, and the stages
+  after it are measured against what the tool actually said.
+- **A FAILED RESULT IS NEVER PRIMED.** Scoring a seat's words against "Error:
+  no such file" would call every honest report of a failure a drift, and
+  sitting 40 is why a failure has to be reportable in plain words.
+- **A BUG THAT HAD TO BE FIXED FOR ANY OF IT TO WORK.** `prime()` set
+  `_failed = True` for a source shorter than MIN_SOURCE_CHARS — and `_failed`
+  is permanent. One short source poisoned the object and no later, longer one
+  could ever prime it. Right for a dead embedder, wrong for a short string; the
+  two are separate now, and a stroke holds the distinction.
+- **I NEARLY BUILT A SECOND CITATION CHECK BESIDE THE EXISTING ONE.** The
+  suite's duplicate-name meta-stroke caught it: `test_the_citation_check`
+  ALREADY EXISTS (sitting 61, `bogus_citations`) and covers the CITED half — a
+  (path, cosine) pair claimed but absent from the tool output. What was open is
+  the half `intent.cites_search_results` names as its own honest limit: "prose
+  that fabricates without naming a path and a number still passes." Mine is
+  that half, and it is named for it.
+- **PROVEN LIVE, same objective, three runs:** `what is in the skills dir` read
+  "drift: not scored this run (no usable source)" at 06:13 and 06:50, and
+  **drift 0.788** at 07:05 — the seat's words measured against what
+  `ground_list` returned.
+- **SPEC 4.3's second half: OPEN → MET.** Advisory, as drift is by design.
+- **TWO OVERSTATEMENTS OF MINE, CORRECTED IN THE ENTRY ABOVE** rather than left
+  standing: "a weight was refused in favour of a split" (the estate already
+  ranks with weights — foundation +0.06, `us/` and `agents/` +0.03, `manjuel/`
+  and `tests/` −0.03 — written after sitting 28; a weight was not ENOUGH, which
+  is different from refused), and "there is no covenant DOCUMENT" (the covenant
+  is a HASH, the proof that the sealed laws are unchanged — his words — and
+  `commands.md` already holds a `covenant` command that cites it).
+- Proven: 1944/1944 strokes (6 new), and BUILDPATH now records WHY the
+  transcripts are indexed at all, in his words: two corpora with two jobs —
+  sources answer a question, transcripts are what a drift measurement is taken
+  against.
+
 ### 2026-09-10 — 0.1.9 OPENS: the ladder rewritten, and the corpus split (operator: "c with d folded in, i like that" / "write up the plan and start implementing")
 - **THE LADDER SAID SOMETHING THAT DID NOT HAPPEN.** BUILDPATH's plan of
   2026-09-08 named "0.1.7 the door and the court" and "0.1.8 the seal". 0.1.7
@@ -57,10 +106,15 @@ hand that iterates without updating this file is out of line.
   transcript: **9,541 characters to 1,233**.
 - **D — TWO CORPORA, ONE LINE.** `VectorIndex.search` takes a scope;
   `is_transcript` draws the boundary in ONE place; `semantic_search` answers
-  from SOURCES and a new `search_transcripts` reaches the runs. **A weight was
-  refused in favour of a split**: a cosine penalty is a number nobody can
-  defend, needs retuning as the corpus grows, and would still return
-  transcripts for a question about doctrine — just fewer. The second reach is a
+  from SOURCES and a new `search_transcripts` reaches the runs. **A weight was not
+  ENOUGH, which is different from refused** — and I overstated it when I first
+  wrote this line. `_search_scoped` ALREADY ranks with weights (foundation
+  +0.06, `us/` and `agents/` +0.03, `manjuel/` and `tests/` −0.03, plus
+  recency), written for this exact class after sitting 28 asked "what is the
+  covenant" and got the alias table in intent.py. What a weight cannot do is
+  EXCLUDE a corpus: it would still return transcripts for a doctrine question,
+  just fewer, and the penalty needs retuning as the corpus grows. The split
+  sits on top of the weights; it did not replace them. The second reach is a
   KEYWORD, not an argument, because the Router chooses between keywords; it
   costs nothing at the door, which no longer sees the roster at all.
 - **THE NUMBERS, before and after a rebuild from scratch:**
@@ -78,12 +132,18 @@ hand that iterates without updating this file is out of line.
   300s skill bound on 2026-09-09 now completes in **191s** from scratch. The
   bound never needed raising; the corpus needed to stop carrying every model's
   working prose.
-- **AND A GAP THE SPLIT EXPOSED.** There is no covenant DOCUMENT — the word
-  appears across many docs and nothing defines it. So the old answer was one
-  model's paraphrase, written to logs/, indexed, and handed back as the record
-  every time the question was asked. The loop was manufacturing an answer to a
-  question the sources do not answer. Reported, not fixed: writing that
-  document is his.
+- **A GAP I REPORTED WRONG, corrected by him the same hour.** I wrote that
+  there is no covenant DOCUMENT and that writing one was his. The covenant is
+  not a document at all — it is a HASH. His words: "the covenant is the doctrine
+  sealed, that was kind of the original idea. the laws are sealed, that sealed
+  hash covenant is the PROOF of the sealed laws not being changed."
+  BUILDPATH:142 says it in the estate's own vocabulary ("covenant — the hash
+  binding a record to its office"), every `.us` record carries it
+  (`1512741580b7239b`), and `commands.md` already holds a `covenant` COMMAND
+  whose job is to "cite the covenant from the founding record". So the right
+  answer to "what does the covenant say" was never a semantic search: the
+  search was answering a question that already has a command. What the loop was
+  laundering was a paraphrase OF A PROOF.
 - **A CORRECTION I MADE MID-RUN.** I first reported the corpus had fallen to
   1,630 passages. That was the count of NEWLY EMBEDDED chunks — `build()` is
   incremental, the old full-text chunks were still there, and the total had
