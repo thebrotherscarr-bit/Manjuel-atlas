@@ -34,6 +34,52 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — DISCERN: SOURCES ARE WHAT IS, THE RECORD IS WHAT HAPPENED
+- **HIS RULING OF THIS MORNING WAS RIGHT AND STOPPED ONE FILE SHORT.**
+  "semantic_search answers from SOURCES by default; the transcripts are a
+  separate explicit reach" — all three parts of it had landed. And the covenant
+  question still failed, with no transcript anywhere in the answer.
+- **THE MEASUREMENT, inside `sources`, transcripts already removed:**
+
+        code                908 chunks   36.0%
+        THE LEDGERS         821 chunks   32.6%
+        other docs          678 chunks   26.9%
+        doctrine (sealed)   115 chunks    4.6%
+
+  The eight append-only ledgers outweighed the doctrine **seven to one**. A
+  question about doctrine was answered from a corpus that is a third commentary
+  and a twentieth scripture.
+- **WHAT THAT LOOKED LIKE.** `what does the covenant say` ranked `TASKS.md`
+  first — on the chunk holding the task ABOUT that very failure. `what do the
+  laws say` returned `HANDOFF.md` ABOVE `SITTING_LAWS.md` and `ESTATE_LAWS.md`:
+  ask the estate what its laws say and it hands back a status note about them.
+- **THE FIX IS HIS OWN REASONING, EXTENDED ONE STEP.** logs/ left `sources`
+  because a run ABOUT a thing is not the thing; a CHANGELOG entry about the
+  covenant is not the covenant either. `is_record()` names the eight, `sources`
+  now means neither transcript nor ledger, and `scope="record"` reaches both.
+  **Nothing was weighted** — the ruling refused a cosine penalty as "a number
+  nobody can defend", and none was added. The corpus was named correctly and
+  the ranking followed.
+- **NO NEW SKILL.** `search_transcripts` widened to the whole record rather
+  than adding a roster slot — the morning's lesson about what a slot costs the
+  Router's shortlist. The keyword stays (renaming churns the shortlist, the us
+  record and every transcript that names it, for a word); the DESCRIPTION says
+  what it now covers.
+- **PROVEN LIVE, AND HONESTLY.** `what do the laws say` now returns SIX law
+  documents, top to bottom. `what does the covenant say` is BETTER, NOT SOLVED:
+  the ledgers are gone and three doctrine passages reach the top six, but
+  `commands.md` and two code files still outrank them. Those are legitimate
+  sources; the remedy would be a weight, and a weight is what was refused.
+- **AND THE QUESTION MAY BE MALFORMED.** The covenant is a HASH — the seal over
+  four files — not a passage. "What does the covenant say" asks prose of a
+  fingerprint; the honest answer is the chain's state, which `doctrine_check`
+  reports and no search can.
+- Nine strokes, on a stub embedder so RANK cannot be what makes them pass:
+  a ledger is named wherever it sits, a source is not, nothing outside the
+  eight is swept in, `sources` excludes both kinds without emptying itself, and
+  `record` reaches both without leaking a source.
+- Proven: 2055/2055 strokes, 60/60 smoke, BUILDMAP regenerated.
+
 ### 2026-09-10 — THE BOOTSTRAP COUNT, AND SIX DOCS THAT ONLY EVER WORKED ON ONE MACHINE
 - **THE COUNT, run on a clean clone rather than argued about.** From bare
   machine to a booting engine: install Python and Ollama, pull the models,

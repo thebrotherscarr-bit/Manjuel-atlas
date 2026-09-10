@@ -2529,7 +2529,19 @@ def _semantic_search(env: SkillExecutionEnv, args: dict) -> str:
 @skill("search_transcripts")
 def _search_transcripts(env: SkillExecutionEnv, args: dict) -> str:
     """What was SAID on a past run, as opposed to what the estate holds."""
-    return _search_scoped(env, args, "transcripts")
+    # THE WHOLE RECORD, not only logs/. The ledgers -- CHANGELOG, HANDOFF,
+    # SEAT_LOG, DAYBOOK, TASKS, REFUSALS, memory, BUILDMAP -- are dated history
+    # that happens not to live under logs/, and they left `sources` on
+    # 2026-09-10 for the same reason transcripts did: a CHANGELOG entry ABOUT
+    # the covenant is not the covenant. They have to be reachable somewhere or
+    # the split hides them, and this is the reach that already means "what
+    # happened".
+    #
+    # THE KEYWORD DOES NOT CHANGE. `search_transcripts` is now narrower than
+    # what it does, and renaming it would churn the shortlist, the us record
+    # and every transcript that names it -- for a word. The DESCRIPTION says
+    # what it actually covers, which is the part a caller reads.
+    return _search_scoped(env, args, "record")
 
 
 def _search_scoped(env: SkillExecutionEnv, args: dict, scope: str) -> str:

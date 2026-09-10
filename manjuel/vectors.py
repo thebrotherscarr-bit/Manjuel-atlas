@@ -147,6 +147,42 @@ def is_transcript(path) -> bool:
     return "/logs/" in p or p.startswith("logs/")
 
 
+# THE APPEND-ONLY LEDGERS. Dated history that happens not to live under logs/.
+# A CHANGELOG entry ABOUT the covenant is not the covenant, exactly as a
+# transcript about it is not -- the ruling that split logs/ off drew the line
+# in the right place and stopped one file short of the files that carry the
+# same freight.
+RECORD_FILES = frozenset({
+    "CHANGELOG.md", "HANDOFF.md", "SEAT_LOG.md", "DAYBOOK.md",
+    "TASKS.md", "REFUSALS.md", "memory.md", "BUILDMAP.md",
+})
+
+
+def is_record(path) -> bool:
+    """Is this a ledger -- what HAPPENED -- rather than a source?
+
+    MEASURED 2026-09-10, inside `sources` (transcripts already removed):
+
+        code                908 chunks   36.0%
+        THE LEDGERS         821 chunks   32.6%
+        other docs          678 chunks   26.9%
+        doctrine (sealed)   115 chunks    4.6%
+
+    The record outweighed the doctrine SEVEN TO ONE, so a question about
+    doctrine was answered from a corpus that is a third commentary and a
+    twentieth scripture. `what does the covenant say` ranked TASKS.md first --
+    on the chunk holding the task ABOUT that very failure -- and `what do the
+    laws say` returned HANDOFF.md above SITTING_LAWS.md and ESTATE_LAWS.md.
+    Asking the estate what its laws say handed back a status note about them.
+
+    With these eight excluded the doctrine takes three of the top six on the
+    first question and the three law files take 1-3 on the second. Nothing was
+    weighted: the corpus was named correctly and the ranking followed.
+    """
+    p = str(path).replace("\\", "/")
+    return p.rsplit("/", 1)[-1] in RECORD_FILES
+
+
 # ---------------------------------------------------------------------
 # chunking
 # ---------------------------------------------------------------------
@@ -521,10 +557,14 @@ class VectorIndex:
                scope: str = "all"):
         """Rank the index. `scope` picks the corpus (his ruling 2026-09-10):
 
-            sources      everything that is not a transcript -- the code, the
-                         doctrine, the seats, the record's own documents
+            sources      WHAT IS -- the doctrine, the law, the code, the
+                         seats, the specs. Neither transcripts nor ledgers.
+            record       WHAT HAPPENED -- transcripts AND the append-only
+                         ledgers (CHANGELOG, HANDOFF, SEAT_LOG, DAYBOOK,
+                         TASKS, REFUSALS, memory, BUILDMAP)
             transcripts  logs/ only: what was SAID on a past run
-            all          both, the old behaviour, kept for callers that mean it
+            ledgers      the eight ledgers only
+            all          everything, kept for callers that mean it
 
         WHY THIS EXISTS. Measured 2026-09-10: 812 of 996 indexed documents and
         4,060 of 6,705 ranked passages were old runs, and "what does the
@@ -542,9 +582,19 @@ class VectorIndex:
             "FROM chunks c JOIN docs d ON d.id = c.doc_id"
         ).fetchall()
 
-        if scope in ("sources", "transcripts"):
-            want_log = scope == "transcripts"
-            rows = [r for r in rows if is_transcript(r[6]) == want_log]
+        # SOURCES ARE WHAT IS; THE RECORD IS WHAT HAPPENED. The 2026-09-10
+        # ruling split logs/ off for that reason and the ledgers belong on the
+        # same side of it -- see is_record for the measurement that showed
+        # them outweighing the doctrine seven to one.
+        if scope == "sources":
+            rows = [r for r in rows
+                    if not is_transcript(r[6]) and not is_record(r[6])]
+        elif scope == "record":
+            rows = [r for r in rows if is_transcript(r[6]) or is_record(r[6])]
+        elif scope == "transcripts":
+            rows = [r for r in rows if is_transcript(r[6])]
+        elif scope == "ledgers":
+            rows = [r for r in rows if is_record(r[6])]
 
         usable = [r for r in rows if len(r[5]) // 4 == len(q)]
         if not usable:

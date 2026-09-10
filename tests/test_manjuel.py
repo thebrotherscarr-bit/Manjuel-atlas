@@ -1507,6 +1507,49 @@ def test_the_corpus_is_split(reg, lib, book):
     check("`all` still sees both, for a caller that means it",
           len(both) >= len(src) + len(runs) - 1)
 
+    # ---- AND THE LEDGERS SIT WITH THE TRANSCRIPTS -------------------------
+    # The 2026-09-10 ruling split logs/ off because a run ABOUT a thing is not
+    # the thing. CHANGELOG, HANDOFF, SEAT_LOG, DAYBOOK, TASKS, REFUSALS,
+    # memory and BUILDMAP carry exactly the same freight and stopped one file
+    # short of it. Measured inside `sources` with transcripts already gone:
+    # the eight ledgers were 821 chunks against the doctrine's 115 -- SEVEN TO
+    # ONE -- so `what does the covenant say` ranked TASKS.md first (on the
+    # chunk holding the task about that very failure) and `what do the laws
+    # say` put HANDOFF.md above SITTING_LAWS.md and ESTATE_LAWS.md.
+    from manjuel.vectors import is_record
+    (g / "CHANGELOG.md").write_text(
+        "the covenant binds one operator and one machine\n",
+        encoding="utf-8")
+    (g / "index_roots.txt").write_text(
+        "SPEC.md\nCHANGELOG.md\nlogs\n", encoding="utf-8")
+    idx2 = VectorIndex(g / "vectors2.db", "stub-embedder")
+    idx2.build([g / "SPEC.md", g / "CHANGELOG.md", g / "logs"], embed_fn=embed)
+
+    check("a ledger is named as record, wherever it sits",
+          is_record("CHANGELOG.md") and is_record("C:/x/HANDOFF.md")
+          and is_record(r"C:\x\TASKS.md"))
+    check("and a source is not named as record", not is_record("SPEC.md")
+          and not is_record("foundation/doctrine/C1.md")
+          and not is_record("manjuel/vectors.py"))
+    # A file merely NAMED like a ledger elsewhere is still a ledger; a file
+    # named nothing like one never is. The set is the whole rule.
+    check("nothing outside the eight is swept in",
+          not is_record("law/ESTATE_LAWS.md") and not is_record("QUICKSTART.md"))
+
+    src2 = idx2.search(qv, limit=10, scope="sources")
+    rec2 = idx2.search(qv, limit=10, scope="record")
+    check("SOURCES now excludes the ledgers as well as the transcripts",
+          src2 and not any(is_record(h["path"]) or is_transcript(h["path"])
+                           for h in src2), [h["path"] for h in src2])
+    check("and the source itself is still there -- the filter did not empty it",
+          any(h["path"].endswith("SPEC.md") for h in src2))
+    check("RECORD reaches the ledgers AND the transcripts",
+          any(is_record(h["path"]) for h in rec2)
+          and any(is_transcript(h["path"]) for h in rec2),
+          [h["path"] for h in rec2])
+    check("nothing that is a source leaks into the record reach",
+          not any(h["path"].endswith("SPEC.md") for h in rec2))
+
 
 def test_rack_sync(reg, lib):
     """The written rack: pulled fresh, derived whole, honest about mismatches."""
