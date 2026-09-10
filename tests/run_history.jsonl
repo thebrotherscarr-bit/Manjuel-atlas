@@ -212,3 +212,7 @@
 {"suite": "strokes", "at": 1789052854.5454476, "state": "finished", "passed": 1964, "total": 1964, "green": true, "failed": []}
 {"suite": "smoke", "at": 1789052858.2499046, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
 {"suite": "standup", "at": 1789052972.844032, "state": "finished", "passed": 9, "total": 9, "green": true, "failed": [], "report": "logs/standup_2026-09-10_080932.md"}
+{"suite": "strokes", "at": 1789053226.900266, "state": "finished", "passed": 1964, "total": 1965, "green": false, "failed": ["the suite uses no import newer than requires-python allows"]}
+{"suite": "strokes", "at": 1789053256.2981596, "state": "finished", "passed": 1965, "total": 1965, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789053271.1719475, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "standup", "at": 1789053479.74764, "state": "finished", "passed": 9, "total": 9, "green": true, "failed": [], "report": "logs/standup_2026-09-10_081759.md"}

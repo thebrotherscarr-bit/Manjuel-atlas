@@ -34,6 +34,31 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE LAW 6 STROKE BROKE THE BUILD, AND HE CAUGHT IT
+- **MY FAULT, and the irony is the point.** The stroke whose whole job is LAW 6
+  — the system must not disagree with itself — used `import tomllib`, which is
+  stdlib ONLY FROM 3.11. `pyproject.toml` declares
+  `requires-python = ">=3.10"` and the matrix runs 3.10, so the suite died on
+  3.10 on both platforms. A check for self-agreement that itself disagreed with
+  the package's own floor.
+- **MY CLEAN-CLONE MIRROR COULD NOT SEE IT, and that is worth writing down.**
+  The mirror answers "what is MISSING from a fresh checkout" — it runs on this
+  machine's interpreter (3.14), so it says nothing about a VERSION FLOOR. Two
+  different questions and I had only asked one. The mirror is still right for
+  what it is for; it is not a substitute for the matrix.
+- **THE STROKE NOW READS THREE LINES WITH A REGEX** — version, the test extra,
+  the homepage. Not a shortcut around a parser: it wants three declarations,
+  not a TOML document model, and reading them narrowly is what keeps it inside
+  the floor it asserts.
+- **AND IT ASSERTS THAT FLOOR NOW**: the suite may contain no import newer than
+  `requires-python` allows. The first cut of THAT check grepped for the word
+  "tomllib" and fired on the comment explaining why tomllib is not used — a
+  guard that cannot survive being described is a guard nobody can document. It
+  matches an IMPORT.
+- Proven: 1965/1965 in the ground, and ALL SIX CI STEPS pass in a fresh
+  clean-clone mirror. The remaining unknown is 3.10 itself, which only the
+  matrix can answer.
+
 ### 2026-09-10 — TWO MORE REASONS CI COULD NEVER PASS, FOUND IN A CLEAN-CLONE MIRROR
 - **THE NUMPY FIX WORKED AND REVEALED THE NEXT ONE.** With the extra installed
   the strokes got further and died on

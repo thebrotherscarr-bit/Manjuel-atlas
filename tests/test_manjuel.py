@@ -1154,31 +1154,56 @@ def test_the_version_agrees_with_itself(reg, lib, book):
     silently-renamed extra would put the strokes back where they were: dead on
     an import in every matrix leg, 30 runs red without one green.
     """
-    import tomllib
+    # READ WITH A REGEX, NOT tomllib. tomllib is stdlib only from 3.11, and
+    # this package declares `requires-python = ">=3.10"` with 3.10 in the CI
+    # matrix -- so the first version of this stroke, whose whole job is LAW 6,
+    # broke the build on 3.10 on both platforms. A stroke asserting that the
+    # system agrees with itself must not need a newer Python than the package
+    # it checks. Three declarations are wanted here, not a document model.
+    import re as _re
     from manjuel import __version__
 
     raw = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
-    meta = tomllib.loads(raw)["project"]
-    check("the packaged version is the version the code reports",
-          meta["version"] == __version__,
-          f"pyproject {meta['version']} vs code {__version__}")
 
-    extras = meta.get("optional-dependencies", {})
+    def _field(name):
+        m = _re.search(r'^%s\s*=\s*"([^"]*)"' % name, raw, _re.M)
+        return m.group(1) if m else ""
+
+    check("the packaged version is the version the code reports",
+          _field("version") == __version__,
+          f"pyproject {_field('version')!r} vs code {__version__!r}")
+
+    extras = _re.search(r"^\[project\.optional-dependencies\](.*?)(?=^\[|\Z)",
+                        raw, _re.M | _re.S)
+    extras_text = extras.group(1) if extras else ""
     check("a `test` extra exists, because CI installs .[test]",
-          "test" in extras, str(sorted(extras)))
+          _re.search(r"^test\s*=", extras_text, _re.M) is not None,
+          extras_text[:120])
     check("and it carries numpy, which a stroke imports outright",
-          any("numpy" in d for d in extras.get("test", [])),
-          str(extras.get("test")))
+          _re.search(r"^test\s*=[^\n]*numpy", extras_text, _re.M) is not None,
+          extras_text[:120])
 
     # The workflow must actually ASK for the extra. Declaring it and not
     # installing it is the state that was red for 30 runs.
     ci = (ROOT / ".github" / "workflows" / "prove.yml").read_text(encoding="utf-8")
     check("and the workflow installs it, not the bare package",
-          '.[test]' in ci, "prove.yml installs `.` without the extra")
+          ".[test]" in ci, "prove.yml installs `.` without the extra")
 
     check("the homepage names a real repository, not a placeholder",
-          "OWNER" not in meta.get("urls", {}).get("Homepage", ""),
-          str(meta.get("urls")))
+          "OWNER" not in _field("Homepage"), _field("Homepage"))
+
+    # AND THE STROKE STAYS INSIDE THE FLOOR IT ASSERTS. This is the fault that
+    # produced this comment: a check for self-agreement that itself disagreed
+    # with requires-python.
+    floor = _field("requires-python") or ">=3.10"
+    # AN IMPORT, not the word. The first cut grepped for "tomllib" and fired
+    # on the comment above explaining why tomllib is not used -- a guard that
+    # cannot survive being described is a guard nobody can document.
+    check("the suite uses no import newer than requires-python allows",
+          _re.search(r"^\s*(import tomllib|from tomllib)",
+                     (ROOT / "tests" / "test_manjuel.py").read_text(encoding="utf-8"),
+                     _re.M) is None,
+          f"requires-python is {floor}; tomllib needs 3.11")
 
 
 def test_the_dedup_covers_the_run(reg, lib, book):
