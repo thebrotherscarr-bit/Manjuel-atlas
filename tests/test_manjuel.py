@@ -1248,8 +1248,15 @@ def test_steward_hands_off(reg, lib, book):
 
     # Short tool-naming turns ("git commit") skip the roster now -- intent.py
     # routes them before the Steward speaks, so nothing is lost there.
+    #
+    # 2026-09-10, SPEC 4.2: the reach is described, not enumerated. This
+    # stroke asked for the KEYWORDS and got them for a year; what it was ever
+    # really guarding is that the door knows the chain can act, and that is
+    # what it checks now. The keywords are the Router's (test_router_manifest).
     check("the front door is told what the chain can actually reach",
-          "git_commit" in p and "semantic_search" in p)
+          "read and write files" in p and "drive the repository" in p, p[-260:])
+    check("and not one callable name among them",
+          not any(k in p for k in lib.keywords() if "_" in k))
     check("and told not to send the operator off to do it himself",
           "run something himself" in p or "do it by hand" in p.lower())
     check("the seat prompt calls deferring a failure",
@@ -4550,8 +4557,11 @@ def test_small_talk_gets_conversation_not_scaffolding(reg, lib, book):
 
     long_ = build_prompt(st, RunContext(
         objective="walk me through how the vram budget is planned here"), lib)
+    # Was `"classify_sentiment" in long_`. That keyword in that prompt IS the
+    # sitting-88 bait (SPEC 4.2), so the stroke now asserts the task branch is
+    # taken -- which is what it was distinguishing -- without the roster.
     check("a task-length turn still sees the full reach",
-          "classify_sentiment" in long_)
+          "needs_tool" in long_ and "conversation, not a task" not in long_)
     fed = build_prompt(st, RunContext(objective="summarise", feed="text " * 30), lib)
     check("a short turn WITH a feed is a task, not small talk",
           "conversation, not a task" not in fed)
@@ -9582,8 +9592,42 @@ def test_the_router_is_told_how_not_just_what(reg, lib, book):
     70-135. So the body is injected for the skill already chosen, not for
     all of them.
     """
-    from manjuel.pipeline import _router_prompt
+    from manjuel.pipeline import _router_prompt, _steward_prompt
     from manjuel.skills import ROUTING_DESC_CHARS
+
+    # PHRASES FOR THE DOOR, KEYWORDS FOR THE ROUTER (his ruling 2026-09-09,
+    # SPEC 4.2). Sitting 88: "morning, what's on the board?" came back from
+    # the Steward as "our objective is to answer a question about sentiment
+    # classification... we'll use the `classify_sentiment` tool" -- a whole
+    # mission built around a name it had just been handed. The roster WAS the
+    # provocation, and `classify_sentiment` is ours, so nothing was invented.
+    #
+    # The guard is derived from the library, so a skill added tomorrow cannot
+    # quietly reappear at the door. It tests the UNDERSCORED names on purpose:
+    # `sitting` and `when` are also keywords and are also ordinary English, and
+    # a test that failed on the word "when" would only teach the next hand to
+    # loosen it. The bait was never an English word.
+    callable_names = sorted(k for k in lib.keywords() if "_" in k)
+    door = _steward_prompt(reg.get("Steward"),
+                           RunContext(objective="stage everything and commit it"),
+                           lib)
+    leaked = [k for k in callable_names if k in door]
+    check("the door is handed no callable tool name at all",
+          not leaked, str(leaked[:6]))
+    check("and there are enough of them for that to mean something",
+          len(callable_names) >= 25, str(len(callable_names)))
+    check("but the door still knows it can hand work off",
+          "needs_tool" in door, door[-200:])
+    check("and it is told the SHAPE of the reach, not a catalogue",
+          "read and write files" in door and "search the record" in door)
+
+    # The other half: this is a split, not a deletion. If the roster vanished
+    # everywhere, routing would break and only this stroke would notice.
+    router_sees = _router_prompt(reg.get("Router"),
+                                 RunContext(objective="stage everything and commit it"),
+                                 lib)
+    check("the Router still gets every keyword, which is where they belong",
+          all(k in router_sees for k in callable_names), "the roster moved, not vanished")
 
     ctx = RunContext(objective="read pipelines.md")
     plain = _router_prompt(reg.get("Router"), ctx, lib)

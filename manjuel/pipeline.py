@@ -766,16 +766,39 @@ def _steward_prompt(agent: Agent, ctx: RunContext, skills: SkillLibrary) -> str:
     if not worked:
         # Session 5: the Steward told the operator to run `git add` by hand
         # rather than raising needs_tool -- it knew its own limits but not the
-        # chain's reach. Naming the tools is what closes that gap.
-        reach = ", ".join(sorted(skills.keywords()))
+        # chain's reach. Naming the tools closed that gap and opened another.
+        #
+        # PHRASES FOR THE DOOR, KEYWORDS FOR THE ROUTER (the operator,
+        # 2026-09-09: "that's what the chat/router gating is for"). This line
+        # was `", ".join(sorted(skills.keywords()))` -- thirty-seven callable
+        # tokens in front of a 3b model asked to say good morning, and it
+        # answered them: sitting 88's "morning, what's on the board?" came back
+        # as "our objective is to answer a question about sentiment
+        # classification... we'll use the `classify_sentiment` tool", a whole
+        # mission built around a name it had just been shown. It was not
+        # hallucinating; `classify_sentiment` is ours. The roster WAS the
+        # provocation.
+        #
+        # So the door is told the SHAPE of the reach and not one callable name.
+        # It only ever needed to know that handing off is possible -- which
+        # tool is the Router's question, and the Router still gets the list
+        # (_router_prompt). A phrase per skill was measured and refused:
+        # 4,617 characters against the keyword list's 451, ten times the prompt
+        # at the one seat whose value is answering in under a second, and a
+        # long description is its own bait.
+        #
+        # A stroke asserts NO KEYWORD survives here, derived from the library,
+        # so a skill added tomorrow cannot quietly reappear at the door.
         return (
             f"{talk}{ctx.source_block()}\n\n"
             f"Answer this.\n\n"
-            f"If it needs a tool, the chain has these and you can hand off to "
-            f"them by raising `<flags>needs_tool</flags>`:\n  {reach}\n\n"
-            f"Do not tell the operator to run something himself when one of "
-            f"those would do it. Raise the flag instead, and say in one line "
-            f"what you are passing along.\n\n"
+            f"You are not alone: the chain behind you can read and write files "
+            f"in the ground, search the record, drive the repository, look at "
+            f"the rack, and run the suites. Hand any of that off by raising "
+            f"`<flags>needs_tool</flags>`.\n\n"
+            f"Do not tell the operator to run something himself when the chain "
+            f"could do it. Raise the flag instead, and say in one line what "
+            f"you are passing along -- in plain words, never a tool name.\n\n"
             f"Answer in plain words. Never answer with tool names or flag "
             f"names -- the flag is for the chain, the sentence is for him, "
             f"and a reply that is only a flag has said nothing."

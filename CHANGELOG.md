@@ -34,6 +34,60 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-10 — SPEC 4.2 BUILT: phrases for the door, keywords for the Router (operator: "4.2 next, phrases for the door")
+- **THE RECORD CORRECTED THE SPEC BEFORE ANYTHING WAS TOUCHED**, which is the
+  whole reason he said to read it. SPEC 4.2 said "the door is handed the bare
+  list of skill keywords in its prompt". TASKS' third sighting added the part
+  that matters: "The casual branch of the Steward prompt still lists nothing"
+  — so the bait was in the TASK branch, and the named transcript
+  (`logs/2026-09-04_153342_morning_what_s_on_the_board.md`) held the whole
+  fault in five lines.
+- **THE FAULT, from that transcript.** "morning, what's on the board?" came
+  back as *"Our objective is to answer a question about sentiment
+  classification for a given text. We'll use the `classify_sentiment` tool"* —
+  a mission invented around a name. And `classify_sentiment` IS ours
+  (`skills/sentiment_classifier.md`), so the model hallucinated nothing: it was
+  reading a name off the roster it had been handed. THE ROSTER WAS THE
+  PROVOCATION.
+- **THE LINE.** `_steward_prompt`, task branch:
+  `reach = ", ".join(sorted(skills.keywords()))`, handed over as "the chain has
+  these". Thirty-seven callable tokens in front of a 3b model asked to say good
+  morning. The door is now told the SHAPE of the reach in prose — read and
+  write files in the ground, search the record, drive the repository, look at
+  the rack, run the suites — and not one callable name. The Router keeps the
+  whole list, which is exactly the chat/router gating he named.
+- **A PHRASE PER SKILL WAS MEASURED AND REFUSED.** Deriving one from each
+  skill's own Description comes to **4,617 characters against the keyword
+  list's 451** — ten times the prompt at the one seat whose entire value is
+  answering in under a second, and a long description is its own bait. The door
+  never needed the catalogue; it needed to know handing off is possible.
+- **THE GUARD IS MECHANICAL, NOT A PROMISE.** Prose can drift back into a list
+  one edit later, so a stroke reads the LIBRARY and asserts no underscored
+  keyword reaches the door — a skill added tomorrow is covered without anyone
+  remembering. It tests the underscored names deliberately: `sitting` and `when`
+  are also keywords and also ordinary English, and a test that failed on the
+  word "when" would only teach the next hand to loosen it. A second stroke
+  asserts the Router still HAS them, so this is a split and not a deletion.
+- **TWO OLD STROKES MOVED WITH THE PROMISE**, both of which asserted the door
+  IS handed the roster (`"git_commit" in p and "semantic_search" in p`, and
+  `"classify_sentiment" in long_`). They were not wrong; they were old. 1919 →
+  1925, all green.
+- **PROVEN LIVE ON THE SAME OBJECTIVE.** The standup's `greeting` case IS
+  sitting 88's: "morning, what's on the board?" now returns *"The ground is
+  currently quiet. There are no requests to process... What would you like to
+  do, operator?"* — 5.3s, no tools, no tool name. One honest nit: it
+  paraphrased "I can raise flags" back at the operator. The old prompt carried
+  that instruction too, so it is not new, but it is the same family as sitting
+  89's recited closing instruction.
+- **A STANDUP FAILURE THAT WAS NOT MINE, checked rather than assumed.** The
+  first live run after the change read 8/9 with `a file` failing — its first
+  failure in the whole history. The transcript says why: *"intent: front Steward
+  skipped -- arithmetic already dispatched"*, so the branch I changed never
+  executed; the CLOSING Steward timed out at 150s on a 12,000-character read.
+  The re-run was 9/9. Recorded because "it passed the second time" is not the
+  same as "it was not mine", and the transcript is what separates them.
+- **SPEC 4.2 OPEN → MET.** Section 4 now reads 16 MET, 6 OPEN. Gate 9 of 9.
+
 ### 2026-09-10 — SPEC 4.3 BUILT: rack_report gives facts only (operator: "now do 4.3 rack_report facts only")
 - **THE FAULT.** The skill collected the rack's state in python -- installed,
   resident, declared, missing, VRAM budget -- and then ALWAYS handed it to the

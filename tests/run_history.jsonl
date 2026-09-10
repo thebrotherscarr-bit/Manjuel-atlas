@@ -165,3 +165,8 @@
 {"suite": "strokes", "at": 1789044876.2716606, "state": "finished", "passed": 1919, "total": 1919, "green": true, "failed": []}
 {"suite": "smoke", "at": 1789044880.0272486, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
 {"suite": "standup", "at": 1789045092.9288342, "state": "finished", "passed": 9, "total": 9, "green": true, "failed": [], "report": "logs/standup_2026-09-10_055812.md"}
+{"suite": "strokes", "at": 1789045651.2303386, "state": "finished", "passed": 1922, "total": 1924, "green": false, "failed": ["the front door is told what the chain can actually reach", "a task-length turn still sees the full reach"]}
+{"suite": "strokes", "at": 1789045690.0812726, "state": "finished", "passed": 1925, "total": 1925, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789045708.3134289, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "standup", "at": 1789045955.1334078, "state": "finished", "passed": 8, "total": 9, "green": false, "failed": ["a file"], "report": "logs/standup_2026-09-10_061235.md"}
+{"suite": "standup", "at": 1789046114.195748, "state": "finished", "passed": 9, "total": 9, "green": true, "failed": [], "report": "logs/standup_2026-09-10_061514.md"}
