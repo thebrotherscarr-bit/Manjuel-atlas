@@ -4582,14 +4582,35 @@ def test_index_stays_in_research_and_off_the_keys(reg, lib, book):
     _ignored = {l.strip().rstrip("/") for l in
                 (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
                 if l.strip() and not l.startswith("#")}
+    # A ROOT UNDER AN IGNORED DIRECTORY IS ALSO NOT SHIPPED. The exempt set
+    # was matched EXACTLY, so `atlas` in .gitignore exempted the directory and
+    # nothing beneath it. That held until 2026-09-10, when the core and atlas
+    # became separate repositories and the control centre spec moved to
+    # `atlas/docs/SPEC_CONTROL_CENTER.md` -- a path that is on his ground,
+    # deliberately untracked HERE, and absent from every clone. CI went red on
+    # the first push after the move while the same suite passed on the one
+    # machine that has both repositories, which is the exact shape of fault
+    # this stroke was rewritten to catch and then reproduced one level down.
+    #
+    # `.gitignore` ignores a directory and everything under it; the check now
+    # says the same by walking the parents.
+    def _shipped_by_design(rel: str) -> bool:
+        parts = rel.rstrip("/").replace("\\", "/").split("/")
+        return any("/".join(parts[:i + 1]) in _ignored
+                   for i in range(len(parts)))
+
     absent = [x for x in listed if not (ROOT / x).exists()]
-    unexplained = [x for x in absent if x.rstrip("/") not in _ignored]
+    unexplained = [x for x in absent if not _shipped_by_design(x)]
     check("every listed root exists, or is one the estate does not ship",
           not unexplained,
           f"absent and not gitignored: {unexplained}")
     check("and an absent root is absent BY DESIGN, never by accident",
-          all(x.rstrip("/") in _ignored for x in absent),
+          all(_shipped_by_design(x) for x in absent),
           f"absent: {absent}")
+    check("a root under an ignored directory counts as not shipped",
+          _shipped_by_design("atlas/docs/SPEC_CONTROL_CENTER.md"))
+    check("and a root under no ignored parent still does not",
+          not _shipped_by_design("manjuel/nope.py"))
 
     # Worlds are indexed ONE AT A TIME, by name, on the operator's call.
     # This guard is stated as a PROPERTY rather than a list of his folders:
