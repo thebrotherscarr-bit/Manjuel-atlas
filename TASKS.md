@@ -1103,9 +1103,35 @@ Kept so nobody re-derives them and starts.
          difference; the guard moved from cli.py to intent.py so the ENGINE
          can use it, not just /brief. Intermittent still: a stamp catches it,
          it does not cure it, and RESEATING IS STILL OPEN.
-    [ ]  THE DOOR PARROTS. The record's labels; the previous question; an
-         empty flag scaffold. Includes the mild case the new door prose
-         showed on 2026-09-10 ("I can raise flags", echoed at him).
+    [x]  THE DOOR PARROTS -- READ, NOT BUILT, 2026-09-10. Three shapes, and
+         the record already answers all three:
+
+           the record's labels   GUARDED. `_SCAFFOLD_RE` in pipeline.py
+                                 discards an output that opens with the
+                                 conversation block's own heading or its
+                                 recalled-turn labels, keeps the discarded
+                                 words in the record as evidence, and has a
+                                 stroke. FIRED TWICE in the wild.
+           an empty flag scaffold GUARDED. `strip_control` plus a named note:
+                                 "replied with control markup and no words".
+                                 Has a stroke; never fired in the wild, which
+                                 is a live guard that has not been provoked
+                                 rather than dead code.
+           the previous question  A GUARD IS DECLINED BY RULING. HANDOFF
+                                 2026-09-02: "No fourth narrow gate: four
+                                 detectors for 'claimed an observation with no
+                                 observation' is one fact told four ways."
+                                 A near-duplicate-of-previous-delivery check
+                                 would be a fifth, for a different fact, and
+                                 the ruling sends it "into 14.11's tally as
+                                 evidence about the closing seat, not into the
+                                 engine as another detector". DESIGN 14.11
+                                 already carries it: the SIXTH shape, sitting
+                                 77 run 3, a stale answer and not an invention.
+
+         So nothing is built here, and that is the finding. The mild case of
+         2026-09-10 ("I can raise flags", echoed back) is the same family and
+         goes to the tally by the same ruling.
     [ ]  THE TOOL-LOOP DEDUP is per Router sitting, not per run.
 
     MOVED OUT, deliberately, to 0.1.10 (the seal): the gate in CI, ESTATE

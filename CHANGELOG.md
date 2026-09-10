@@ -34,6 +34,41 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-10 — THE DOOR PARROTS: read, not built (operator: "the door parroting next")
+- **NOTHING WAS BUILT, AND THAT IS THE FINDING.** The task line names three
+  shapes. The record already answers all three, and one of them must NOT be
+  built.
+- **The record's labels — GUARDED.** `_SCAFFOLD_RE` discards an output that
+  opens with the conversation block's own heading or its recalled-turn labels,
+  and KEEPS THE DISCARDED WORDS in the record so a wrong discard can be seen
+  for what it was (sitting 87 had two). It has a stroke, and it has FIRED TWICE
+  in the wild.
+- **The empty flag scaffold — GUARDED.** `strip_control` with a named note,
+  "replied with control markup and no words". It has a stroke and has never
+  fired in the wild — measured, so that is a live guard nothing has provoked,
+  not dead code. I checked rather than assumed, because zero sightings reads
+  the same either way.
+- **Answering the previous question — A GUARD IS DECLINED BY RULING, and I
+  nearly built one.** HANDOFF, 2026-09-02: *"No fourth narrow gate: four
+  detectors for 'claimed an observation with no observation' is one fact told
+  four ways."* A near-duplicate-of-previous-delivery check is, in the record's
+  own words, "cheap and arithmetic" — and declined anyway, because it would be
+  a fifth detector for a different fact. The ruling says where it goes instead:
+  "into 14.11's tally as evidence about the closing seat, not into the engine
+  as another detector." **DESIGN 14.11 already carries it**: the SIXTH shape,
+  sitting 77 run 3, the Steward delivering run 2's todo-list answer against a
+  /skills objective with the correct objective in its prompt — a STALE answer,
+  not an invention.
+- **So the estate had already done this work, twice over**, and the only thing
+  missing was a line saying so. That line is now in TASKS, with the ruling
+  quoted, so nobody re-derives the detector and starts building it — which is
+  exactly what TASKS says a few lines above: "Kept so nobody re-derives them
+  and starts."
+- The mild case from this morning ("I can raise flags", echoed back at him in
+  the new door prose) is the same family and goes to the tally by the same
+  ruling.
+- No code changed. 1949/1949 strokes, 60/60 smoke, gate 9 of 9.
+
 ### 2026-09-10 — A NUMBER NO TOOL RETURNED IS STAMPED (operator: "the door inventing numbers next")
 - **THE CHECK ALREADY EXISTED AND RAN IN ONE PLACE.** `_unsourced(said, facts)`
   — numbers and hashes in what was said that appear nowhere in the facts, with
