@@ -391,7 +391,18 @@ class SkillExecutionEnv:
         ws = self.workspace.resolve()
         if ws == candidate or ws in candidate.parents:
             return candidate
-        return self.workspace / os.path.basename(clean)
+        # THE JAIL ANSWERS IN ONE FORM. This returned
+        # `self.workspace / base` -- UNRESOLVED -- while the branch
+        # above returns a resolved path, so the same jail gave two
+        # spellings of one directory depending on which way a call
+        # went. On Windows that is not cosmetic: the CI runner works
+        # under a path carrying an 8.3 SHORT NAME (RUNNER~1), so this
+        # branch answered the short form while workspace.resolve()
+        # gives the long one, and a caller comparing the jailed answer
+        # against the jail saw a mismatch for a correctly jailed path.
+        # Linux has no short names -- which is why only the two Windows
+        # legs were red and both Ubuntu legs passed (2026-09-10).
+        return ws / os.path.basename(clean)
 
 
 # =====================================================================

@@ -34,6 +34,30 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE JAIL ANSWERED IN TWO SPELLINGS, AND ONLY WINDOWS COULD SEE IT
+- **THE LAST RED LEG.** `escape collapses to basename inside the jail`, failing
+  on both Windows Pythons while BOTH UBUNTU LEGS PASSED — the first green
+  anything this repository has had.
+- **THE FAULT IS IN THE JAIL, NOT THE STROKE.** `safe_path` resolves the
+  candidate and the workspace; if the candidate stays inside it returns the
+  RESOLVED path, and if it escapes it returned `self.workspace / basename` —
+  UNRESOLVED. The same jail gave two spellings of one directory depending on
+  which way the call went.
+- **WHY ONLY WINDOWS.** The runner works under a path carrying an 8.3 SHORT
+  NAME (`C:\Users\RUNNER~1\...`), so the escape branch answered the short form while
+  `workspace.resolve()` gives the long one. A caller comparing the jailed
+  answer against the jail saw a mismatch FOR A PATH THAT WAS CORRECTLY JAILED.
+  Linux has no short names, so both forms are identical there and the fault was
+  invisible on the legs that were passing.
+- **REPRODUCED LOCALLY BEFORE THE FIX WAS TRUSTED**, by handing the env a
+  workspace in short form via `GetShortPathNameW` — `TMPALW~1\AGENT_~1`, the same shape
+  as the runner's. Before: the jailed answer came back short and the comparison
+  failed. After: it comes back resolved and both halves hold. That is the proof
+  CI alone cannot give, because CI can only say red or green.
+- The fix is one line: return `ws / basename`, where `ws` is the resolved
+  workspace already computed two lines above.
+- Proven: 1965/1965 strokes, 60/60 smoke, BUILDMAP regenerated.
+
 ### 2026-09-10 — THE LAW 6 STROKE BROKE THE BUILD, AND HE CAUGHT IT
 - **MY FAULT, and the irony is the point.** The stroke whose whole job is LAW 6
   — the system must not disagree with itself — used `import tomllib`, which is
