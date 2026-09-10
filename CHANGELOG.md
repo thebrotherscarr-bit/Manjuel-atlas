@@ -34,6 +34,46 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-10 — SPEC 4.3 BUILT: rack_report gives facts only (operator: "now do 4.3 rack_report facts only")
+- **THE FAULT.** The skill collected the rack's state in python -- installed,
+  resident, declared, missing, VRAM budget -- and then ALWAYS handed it to the
+  Quartermaster and appended the seat's prose beneath. The numbers were honest
+  and the join was labelled after sitting 59, but the Router read the whole
+  thing and summarised THE READING rather than the facts, three times in
+  sitting 85. SPEC 4.7 records why that matters: the Quartermaster on llama3.2
+  invented in three of three readings.
+- **THE FIX IS THE DEFAULT, NOT A BETTER LABEL.** A reading nobody asked for is
+  one the Router will summarise however it is fenced. The Quartermaster is now
+  woken only when the question asks to be advised; otherwise the skill returns
+  the observed numbers plus one line saying no seat read them and how to ask
+  for one. Silence about the absence was the other half of the fault.
+- **ONE DEFINITION, IN THE RIGHT PLACE.** `intent.asks_for_a_judgement` sits
+  beside `_ABOUT_FRAMES` and the estate's other question shapes rather than as
+  a private copy inside skills.py, which would have drifted the first time
+  either changed. **THE BURDEN IS ON ASKING**: the default is facts, so a
+  question that does not plainly ask for an opinion gets numbers -- being wrong
+  that way costs a reading he can ask for again, and being wrong the other way
+  is the fault being closed. Measured across fifteen questions: "what is the
+  state of the rack?", "how much vram is free", "is there room?" and four more
+  read as FACTS; "should i pull another model", "any concerns about vram",
+  "what would you recommend" and five more read as JUDGEMENT. No miss either
+  way.
+- **FOUR STROKES, and the strongest is not about the text.** It asserts the
+  stub was NEVER CALLED -- a stroke that only checked for absent prose would
+  pass while the model was still woken and its answer discarded, costing the
+  call, the wait, and every later chance for the reading to leak. 1915 → 1919,
+  all green.
+- The reading path is unchanged and still labelled LAW 5; it is now reached by
+  asking. `skills/rack_report.md` says so, since that markdown is what a seat
+  actually reads, and the skill's title is no longer "Ask the Quartermaster".
+- **A REPORTING FAULT OF MINE, FOUND BY COUNTING.** I had written the ruled
+  lines leading with "RULED <date>". `release.py`'s spec check reads a LEADING
+  `MET|OPEN|RULED OUT`, so those lines fell out of the gate's status tracking
+  entirely -- open work would stop being counted the moment it was decided.
+  4.2 leads with OPEN again; the ruling belongs in the text, not the status.
+- **SPEC 4.3 OPEN → MET.** Section 4 now reads 15 MET, 7 OPEN.
+- Proven: 1919/1919 strokes, 60/60 smoke, BUILDMAP regenerated (1251 lines).
+
 ### 2026-09-10 — HOW HE STARTS AND RUNS IT, WRITTEN DOWN (operator: "review all the docs so i have the proper information for starting and running the system on my end, including starting the servers, running the dashboard, skills tools, etc.")
 - **THE BINARIES HE HAS BEEN USING LIVED IN A SESSION TEMP DIRECTORY.** Every
   Boot, Commit and Push he clicked yesterday went through `atlas-mcp.exe` and

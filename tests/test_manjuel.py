@@ -1090,7 +1090,25 @@ def test_rack(reg, lib):
     check("rack_pull is refused until the operator allows it",
           "Refused" in lib.execute("rack_pull", {"content": "llama3.2"}, env))
 
-    rep = lib.execute("rack_report", {"content": "is there room?"}, env)
+    # FACTS ONLY UNLESS A JUDGEMENT IS ASKED FOR (his ruling 2026-09-09,
+    # SPEC 4.3). The facts question comes first, and the strongest thing it
+    # asserts is that NO SEAT WAS CALLED -- a stroke that only read the text
+    # would pass while the model was still being woken and its words thrown
+    # away, which costs the call, the wait, and every later chance to leak.
+    facts_env = env_for(g, reg, RackStub())
+    facts_rack = facts_env.runtime
+    plain = lib.execute("rack_report", {"content": "is there room?"}, facts_env)
+    check("a facts question gets the observed numbers",
+          "models installed" in plain and "VRAM budget" in plain, plain[:120])
+    check("and NO seat is woken for it -- not called, not merely ignored",
+          not facts_rack.seen, repr(facts_rack.seen)[:120])
+    check("no reading, and no LAW 5 join, because there is nothing to fence",
+          "OBSERVED ABOVE" not in plain and "Quartermaster's reading" not in plain.lower())
+    check("and it SAYS there is no opinion in it, rather than leaving it to be assumed",
+          "FACTS ONLY" in plain, plain[-160:])
+
+    # The reading path is unchanged -- it is now reached by asking for one.
+    rep = lib.execute("rack_report", {"content": "should i drop a model?"}, env)
     check("rack_report hands OBSERVED facts to the Quartermaster",
           "Quartermaster" in rep, rep[:50])
     sent = r.seen[-1][1] if r.seen else ""
@@ -1116,7 +1134,8 @@ def test_rack(reg, lib):
         def chat(self, agent, prompt, stream_to=None, tools=None,
                  think_to=None):
             return "   "
-    quiet = lib.execute("rack_report", {}, env_for(g, reg, Mute()))
+    quiet = lib.execute("rack_report", {"content": "what do you think?"},
+                        env_for(g, reg, Mute()))
     check("an empty Quartermaster costs the reading, never the numbers",
           "models installed" in quiet and "returned nothing" in quiet, quiet[:160])
 

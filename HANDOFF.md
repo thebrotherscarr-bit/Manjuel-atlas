@@ -670,6 +670,45 @@ dropped by operator ruling 2026-09-01 — see the fix log.
        is testimony (LAW 5). `WHAT RAN (observed)` and the file itself are
        the facts.
 
+## HANDOFF FOR 2026-09-10 — read this before anything below it
+
+**Where the ground stands.** `main`, version 0.1.8, strokes 1919/1919 (four
+new), smoke 60/60, law chain whole at 4 links, BUILDMAP matching, index 995
+documents over 39 roots. The release gate refuses only what a new day and a
+code edit make it refuse: the standup must run live again, and this block is
+the handoff it wanted.
+
+**THE SERVERS ARE REAL NOW.** Everything he clicked through yesterday ran from
+binaries built into a session temp directory, which vanish. Both are built in
+place -- `atlas/line/atlas-mcp.exe`, `atlas/webapp/atlas-webapp.exe`, `*.exe`
+already gitignored -- and RUNBOOK's new "Starting the system" holds every
+command, each one RUN BEFORE IT WAS WRITTEN. Two things that proving caught:
+PowerShell 5.1 has no `&&` (a parser error, not a no-op), and `> log 2>&1` on
+a native exe wraps stderr in ErrorRecords there, so the doc uses `*> log`.
+
+**SPEC 4.3 IS BUILT.** `rack_report` gives FACTS ONLY unless a judgement is
+asked for. The Quartermaster is woken only when the question asks to be
+advised; a facts question returns the observed numbers and one line saying no
+seat read them. The test lives in `intent.asks_for_a_judgement`, beside the
+estate's other question shapes rather than as a second copy in skills.py.
+Measured across fifteen questions, seven facts and eight judgements, no miss
+either way. Four strokes hold it, and the strongest asserts THE SEAT WAS NEVER
+CALLED rather than merely that its words are absent -- a stroke that only read
+the text would pass while the model was still being woken and its answer
+thrown away.
+
+**A REPORTING FAULT OF MINE, FOUND BY COUNTING.** I first wrote the ruled
+lines leading with "RULED <date>". `release.py`'s spec check reads a LEADING
+`MET|OPEN|RULED OUT`, so those lines dropped out of the gate's status tracking
+entirely -- open work would stop being counted the moment it was decided.
+4.2 leads with OPEN again; the ruling belongs in the text, not the status.
+
+**SPEC section 4: 15 MET, 7 OPEN.** Still his: 4.4 sealing SITTING LAW 5 onto
+the chain (written in law/SITTING_LAWS_2.md; the chain seals four files and
+that is not one), 4.5 the terminators, 4.5 the client token's last two places.
+Still to build: 4.2 phrases for the door (RULED, not built), 4.3 the citation
+check (the largest thing left), 4.4 ESTATE LAW 2 as a gate.
+
 ## HANDOFF FOR 2026-09-09 — read this before anything below it
 
 **THE FRONTEND IS UP AND THE GLASS REACHES THE COUNCIL. atlas-mcp on

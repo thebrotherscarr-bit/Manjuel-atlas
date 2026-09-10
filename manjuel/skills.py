@@ -1992,10 +1992,18 @@ def _rack_list(env: SkillExecutionEnv, args: dict) -> str:
 
 @skill("rack_report")
 def _rack_report(env: SkillExecutionEnv, args: dict) -> str:
-    """Gather the rack's OBSERVED state and hand it to the Quartermaster.
+    """The rack's OBSERVED state. FACTS ONLY unless a judgement is asked for.
 
     The facts are collected in Python -- a model is never asked what is
     installed, only what the inventory means. That keeps the numbers real.
+
+    AND A READING IS ONLY TAKEN WHEN ONE IS ASKED FOR (the operator,
+    2026-09-09: "4.3 facts only"). Before this, the Quartermaster was woken on
+    every call and its prose appended beneath the numbers; the join was
+    labelled after sitting 59, but the Router still summarised THE READING
+    rather than the facts, three times in sitting 85. A reading nobody asked
+    for is one the Router will summarise however it is fenced -- so the fix is
+    the default, not a better label.
     """
     facts = _rack_list(env, {})
     if facts.startswith("Rack unreachable"):
@@ -2008,16 +2016,30 @@ def _rack_report(env: SkillExecutionEnv, args: dict) -> str:
         missing = []
     budget = _vram.gb(_vram.budget_bytes())
 
+    question = (args.get("content") or "What is the state of the rack?").strip()
     inventory = (
         f"{facts}\n\n"
         f"Declared by this ground: {', '.join(declared)}\n"
         f"Declared but NOT installed: {', '.join(missing) or 'none'}\n"
         f"VRAM budget: {budget}\n"
-        f"Question: {(args.get('content') or 'What is the state of the rack?').strip()}"
+        f"Question: {question}"
     )
 
     if not env.registry.has("Quartermaster"):
         return inventory
+
+    # FACTS ONLY UNLESS A JUDGEMENT IS ASKED FOR. The test lives in intent.py
+    # with the estate's other question shapes rather than as a second copy
+    # here, and it answers False by default -- so a question that does not
+    # plainly ask to be advised gets the numbers, which are never wrong.
+    # The line below is not decoration: it tells whatever reads this that
+    # there is no opinion in it, which is exactly what the Router got wrong.
+    from .intent import asks_for_a_judgement
+    if not asks_for_a_judgement(question):
+        return (f"{inventory}\n\n"
+                f"(FACTS ONLY -- no seat was asked to read them. Ask for a "
+                f"judgement in the question and the Quartermaster reads the "
+                f"same inventory beside it.)")
 
     # 2026-09-02, sitting 59: this returned ONLY the Quartermaster's prose, and
     # the transcript labelled it `Tool executed: rack_report / Result:` -- so a

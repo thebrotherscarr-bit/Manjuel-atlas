@@ -205,6 +205,43 @@ def cites_search_results(prose: str) -> list:
             for m in _CITED_PAIR.finditer(prose or "")]
 
 
+# Asking to be ADVISED, not to be told. `rack_report` gives facts only
+# unless a judgement is asked for (the operator, 2026-09-09: "4.3 facts
+# only"), and this is the test.
+#
+# THE BURDEN IS ON ASKING, deliberately. The default is the observed numbers,
+# so a question that does not plainly ask for an opinion gets them; being
+# wrong that way costs a reading he can ask for again, and being wrong the
+# other way is a seat's prose the Router will summarise instead of the facts
+# -- which is the fault this exists to close (sitting 85, three times).
+#
+# Every frame here is first-person-addressed or explicitly evaluative. A bare
+# "what is the state of the rack?" is a FACTS question and must not match.
+_JUDGEMENT_RE = re.compile(
+    r"\bshould\s+(?:i|we|you|it|he|they|the)\b"
+    r"|\bwhat\s+should\b"
+    r"|\bwould\s+you\s+(?:recommend|advise|suggest|keep|drop|pull)\b"
+    r"|\b(?:recommend|advise|suggest|evaluate|assess|critique|appraise)\b"
+    r"|\byour\s+(?:opinion|read|view|assessment|judgement|judgment|take|advice)\b"
+    r"|\bwhat\s+do\s+you\s+(?:think|make\s+of|reckon)\b"
+    r"|\bdo\s+you\s+think\b"
+    r"|\bis\s+it\s+(?:worth|wise|sensible|safe|a\s+good\s+idea)\b"
+    r"|\bany\s+(?:concerns?|worries|problems?|issues?)\b"
+    r"|\bwhat\s+would\s+you\b",
+    re.IGNORECASE)
+
+
+def asks_for_a_judgement(question: str) -> bool:
+    """Does this question ask to be ADVISED, rather than told?
+
+    Used by rack_report to decide whether a seat is woken at all. False is the
+    safe answer and the default: the caller gets the observed numbers, which
+    are never wrong, instead of a reading that has been (SPEC 4.7 -- the
+    Quartermaster on llama3.2 invented in three of three readings).
+    """
+    return bool(_JUDGEMENT_RE.search(question or ""))
+
+
 # Asking ABOUT a tool, not asking FOR it. The frames are deliberately
 # narrow and all interrogative: a question about a thing, never an order
 # involving it. "read pipelines.md" must keep dispatching.
