@@ -119,14 +119,20 @@ that is the one part it cannot read off the ground:
 
 It does five things and reports what each one said:
 
-    THE PROOFS            the six file-readable checks the boot report asks
-                          (strokes, smoke, standup, SPEC vs CHANGELOG, DAYBOOK,
-                          HANDOFF). A red or STALE one REFUSES THE SHIP by
-                          name, and nothing is committed. It does not RUN the
-                          suites -- spawning python inside the engine is
-                          measured unsafe here -- it reads the verdict they
-                          already left, which is why a proof older than the
-                          code is refused.
+    THE PROOFS            the six file-readable checks the boot report asks,
+                          of which ONLY TWO GATE A COMMIT: strokes and smoke,
+                          green AND fresh. A red or STALE one there REFUSES THE
+                          SHIP by name and nothing is committed. The other four
+                          -- standup, SPEC vs CHANGELOG, DAYBOOK, HANDOFF --
+                          are read and PRINTED but do not stop a commit: a
+                          commit does not cut a tag, close a session or end a
+                          day, and it must never need a live rack. They are the
+                          TAG's to answer; `python tests/release.py --check`
+                          still wants all nine.
+                          It does not RUN the suites -- spawning python inside
+                          the engine is measured unsafe here -- it reads the
+                          verdict they already left, which is why a proof older
+                          than the code is refused.
     THE GROUND            what is about to be committed. Clean tree, no commit.
     THE COMMIT            the hash, or a refusal.
     THE PUSH              git's own output.

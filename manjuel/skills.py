@@ -1928,9 +1928,16 @@ def _git_cycle(env: SkillExecutionEnv, args: dict) -> str:
     spawning python inside the engine, and that is measured unsafe here: a
     first cut of the boot gate did it on 2026-09-10 and never returned -- two
     processes blocked for three minutes, no engine opened. So the same six
-    file-readable checks the boot report asks are asked here, and a red or
-    STALE one refuses the ship. buildmap, law and manifest need a child
-    process or the rack; they are named as not asked, as boot names them.
+    file-readable checks the boot report asks are read here. buildmap, law and
+    manifest need a child process or the rack; they are named as not asked, as
+    boot names them.
+
+    ONLY TWO OF THE SIX GATE A COMMIT: strokes and smoke, green AND fresh. The
+    other four -- standup, SPEC against the CHANGELOG, DAYBOOK, HANDOFF -- are
+    read and printed but do not refuse, because a commit does not cut a tag,
+    close a session or end a day, and it must never need a live rack. They all
+    came from tests/release.py, which is the RELEASE gate; lifting the whole
+    set put tag ceremony on every commit and cost a live standup each time.
 
     AND IT VERIFIES THE PUSH. `git push` exiting 0 is not proof the remote
     moved, and the fault this closes is a push that never ran while everything
@@ -1962,15 +1969,43 @@ def _git_cycle(env: SkillExecutionEnv, args: dict) -> str:
         return (f"Refused: the proofs could not be read "
                 f"({type(exc).__name__}: {exc}). Nothing ships unproven.")
 
-    bad = [c for c in checks if not c.ok]
-    out.append(f"THE PROOFS  {len(checks) - len(bad)}/{len(checks)} read here "
-               f"(buildmap, law and manifest need a child process or the rack "
-               f"and are not asked from inside the engine)")
+    # A COMMIT REFUSES ON WHAT A COMMIT CAN BREAK, AND ONLY THAT.
+    #
+    # All six came from tests/release.py, which is THE RELEASE GATE -- it gates
+    # a TAG. One of them wants a LIVE standup stamped after the newest edit, so
+    # lifting the whole set put tag-level ceremony on every commit: any code
+    # edit staled it, and shipping meant nine cases of live model work on a
+    # single rack, again and again. The operator, watching it: "the live
+    # standup is the issue". It never took the twenty minutes it looked like --
+    # every nine-case run that morning finished in 62 to 135 seconds -- but he
+    # was right that it had no business gating a commit at all.
+    #
+    # THE LINE IS WHAT A COMMIT INVALIDATES. A commit changes code, so the
+    # suites must be green AND fresh: those two REFUSE. A commit does not close
+    # a session (DAYBOOK), does not end a day (HANDOFF), does not cut a tag
+    # (SPEC against the CHANGELOG) and does not need a live rack (standup).
+    # Those four are still READ and still PRINTED -- they cost nothing, and
+    # they are the only warning he gets before a tag -- but they no longer stop
+    # a commit. Trading one bad gate for a blind one would be no better.
+    #
+    # tests/release.py is UNCHANGED. The tag still wants all nine.
+    GATES = ("strokes", "smoke")
+    bad = [c for c in checks if not c.ok and c.name in GATES]
+    noted = [c for c in checks if not c.ok and c.name not in GATES]
+    out.append(f"THE PROOFS  {sum(1 for c in checks if c.ok)}/{len(checks)} green "
+               f"(strokes and smoke gate a commit; the rest are read and "
+               f"reported. buildmap, law and manifest need a child process or "
+               f"the rack and are not asked from inside the engine)")
     for c in checks:
-        out.append(f"  {'ok     ' if c.ok else 'REFUSED'} {c.name:9} {c.why}")
+        mark = "ok     " if c.ok else ("REFUSED" if c.name in GATES else "note   ")
+        out.append(f"  {mark} {c.name:9} {c.why}")
     if bad:
         return ("\n".join(out) + "\n\nREFUSED: " + ", ".join(c.name for c in bad)
                 + ". Nothing was committed and nothing was pushed.")
+    if noted:
+        out.append("  (" + ", ".join(c.name for c in noted) + " are the TAG's to "
+                   "answer, not this commit's -- run `python tests/release.py "
+                   "--check` before you cut one.)")
 
     # ---- 2. WHAT IS ABOUT TO BE COMMITTED ------------------------------
     st = _git.read(env.ground)

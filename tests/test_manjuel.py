@@ -10489,6 +10489,50 @@ def test_math():
           refuses(lambda: M.matmul([[1, 2]], [[1, 2]]), M.MathError))
 
 
+def test_a_commit_is_not_a_tag():
+    """git_cycle GATES ON WHAT A COMMIT CAN BREAK, AND REPORTS THE REST.
+
+    THE FAULT. All six of its proofs were lifted from tests/release.py, which
+    is THE RELEASE GATE -- it gates a TAG. One of them demands a LIVE standup
+    stamped after the newest edit, so every commit inherited tag ceremony: any
+    code edit staled it, and shipping meant nine cases of live model work on a
+    single rack, over and over. The operator watched a whole morning of it.
+
+    THE LINE. A commit changes code, so strokes and smoke must be green AND
+    fresh -- those refuse. A commit does not close a session, end a day, cut a
+    tag, or need a live rack, so DAYBOOK, HANDOFF, SPEC-vs-CHANGELOG and
+    standup are read, printed, and do not stop it. Trading one bad gate for a
+    blind one would be no better, so they are never hidden.
+
+    tests/release.py is untouched: the TAG still wants all nine.
+    """
+    from manjuel.skills import _HANDLERS
+    import types as _types
+
+    src = __import__("inspect").getsource(_HANDLERS["git_cycle"])
+    check("only strokes and smoke gate a commit",
+          'GATES = ("strokes", "smoke")' in src)
+    check("the other four are still read, not dropped",
+          all(n in src for n in ("standup", "spec", "daybook", "handoff")))
+    check("a non-gating red is marked as a note, not a refusal",
+          '"note   "' in src, src[:0])
+
+    # The RELEASE gate keeps all nine -- this change must not have loosened it.
+    import importlib.util as _ilu
+    spec = _ilu.spec_from_file_location("_rel_for_gate", Path("tests/release.py"))
+    rel = _ilu.module_from_spec(spec)
+    spec.loader.exec_module(rel)
+    names = [c.name for c in rel.checks(Path("."))]
+    for n in ("strokes", "smoke", "standup", "spec", "daybook", "handoff"):
+        check(f"the tag still gates on {n}", n in names, names)
+
+    # And it still refuses outright with no message: the one thing a machine
+    # cannot supply.
+    said = _HANDLERS["git_cycle"](_types.SimpleNamespace(ground="."), {})
+    check("git_cycle still refuses without a commit message",
+          said.startswith("Refused:") and "message" in said, said[:120])
+
+
 def test_says_is_a_phrase_list_not_a_paragraph():
     """**Says:** ENDS AT A BLANK LINE, AND `|` SEPARATES LIKE A COMMA.
 
@@ -11141,6 +11185,7 @@ def main() -> int:
     test_flags_are_not_speech(reg, lib, book)
     test_ink()
     test_math()
+    test_a_commit_is_not_a_tag()
     test_says_is_a_phrase_list_not_a_paragraph()
     test_the_stamp_is_not_an_edit()
     test_doctrine()
