@@ -110,6 +110,34 @@ The pages, in the order the panel lists them:
                        DO THIS. A sitting left open is what makes the next
                        Boot refuse.
 
+**Or the whole turn in one act.** `git_cycle` is step 3's commit and push as a
+single skill, with the proofs read first and the push verified after. Type it
+on the Dashboard the way you would any objective, and give it the message --
+that is the one part it cannot read off the ground:
+
+    git_cycle: "what this commit is"
+
+It does five things and reports what each one said:
+
+    THE PROOFS            the six file-readable checks the boot report asks
+                          (strokes, smoke, standup, SPEC vs CHANGELOG, DAYBOOK,
+                          HANDOFF). A red or STALE one REFUSES THE SHIP by
+                          name, and nothing is committed. It does not RUN the
+                          suites -- spawning python inside the engine is
+                          measured unsafe here -- it reads the verdict they
+                          already left, which is why a proof older than the
+                          code is refused.
+    THE GROUND            what is about to be committed. Clean tree, no commit.
+    THE COMMIT            the hash, or a refusal.
+    THE PUSH              git's own output.
+    THE PROOF IT LANDED   the local head and the remote head, side by side.
+                          A push exiting 0 is not proof the remote moved; on
+                          2026-09-10 one reported success while origin sat a
+                          commit behind. These two lines are what closed that.
+
+It refuses rather than guesses: no message, a red proof, nothing to commit, the
+wall shut, not a repository -- each names itself and stops. Nothing half-runs.
+
 Push is disabled unless the wall is open (`MANJUEL_GIT_REMOTE` in `.env`) and
 there is something to push; hover it and it says which.
 

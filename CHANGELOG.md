@@ -70,6 +70,27 @@ hand that iterates without updating this file is out of line.
   WRITING_SKILLS — so the dedup's write rule and the law gate both see it for
   what it is. The manifest agrees with the disk.
 - Proven: 1971/1971 strokes, 60/60 smoke, 39 skills on the ground.
+- **AND IT SHIPPED ITSELF**, which is the only proof of a version-control
+  skill worth having. Run from the Dashboard as
+  `git_cycle: "the whole version-control turn, as one skill"`, it read its own
+  six proofs green, saw its own source in the dirty tree, committed it at
+  `f1fd37d93`, pushed `0798840..f1fd37d`, and printed the two heads agreeing.
+  `logs/2026-09-10_090740_git_cycle_the_whole_version_control_turn.md`.
+- **WHAT IT DID NOT CLOSE, AND THE OPERATOR'S TO RULE ON.** The ruling holds
+  for the DECISIONS -- no seat chose anything, and the tool's own report is in
+  the record verbatim. It does NOT hold for the ANSWER: the closing Steward
+  still summarises the run, and on this first live turn that summary inverted
+  it -- "Nothing changed", "the skill was not fully executed", delivered over a
+  tool report showing the commit, the push and two matching heads. Drift 0.470,
+  flagged DRIFTED. That is the 08:28 fault inside out: that one reported
+  success without pushing, this one reports failure after pushing. Suppressing
+  the closing seat for a skill whose output is already the answer is a change
+  to the pipeline nobody has ordered, so it is written down and not built.
+- **LAW 6.** `RUNBOOK.md`'s four-click loop described commit and push as two
+  acts, which is no longer all the estate can do; it now names the one-act
+  path, the message it cannot supply, the five things it reports, and what it
+  refuses on. The two-act route is unchanged and still what the REPOSITORY
+  panel's buttons run.
 
 ### 2026-09-10 — A PUSH THAT REPORTED SUCCESS WITHOUT PUSHING (operator: "fix the push reporting delivered when it didn't")
 - **THE FAULT, WHOLE, FROM ONE TRANSCRIPT.**
