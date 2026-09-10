@@ -34,6 +34,25 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE SPLIT TURNED CI RED ONE LEVEL DOWN FROM WHERE IT WAS FIXED
+- **THE FAULT.** `index_roots.txt` follows the control centre spec to
+  `atlas/docs/SPEC_CONTROL_CENTER.md`, and atlas is a separate repository now —
+  so that path is on his ground, deliberately untracked HERE, and absent from
+  every clone. Four pushes went red while the same suite passed on the one
+  machine that has both repositories.
+- **AND IT IS THE SAME SHAPE THIS STROKE WAS REWRITTEN TO CATCH, one level
+  down.** The exempt set is read from `.gitignore` — correct, and better than a
+  hand-written list — but matched EXACTLY, so `atlas` exempted the directory and
+  nothing beneath it. `.gitignore` ignores a directory and everything under it;
+  the check now says the same by walking the parents.
+- Two more strokes hold the rule from both sides: a root under an ignored
+  directory counts as not shipped, and a root under no ignored parent still
+  does not.
+- **PROVEN IN A CLEAN CLONE BEFORE PUSHING, not by watching CI go red a fifth
+  time.** `git clone` of the ground into scratch — no atlas, no logs, no record
+  — then both suites: **2046/2046 strokes, 60/60 smoke**. On the ground with
+  atlas present: 2048/2048.
+
 ### 2026-09-10 — A COMMIT IS NOT A TAG (operator: "the live standup is the issue ... whats the deal?")
 - **THE FAULT WAS MINE, ON THE DAY git_cycle LANDED.** Its six proofs were
   lifted whole from `tests/release.py` — which is THE RELEASE GATE, and gates a
