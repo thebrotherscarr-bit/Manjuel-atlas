@@ -24,6 +24,8 @@ reason the estate can say a seat never touches the filesystem.
     "classify_sentiment",
     "decompose_task",
     "deep_research",
+    "doc_pass",
+    "doctrine_check",
     "embed_text",
     "extract_facts",
     "git_commit",

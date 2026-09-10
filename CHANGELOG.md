@@ -34,6 +34,62 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE DOC PASS AND THE DOCTRINE CHECK, AS ARITHMETIC (operator: "write the whole doc pass workflow into a skill ... additionally a skill for the review of the doctrine and foundational/functional docs")
+- **`doc_pass`** — where the estate stands and what is on the table, in one
+  act: the DAYBOOK's newest entry and whether it carries **At close**, the
+  HANDOFF's newest block, the CHANGELOG's Unreleased entries, the lines still
+  on the table in TASKS, the repository (head, dirty, local against remote,
+  version) and the same six file-readable proofs `git_cycle` and the boot
+  report read. It reads TASKS.md and NEVER writes it — READ FIRST item 6 says
+  a hand does not add work to that list, and a tool that could write it would
+  be the fastest way there is to break that rule.
+- **`doctrine_check`** — his LAW 6 made mechanical: the law chain and any law
+  drafted but not sealed, whether the skill library agrees with the handlers
+  behind it, whether every file holding the version says the same number, any
+  suite tally standing in a living doc, and any backticked path that resolves
+  to nothing. Every finding prints its own file and line.
+- **HE ASKED WHETHER `deep_research` WOULD SERVE, AND IT WOULD NOT.** That skill
+  wakes the Deep Researcher persona and asks it to reason; it reads no files.
+  A model asked to find discrepancies in a corpus it cannot verify INVENTS
+  them — the exact family (invented numbers, parroting, a delivery that
+  inverted its own tool report) this estate spent today closing. Every finding
+  in both skills is a comparison between two things on disk.
+- **THE LEDGER/LIVING SPLIT IS THE WHOLE DESIGN.** A first cut flagged forty
+  tallies and every one was correct where it stood — they were in HANDOFF.md
+  and SEAT_LOG.md, which are DATED HISTORY. "1471/1471 on 2026-09-02" is a true
+  record of that day, not a stale claim, and LAW 1 keeps it. Only a LIVING doc,
+  speaking in the present tense about what the estate IS, can hold a stale
+  claim. Eight ledgers are named and skipped.
+- **THREE CUTS WERE WRONG BEFORE THIS ONE WAS RIGHT, and each is a stroke now.**
+  Comparing `skills/*.md` STEMS against `@skill()` names called five skills
+  undeclared — all false: a skill's identity is its Action Keyword
+  (`fact_extractor.md` declares `extract_facts`) and a handler-less skill is a
+  legitimate PROMPT SKILL on a Model Target. Resolving paths from the ground
+  alone called 23 dead — 19 were alive one directory down, because
+  SPEC_CONTROL_CENTER addresses the Go tree the way that tree addresses itself
+  (`atlas/`, `atlas/line/`). And TASKS.md's own legend line was read as the
+  first open task. A check that cries wolf is a check he learns to skip.
+- **WHAT IT FOUND ON THE FIRST LIVE RUN, all verified by hand before it was
+  trusted:** 5 suite tallies standing in living docs (SPEC_CONTROL_CENTER 381,
+  382, 979, 1226, 1248 — against his sitting-79 ruling that "a once-real number
+  cannot read as a claim"); 6 dead paths (SPEC_CONTROL_CENTER's `flows/runs.jsonl`,
+  `atlas/docs/SPEC_CONTROL_CENTER.md` and `atlas/CLAUDE.md`, and SYSTEM_DESIGN's
+  three `tbc_estimate` addresses); and `law/SITTING_LAWS_2.md` written but not
+  sealed onto the chain — reported, not failed, because sealing is his (RULE 6).
+- **NEITHER SKILL SPAWNS A CHILD PROCESS.** The law chain is walked in-process
+  through `lawgate.verify_chain`, never by running `law.py`; the proofs are read
+  off what the suites stamped. Spawning python inside the engine is measured
+  unsafe here (the boot gate that never returned, this morning).
+- `manjuel/doctrine.py` holds the arithmetic; the two handlers are thin, the
+  same shape `gitstate.py` and `git_cycle` already use. Declared like any other
+  skill: `skills/doc_pass.md`, `skills/doctrine_check.md`, records in
+  `us/manjuel.us` (`writes: false` for both), the Router's clearance.
+- **LAW 6.** `RUNBOOK.md` gained both passes, what each reads, and why the
+  ledgers are skipped.
+- Proven: 2026/2026 strokes (22 hand-written for this piece, plus 32 generated
+  from the new skills' `Says:` phrases), 60/60 smoke, 41 skills, BUILDMAP
+  regenerated. A stroke proves each of the three wrong cuts stays wrong.
+
 ### 2026-09-10 — git_cycle: the whole version-control turn, with no seat in it (operator: "the full git workflow cycle for version control ... the full CI pipeline as a skill")
 - **ZERO SEATS PAST THE GATE, his ruling and his words.** The law gate stamps
   the objective, the work runs, and what comes back is what the tools said.

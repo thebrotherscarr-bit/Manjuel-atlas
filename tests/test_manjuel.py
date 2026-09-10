@@ -10489,6 +10489,124 @@ def test_math():
           refuses(lambda: M.matmul([[1, 2]], [[1, 2]]), M.MathError))
 
 
+def test_doctrine():
+    """THE DOC PASS AND THE DOCTRINE CHECK.
+
+    Every stroke here guards a decision an earlier cut of this code got WRONG,
+    which is the only reason each of them is worth a line. The first cut
+    flagged forty tallies that were correct where they stood, called five
+    skills undeclared that were nothing of the kind, reported nineteen live
+    files as missing, and read the file's own legend as the first open task. A
+    check that cries wolf is a check the operator learns to skip.
+    """
+    from manjuel import doctrine as D
+
+    g = Path(tempfile.mkdtemp())
+
+    # ---- the ledger/living split ----------------------------------------
+    (g / "RUNBOOK.md").write_text("the suite ran 900/900 today\n", encoding="utf-8")
+    (g / "HANDOFF.md").write_text("on 2026-09-02 it was 1471/1471\n", encoding="utf-8")
+    (g / "SEAT_LOG.md").write_text("812/812 and 59/59 are the operator's\n", encoding="utf-8")
+    names = {p.name for p in D.living(g)}
+    check("a living doc is read", "RUNBOOK.md" in names)
+    check("a dated ledger is not read as a claim about now",
+          "HANDOFF.md" not in names and "SEAT_LOG.md" not in names)
+
+    hits = D.stale_tallies(g)
+    check("a tally standing in a living doc is found", len(hits) == 1, hits)
+    check("the finding names its file and line",
+          hits[0][0] == "RUNBOOK.md" and hits[0][1] == 1, hits)
+    check("a tally inside a ledger is left alone -- it is history, not a claim",
+          all(f != "HANDOFF.md" and f != "SEAT_LOG.md" for f, _n, _l in hits))
+
+    # A version fragment is not a tally. `4/4` is too small to be a suite and
+    # flagging it would put noise in front of the five real ones.
+    (g / "README.md").write_text("step 4/4 of the loop\n", encoding="utf-8")
+    check("a small pair is not mistaken for a suite tally",
+          all(f != "README.md" for f, _n, _l in D.stale_tallies(g)))
+
+    # ---- paths ------------------------------------------------------------
+    (g / "DESIGN.md").write_text(
+        "see `manjuel/gone.py` and `.git/index.lock` and `bare_word.py`\n",
+        encoding="utf-8")
+    dead = {rel for f, _n, rel in D.dead_paths(g) if f == "DESIGN.md"}
+    check("a backticked path that is not there is found", "manjuel/gone.py" in dead)
+    check("a path under .git/ is never called missing -- its absence is correct",
+          ".git/index.lock" not in dead)
+    check("a bare filename with no separator is not read as an address",
+          "bare_word.py" not in dead)
+
+    # The Go docs address their own tree. Resolving from the ground alone
+    # called nineteen live files dead.
+    (g / "atlas" / "webapp").mkdir(parents=True)
+    (g / "atlas" / "webapp" / "db.go").write_text("package db\n", encoding="utf-8")
+    (g / "SPEC.md").write_text("see `webapp/db.go`\n", encoding="utf-8")
+    check("a path is resolved under atlas/ before it is called dead",
+          all(f != "SPEC.md" for f, _n, _r in D.dead_paths(g)))
+
+    # ---- the task list ----------------------------------------------------
+    (g / "TASKS.md").write_text(
+        "    [ ]  open          [~]  in hand          [x]  landed, stroked\n"
+        "    [ ]  A REAL OPEN TASK\n"
+        "    [~]  ONE IN HAND\n"
+        "    [x]  ONE THAT LANDED\n", encoding="utf-8")
+    tasks = D.open_tasks(g)
+    marks = [m for m, _t in tasks]
+    texts = [t for _m, t in tasks]
+    check("the legend line is not read as a task", "open" not in texts, texts)
+    check("an open task is on the table", "A REAL OPEN TASK" in texts)
+    check("something in hand is on the table too", "[~]" in marks and "ONE IN HAND" in texts)
+    check("a landed task is not on the table", "ONE THAT LANDED" not in texts)
+    check("the table is exactly the two unfinished lines", len(tasks) == 2, tasks)
+
+    # ---- the skills axis --------------------------------------------------
+    # The identity of a skill is its Action Keyword, and a skill with no
+    # handler is a legitimate prompt skill. Comparing filenames called five of
+    # these a discrepancy.
+    faults = D.skills_axis(Path("."))
+    check("the real library agrees with the handlers behind it", faults == [], faults)
+
+    sk = g / "skills"
+    sk.mkdir()
+    (sk / "renamed.md").write_text(
+        "# Skill: X\n- **Action Keyword:** does_a_thing\n"
+        "- **Model Target:** phi4-mini:latest\n- **Description:** x\n",
+        encoding="utf-8")
+    f2 = D.skills_axis(g)
+    check("a prompt skill with a model target is not a fault",
+          not any("does_a_thing" in x for x in f2), f2)
+
+    (sk / "orphan.md").write_text(
+        "# Skill: Y\n- **Action Keyword:** has_no_way_to_run\n- **Description:** y\n",
+        encoding="utf-8")
+    f3 = D.skills_axis(g)
+    check("a skill with neither a handler nor a model target IS a fault",
+          any("has_no_way_to_run" in x for x in f3), f3)
+
+    # ---- the version ------------------------------------------------------
+    (g / "pyproject.toml").write_text('version = "0.2.0"\n', encoding="utf-8")
+    (g / "manjuel").mkdir()
+    (g / "manjuel" / "__init__.py").write_text('__version__ = "0.2.0"\n', encoding="utf-8")
+    faults, v = D.versions(g)
+    check("one version agreed by both files is no fault", faults == [] and v == "0.2.0", (faults, v))
+    (g / "manjuel" / "__init__.py").write_text('__version__ = "0.1.9"\n', encoding="utf-8")
+    faults, _v = D.versions(g)
+    check("two files disagreeing about the version is a fault", len(faults) == 1, faults)
+
+    # ---- neither skill writes anything ------------------------------------
+    # doc_pass reads TASKS.md, and READ FIRST item 6 says no hand adds work to
+    # it. A tool that could write it would be the fastest way to break that.
+    import types as _types
+    from manjuel.skills import _HANDLERS as _H
+    before = {p.name: p.read_bytes() for p in g.iterdir() if p.is_file()}
+    env = _types.SimpleNamespace(ground=str(Path(".")))
+    for kw in ("doc_pass", "doctrine_check"):
+        out = _H[kw](env, {})
+        check(f"`{kw}` returns a report", isinstance(out, str) and len(out) > 80)
+    after = {p.name: p.read_bytes() for p in g.iterdir() if p.is_file()}
+    check("neither skill wrote a single file", before == after)
+
+
 def test_record_and_git():
     g = Path(tempfile.mkdtemp())
     check("git reports a non-repository honestly", gitstate.read(g).is_repo is False)
@@ -10785,6 +10903,7 @@ def main() -> int:
     test_flags_are_not_speech(reg, lib, book)
     test_ink()
     test_math()
+    test_doctrine()
     test_record_and_git()
 
     # ONE loud line about the environment, rather than a crash or a lie.

@@ -138,6 +138,33 @@ It does five things and reports what each one said:
 It refuses rather than guesses: no message, a red proof, nothing to commit, the
 wall shut, not a repository -- each names itself and stops. Nothing half-runs.
 
+**Before you start, and before you tag.** Two read-only skills answer the two
+questions that used to mean opening six files in order. Neither writes
+anything.
+
+    doc_pass          Where the estate stands and what is on the table: the
+                      DAYBOOK's newest entry and whether it was closed, the
+                      HANDOFF's newest block, the CHANGELOG's Unreleased
+                      entries, the lines still open in TASKS, the repository
+                      (head, dirty, local against remote, version), and the
+                      same six proofs git_cycle reads. It reads TASKS.md and
+                      NEVER writes it -- a hand does not add work to your list.
+
+    doctrine_check    Whether the docs still describe what the system performs
+                      -- LAW 6, made mechanical. The law chain and any law
+                      drafted but unsealed; whether the skill library agrees
+                      with the handlers behind it; whether every file holding
+                      the version says the same number; any suite tally left
+                      standing in a living doc; any backticked path that
+                      resolves to nothing. Every finding names its file and
+                      line.
+
+Both are arithmetic. Neither seats a model, and that is deliberate: asked to
+find discrepancies it cannot verify, a model invents them. Dated ledgers
+(HANDOFF, SEAT_LOG, DAYBOOK, CHANGELOG, TASKS, REFUSALS, memory, BUILDMAP) are
+skipped on purpose -- a number in a ledger is a true record of its day, not a
+claim about now.
+
 Push is disabled unless the wall is open (`MANJUEL_GIT_REMOTE` in `.env`) and
 there is something to push; hover it and it says which.
 

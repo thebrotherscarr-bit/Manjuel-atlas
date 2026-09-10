@@ -114,6 +114,25 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `RunContext.history_block` | 365-374 | Prior stage outputs, oldest first. |
 | def | `RunContext.slug` | 376-379 |  |
 
+### manjuel/doctrine.py — 290 lines
+
+*THE RECORD, AND WHETHER IT STILL AGREES WITH THE GROUND. Reads; never writes.*
+
+| kind | name | lines | says |
+|---|---|---|---|
+| def | `living` | 69-71 | Every root doc that speaks in the present tense. |
+| def | `read` | 74-78 |  |
+| def | `stale_tallies` | 83-100 | A living doc naming a suite tally. |
+| def | `dead_paths` | 112-133 | A living doc pointing at a file that is not there. |
+| def | `skills_axis` | 136-156 | Does the skill library agree with the code behind it? |
+| def | `versions` | 159-180 | pyproject and the package must say the same number. |
+| def | `laws` | 183-202 | The chain, and any law sitting in law/ that it does not seal. |
+| def | `daybook_last` | 207-220 | The DAYBOOK's newest entry heading, and whether it was closed. |
+| def | `handoff_today` | 223-229 | Is there a HANDOFF block for today, and what is the newest one? |
+| def | `unreleased` | 232-239 | The CHANGELOG entry headings that have landed since the last tag. |
+| def | `proofs` | 242-264 | The file-readable half of the release gate, and why the rest is absent. |
+| def | `open_tasks` | 267-290 | The lines of TASKS.md that are still on the table, as (mark, text). |
+
 ### manjuel/dotenv.py — 110 lines
 
 *A `.env` beside the work, honored and never printed.*
@@ -513,7 +532,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `open_wire` | 671-688 | The real stdout and stdin as the wire. stdout is swapped for the |
 | def | `main` | 691-790 |  |
 
-### manjuel/skills.py — 2947 lines
+### manjuel/skills.py — 3147 lines
 
 *Skills: markdown declares the interface, Python registers the implementation.*
 
@@ -565,45 +584,47 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `_git_status` | 1524-1544 |  |
 | def | `_commit_subject` | 1547-1679 | Pick a commit subject a human will still understand in six months. |
 | def | `_git_commit` | 1683-1710 | Local, additive, recoverable -- so a seat may do it. |
-| def | `_proved` | 1714-1830 | What the suites last proved, read from what they stamped. |
-| def | `_speak` | 1834-1856 |  |
-| def | `_git_init` | 1860-1864 |  |
-| def | `_git_pull` | 1868-1872 |  |
-| def | `_git_push` | 1876-1880 |  |
-| def | `_git_cycle` | 1884-1986 | The whole version-control turn: prove, status, commit, push, VERIFY. |
-| def | `_linear_regression` | 1990-2023 | Ordinary least squares over numbers found in the text. |
-| def | `_statistics` | 2027-2045 | Descriptive statistics over numbers found in the text. |
-| def | `_pipeline_models` | 2055-2057 | Tags this ground declares -- seats, prompt skills, and the embedder. |
-| def | `_rack_list` | 2061-2110 | Read-only: the shelf and the card. |
-| def | `_rack_report` | 2114-2184 | The rack's OBSERVED state. FACTS ONLY unless a judgement is asked for. |
-| def | `_rack_sync` | 2188-2219 | Pull a current list from Ollama and rewrite rack.md. |
-| def | `_rack_load` | 2223-2235 | Bring a model into VRAM so the next call does not pay the load. |
-| def | `_rack_unload` | 2239-2258 | Free VRAM. REFUSES a model this ground does not declare, because it |
-| def | `_rack_pull` | 2262-2277 | Download a model. Crosses the wall and can move gigabytes, so it is |
-| def | `_index_busy` | 2292-2300 | The refusal for a second build while one is running, or "". |
-| def | `_open_index` | 2303-2323 |  |
-| def | `_wants_rebuild` | 2326-2344 | Did the operator ask for the index to be built from scratch? |
-| def | `_index_ground` | 2348-2370 | Build or refresh the semantic index over the configured roots. |
-| def | `_index_ground_locked` | 2373-2429 | The build itself; the caller holds _INDEX_BUSY for its whole life. |
-| def | `_age_of` | 2432-2450 | How old a file is, in the units a person thinks in. |
-| def | `_semantic_search` | 2454-2455 |  |
-| def | `_search_transcripts` | 2459-2461 | What was SAID on a past run, as opposed to what the estate holds. |
-| def | `_search_scoped` | 2464-2564 |  |
-| def | `_deep_research` | 2568-2590 | Delegate to the Deep Researcher persona defined in agents.md. |
-| class | `SkillLibrary` | 2598-2832 |  |
-| def | `SkillLibrary.__init__` | 2599-2602 |  |
-| def | `SkillLibrary.load` | 2605-2631 |  |
-| def | `SkillLibrary.validate` | 2633-2657 | Return (errors, warnings) for the md <-> handler binding. |
-| def | `SkillLibrary.manifest` | 2659-2670 | Compact by default -- this is what the router reads to pick a tool. |
-| def | `SkillLibrary.shortlist` | 2672-2728 | The manifest, narrowed to what bears on THIS objective. |
-| def | `SkillLibrary.keywords` | 2730-2731 |  |
-| def | `SkillLibrary.spec` | 2733-2735 |  |
-| def | `SkillLibrary.models` | 2737-2739 | Model tags prompt skills depend on, for the startup check. |
-| def | `SkillLibrary.tool_schemas` | 2741-2780 | Ollama `tools=` schemas for the skills a seat may call. |
-| def | `SkillLibrary.execute` | 2782-2832 |  |
-| def | `_run_prompt_skill` | 2835-2887 | Send <content> to the skill's own model, with its markdown as the rules. |
-| def | `_json_call` | 2913-2931 |  |
-| def | `extract_tool_call` | 2934-2947 |  |
+| def | `_doc_pass` | 1714-1806 | WHERE THIS ESTATE STANDS, AND WHAT IS ON THE TABLE. |
+| def | `_doctrine_check` | 1810-1910 | DOES THE RECORD STILL DESCRIBE WHAT THE SYSTEM PERFORMS? |
+| def | `_proved` | 1914-2030 | What the suites last proved, read from what they stamped. |
+| def | `_speak` | 2034-2056 |  |
+| def | `_git_init` | 2060-2064 |  |
+| def | `_git_pull` | 2068-2072 |  |
+| def | `_git_push` | 2076-2080 |  |
+| def | `_git_cycle` | 2084-2186 | The whole version-control turn: prove, status, commit, push, VERIFY. |
+| def | `_linear_regression` | 2190-2223 | Ordinary least squares over numbers found in the text. |
+| def | `_statistics` | 2227-2245 | Descriptive statistics over numbers found in the text. |
+| def | `_pipeline_models` | 2255-2257 | Tags this ground declares -- seats, prompt skills, and the embedder. |
+| def | `_rack_list` | 2261-2310 | Read-only: the shelf and the card. |
+| def | `_rack_report` | 2314-2384 | The rack's OBSERVED state. FACTS ONLY unless a judgement is asked for. |
+| def | `_rack_sync` | 2388-2419 | Pull a current list from Ollama and rewrite rack.md. |
+| def | `_rack_load` | 2423-2435 | Bring a model into VRAM so the next call does not pay the load. |
+| def | `_rack_unload` | 2439-2458 | Free VRAM. REFUSES a model this ground does not declare, because it |
+| def | `_rack_pull` | 2462-2477 | Download a model. Crosses the wall and can move gigabytes, so it is |
+| def | `_index_busy` | 2492-2500 | The refusal for a second build while one is running, or "". |
+| def | `_open_index` | 2503-2523 |  |
+| def | `_wants_rebuild` | 2526-2544 | Did the operator ask for the index to be built from scratch? |
+| def | `_index_ground` | 2548-2570 | Build or refresh the semantic index over the configured roots. |
+| def | `_index_ground_locked` | 2573-2629 | The build itself; the caller holds _INDEX_BUSY for its whole life. |
+| def | `_age_of` | 2632-2650 | How old a file is, in the units a person thinks in. |
+| def | `_semantic_search` | 2654-2655 |  |
+| def | `_search_transcripts` | 2659-2661 | What was SAID on a past run, as opposed to what the estate holds. |
+| def | `_search_scoped` | 2664-2764 |  |
+| def | `_deep_research` | 2768-2790 | Delegate to the Deep Researcher persona defined in agents.md. |
+| class | `SkillLibrary` | 2798-3032 |  |
+| def | `SkillLibrary.__init__` | 2799-2802 |  |
+| def | `SkillLibrary.load` | 2805-2831 |  |
+| def | `SkillLibrary.validate` | 2833-2857 | Return (errors, warnings) for the md <-> handler binding. |
+| def | `SkillLibrary.manifest` | 2859-2870 | Compact by default -- this is what the router reads to pick a tool. |
+| def | `SkillLibrary.shortlist` | 2872-2928 | The manifest, narrowed to what bears on THIS objective. |
+| def | `SkillLibrary.keywords` | 2930-2931 |  |
+| def | `SkillLibrary.spec` | 2933-2935 |  |
+| def | `SkillLibrary.models` | 2937-2939 | Model tags prompt skills depend on, for the startup check. |
+| def | `SkillLibrary.tool_schemas` | 2941-2980 | Ollama `tools=` schemas for the skills a seat may call. |
+| def | `SkillLibrary.execute` | 2982-3032 |  |
+| def | `_run_prompt_skill` | 3035-3087 | Send <content> to the skill's own model, with its markdown as the rules. |
+| def | `_json_call` | 3113-3131 |  |
+| def | `extract_tool_call` | 3134-3147 |  |
 
 ### manjuel/spelling.py — 157 lines
 
@@ -740,7 +761,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `GroundWatch.start` | 109-134 |  |
 | def | `GroundWatch.stop` | 136-142 |  |
 
-manjuel/: 28 files, 16087 lines.
+manjuel/: 29 files, 16577 lines.
 
 ## GUARDS — by the failure that earned them
 
@@ -804,6 +825,12 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 | 237 | `RunContext` | (sitting 88, the operator: "a step that checks to see if it's even |
 | 266 | `RunContext` | not sixty words about it (2026-09-07, the CLAUDE.md system). |
 | 284 | `RunContext` | THE TURN DEADLINE (the operator, 2026-09-08: "600 max for the whole |
+
+### manjuel/doctrine.py
+
+| line | in | marker |
+|---|---|---|
+| 86 | `stale_tallies` | HIS RULING, sitting 79, after he swept six of these by hand: "No doc now |
 
 ### manjuel/gitstate.py
 
@@ -1060,25 +1087,26 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 | 1639 | `_commit_subject` | Sitting 81: `git commit " i ran a session, found a bug in the router.` |
 | 1655 | `_commit_subject` | SITTING 85 (2026-09-04): `git commit -m parity ran, review the models |
 | 1698 | `_git_commit` | SAY WHICH DIRECTION THE COUNT POINTS. Sitting 81: the result carried |
-| 1717 | `_proved` | SITTING 81. The operator asked "have you run a full test suite on these |
-| 1844 | `_speak` | SITTING 70, THE OPERATOR: "speak ran, it just doesnt put the output |
-| 2123 | `_rack_report` | labelled after sitting 59, but the Router still summarised THE READING |
-| 2124 | `_rack_report` | rather than the facts, three times in sitting 85. A reading nobody asked |
-| 2164 | `_rack_report` | 2026-09-02, sitting 59: this returned ONLY the Quartermaster's prose, and |
-| 2280 | `(module)` | ONE BUILD AT A TIME (sitting 94, 2026-09-08). `_run_bounded` cannot kill |
-| 2298 | `_index_busy` | "vectors.db corrupt both (sitting 94). Wait for it, or " |
-| 2315 | `_open_index` | HELD. Sitting 94: this was `pass`, the old file stayed |
-| 2329 | `_wants_rebuild` | Sitting 66, and this is the fault worth naming: the index refused -- |
-| 2381 | `_index_ground_locked` | SITTING 81: this banner was appended to `lines` -- which is then |
-| 2392 | `_index_ground_locked` | account of it. Same fault as git_commit's count (sitting 80). |
-| 2467 | `_search_scoped` | Sitting 26: the Router called search with no query, the error came |
-| 2494 | `_search_scoped` | Doctrine outranks plumbing. Sitting 28 asked "what is the covenant" |
-| 2509 | `_rank` | RECENCY, added 2026-09-02. Age was DISPLAYED on every hit and |
-| 2533 | `_search_scoped` | Sitting 26: passages from an old run transcript were narrated as if |
-| 2576 | `_deep_research` | The standing ruling: the objective IS the payload. Sitting 39 |
-| 2847 | `_run_prompt_skill` | sitting 39 waiting for a <content> nobody was going to type twice. |
-| 2853 | `_run_prompt_skill` | 2026-09-08). Sitting 95: "time align the logs" -- four words, no log |
-| 2903 | `(module)` | `<|python_tag|>`. Sitting 84 (2026-09-04): the closing Steward on llama3.2 |
+| 1884 | `_doctrine_check` | out.append("  His ruling, sitting 79: no doc names a suite tally, because " |
+| 1917 | `_proved` | SITTING 81. The operator asked "have you run a full test suite on these |
+| 2044 | `_speak` | SITTING 70, THE OPERATOR: "speak ran, it just doesnt put the output |
+| 2323 | `_rack_report` | labelled after sitting 59, but the Router still summarised THE READING |
+| 2324 | `_rack_report` | rather than the facts, three times in sitting 85. A reading nobody asked |
+| 2364 | `_rack_report` | 2026-09-02, sitting 59: this returned ONLY the Quartermaster's prose, and |
+| 2480 | `(module)` | ONE BUILD AT A TIME (sitting 94, 2026-09-08). `_run_bounded` cannot kill |
+| 2498 | `_index_busy` | "vectors.db corrupt both (sitting 94). Wait for it, or " |
+| 2515 | `_open_index` | HELD. Sitting 94: this was `pass`, the old file stayed |
+| 2529 | `_wants_rebuild` | Sitting 66, and this is the fault worth naming: the index refused -- |
+| 2581 | `_index_ground_locked` | SITTING 81: this banner was appended to `lines` -- which is then |
+| 2592 | `_index_ground_locked` | account of it. Same fault as git_commit's count (sitting 80). |
+| 2667 | `_search_scoped` | Sitting 26: the Router called search with no query, the error came |
+| 2694 | `_search_scoped` | Doctrine outranks plumbing. Sitting 28 asked "what is the covenant" |
+| 2709 | `_rank` | RECENCY, added 2026-09-02. Age was DISPLAYED on every hit and |
+| 2733 | `_search_scoped` | Sitting 26: passages from an old run transcript were narrated as if |
+| 2776 | `_deep_research` | The standing ruling: the objective IS the payload. Sitting 39 |
+| 3047 | `_run_prompt_skill` | sitting 39 waiting for a <content> nobody was going to type twice. |
+| 3053 | `_run_prompt_skill` | 2026-09-08). Sitting 95: "time align the logs" -- four words, no log |
+| 3103 | `(module)` | `<|python_tag|>`. Sitting 84 (2026-09-04): the closing Steward on llama3.2 |
 
 ### manjuel/transcript.py
 
@@ -1115,7 +1143,7 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 Every `test_*` function in tests/, the manjuel names it touches, and
 its line range. The suites are the memory (HANDOFF: test discipline).
 
-### tests/test_manjuel.py — 157 test functions
+### tests/test_manjuel.py — 158 test functions
 
 | test | lines | touches |
 |---|---|---|
@@ -1228,7 +1256,7 @@ its line range. The suites are the memory (HANDOFF: test discipline).
 | `test_the_review_can_send_work_back_once` | 6882-6938 | `RunContext`, `Seating`, `Step`, `build_prompt`, `run_pipeline` |
 | `test_several_acts_get_a_route_first` | 6941-6981 | `RunContext`, `intent`, `intent.is_big_objective`, `run_pipeline` |
 | `test_a_big_file_is_a_window_not_a_stump` | 6984-7039 | `READ_WINDOW`, `windowed` |
-| `test_the_estate_can_reason_about_time` | 7042-7233 | `RECENCY_WEIGHT`, `REVIEW_ONLY_SKILLS`, `RunContext`, `StepResult`, `build_prompt`, `intent`, `intent.names_a_tool`, `now_block` |
+| `test_the_estate_can_reason_about_time` | 7042-7233 | `RECENCY_WEIGHT`, `REVIEW_ONLY_SKILLS`, `RunContext`, `StepResult`, `build_prompt`, `doctrine`, `intent`, `intent.names_a_tool`, `now_block` |
 | `test_the_log_horizon` | 7236-7275 | `LOG_HORIZON_DAYS`, `_too_old_to_index` |
 | `test_the_router_knows_where_it_is` | 7278-7317 | — |
 | `test_sitting70_regressions` | 7320-7399 | `RunContext`, `WRITING_SKILLS`, `_v`, `_v.speak`, `intent`, `intent.claims_wrote_a_file`, `run_pipeline` |
@@ -1275,5 +1303,6 @@ its line range. The suites are the memory (HANDOFF: test discipline).
 | `test_flags_are_not_speech` | 10372-10412 | `RunContext`, `build_prompt`, `read_flags`, `run_pipeline`, `strip_control` |
 | `test_ink` | 10415-10463 | `ink`, `ink.RESET`, `ink.Spinner`, `ink._STATE`, `ink.bad`, `ink.body`, `ink.dim`, `ink.enabled`, `ink.good`, `ink.seat`, `ink.seat_color`, `ink.warn` |
 | `test_math` | 10466-10489 | `M`, `M.MathError`, `M.cosine`, `M.linear_regression`, `M.matmul`, `M.parse_numbers`, `M.stdev`, `M.transpose`, `M.variance` |
-| `test_record_and_git` | 10492-10596 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
+| `test_doctrine` | 10492-10607 | `D`, `D.dead_paths`, `D.living`, `D.open_tasks`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_v` |
+| `test_record_and_git` | 10610-10714 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
 
