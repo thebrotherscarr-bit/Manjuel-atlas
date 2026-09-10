@@ -1140,6 +1140,57 @@ def test_rack(reg, lib):
           "models installed" in quiet and "returned nothing" in quiet, quiet[:160])
 
 
+def test_a_number_no_tool_returned(reg, lib, book):
+    """SPEC 4.7: the door invents numbers, and until 2026-09-10 the check for
+    it ran in ONE place -- /brief -- never on an ordinary turn.
+
+    2026-09-09, the standup's `a folder`: "37 markdown files, ranging from 300
+    to 1200 bytes in size", with 300 and 1200 in no tool result that run. The
+    count was right; the range was invented. recompose stamps it now, by the
+    same arithmetic it already uses for what was OMITTED.
+    """
+    from manjuel.pipeline import recompose
+
+    def turn(said, results):
+        c = RunContext(objective="what is in the skills dir")
+        c.steps.append(StepResult(agent="Steward", model="llama3.2",
+                                  output=said, elapsed=1.0))
+        c.tool_results = list(results)
+        return c
+
+    tool = "skills/: 37 entries listed (0 folders, 37 files)"
+
+    ctx = turn("The skills dir holds 37 markdown files, ranging from 300 to "
+               "1200 bytes in size.", [tool])
+    check("a number no tool returned is stamped onto the delivery",
+          recompose(ctx, report=lambda *a: None))
+    out = ctx.steps[-1].output
+    check("and the stamp names the invented numbers, not the true one",
+          "300" in out and "1200" in out and "A NUMBER NO TOOL RETURNED" in out,
+          out[-160:])
+
+    clean = turn("The skills dir holds 37 markdown files.", [tool])
+    check("a number the tool DID return is not stamped",
+          not recompose(clean, report=lambda *a: None),
+          clean.steps[-1].output)
+
+    # THE GUARD ON THE GUARD. With no tool results there is nothing to check
+    # against, and stamping a conversational answer would be sitting 27's
+    # compliment-drift again -- a check crying about material that never
+    # existed.
+    chat = turn("Morning. It has been about 45 minutes since we spoke.", [])
+    check("with no tool result there is nothing to check, so nothing is said",
+          not recompose(chat, report=lambda *a: None),
+          chat.steps[-1].output)
+
+    # Dates and clock times are not quantities. This is why `without_clock`
+    # travelled with the guard rather than being reimplemented beside it.
+    dated = turn("As of 2026-09-09 at 16:53 the dir holds 37 files.", [tool])
+    check("a date and a clock time are never called invented numbers",
+          not recompose(dated, report=lambda *a: None),
+          dated.steps[-1].output)
+
+
 def test_an_uncited_claim_is_measured(reg, lib, book):
     """A TOOL RESULT IS SOURCE MATERIAL (SPEC 4.3, built 2026-09-10).
 
@@ -10374,6 +10425,7 @@ def main() -> int:
     test_vram(reg, book)
     test_shared_card(reg, book)
     test_rack(reg, lib)
+    test_a_number_no_tool_returned(reg, lib, book)
     test_an_uncited_claim_is_measured(reg, lib, book)
     test_the_corpus_is_split(reg, lib, book)
     test_rack_sync(reg, lib)

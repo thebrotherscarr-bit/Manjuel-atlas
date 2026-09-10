@@ -34,6 +34,52 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-10 — A NUMBER NO TOOL RETURNED IS STAMPED (operator: "the door inventing numbers next")
+- **THE CHECK ALREADY EXISTED AND RAN IN ONE PLACE.** `_unsourced(said, facts)`
+  — numbers and hashes in what was said that appear nowhere in the facts, with
+  `CLOCK_SHAPES`/`without_clock` beside it so a date is never mistaken for a
+  quantity, and small integers 0-12 left alone because they are words in prose.
+  It ran in `/brief` and NOWHERE ELSE. Never on an ordinary turn — the one where
+  a seat speaks after a tool returns, which is where 2026-09-09's "37 markdown
+  files, ranging from 300 to 1200 bytes in size" happened with 300 and 1200 in
+  no tool result. Only the STANDUP caught that, and a test catching it is not
+  the engine catching it.
+- **IT MOVED TO intent.py, BY LINE, UNCHANGED.** cli.py imports pipeline at
+  module level, so the engine reaching back into the door would be backwards
+  and a lazy import would hide that rather than fix it. intent.py is where this
+  estate reads the SHAPE of text, and `cites_search_results` /
+  `search_result_pairs` right above it are the CITED half of the same question.
+  A regex lift was tried and REFUSED ITSELF — `CLOCK_SHAPES` is built by
+  concatenation with `_MONTHS` across six lines, and a pattern that nearly
+  matches a regex definition is how a move silently drops a clause — so five
+  pieces were taken by asserted line range instead. cli.py keeps the old names
+  as aliases; `/brief`, `tests/standup.py` and the strokes are untouched.
+- **THE RECOMPOSE STAMPS IT**, which is where it belongs: recompose's own
+  docstring names this gap — sittings 66 and 68 were "the same fault and
+  NEITHER IS INVENTION ... the claim-check cannot catch because nothing was
+  cited and the citation-check cannot catch because no result was quoted". An
+  invented number is the mirror image, uncatchable for the same reason. Same
+  arithmetic as the lists it already emits: those carry what was OMITTED, this
+  carries what was INVENTED, both machine-emitted from the record rather than
+  read out of a seat's prose.
+- **A GUARD ON THE GUARD.** It speaks only when a tool actually ran. With no
+  tool results there is nothing to check against, and stamping a plain
+  conversational answer would be sitting 27's compliment-drift again — a check
+  crying about material that was never supposed to exist.
+- **FIVE STROKES**, and they hold the edges rather than the happy path: the
+  invented range is stamped and the TRUE count is not; a number the tool did
+  return is not stamped; a turn with no tool result says nothing; and a date
+  with a clock time is never called an invented number — which is why
+  `without_clock` travelled with the guard instead of being reimplemented
+  beside it. 1944 → 1949.
+- **LIVE: zero false positives across nine standup cases**, and the `a folder`
+  delivery was honest this run ("38 individual markdown files" — correct now
+  that `search_transcripts` exists), so the stamp correctly stayed silent.
+- **SPEC 4.7 records both halves.** TASKS said "stamp or reseat"; this is the
+  stamp. THE SEAT STILL INVENTS — a stamp catches it, it does not cure it, and
+  reseating remains open. Saying otherwise would be the kind of green that
+  means nothing.
+
 ### 2026-09-10 — THE CITATION CHECK: a tool result is source material (operator: "citation check next" / "i think that was part of the drift system as well")
 - **HIS POINTER IS WHAT MADE THIS SMALL.** SPEC 4.3 had carried "the harder
   half; still the one real build left from sitting 82" since sitting 82, and he

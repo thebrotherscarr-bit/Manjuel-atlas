@@ -900,7 +900,13 @@ def _cmd_brief(sess: Session) -> None:
     _record_turn(sess, ctx)
 
 
-_NUM_OR_HASH = re.compile(r"(?<![\w.])([0-9a-f]{7,40}|\d[\d,]*\.?\d*)(?![\w.])")
+# CLOCK_SHAPES, _MONTHS, _NUM_OR_HASH, without_clock and _unsourced MOVED to
+# intent.py 2026-09-10 so the ENGINE can use them too: cli imports pipeline,
+# so the engine reaching back into the door would be backwards. These names
+# stay as aliases -- /brief below, tests/standup.py and the strokes all
+# import them from here and are untouched.
+from .intent import (CLOCK_SHAPES, without_clock,          # noqa: F401
+                     unsourced_numbers as _unsourced)
 
 # A DATE OR A CLOCK IS NOT A FABRICATED QUANTITY, and the guards below exist
 # for fabricated quantities. The clock reaches a seat through its brief, so a
@@ -914,48 +920,6 @@ _NUM_OR_HASH = re.compile(r"(?<![\w.])([0-9a-f]{7,40}|\d[\d,]*\.?\d*)(?![\w.])")
 # like a date, so everything caught before is still caught. A bare four-digit
 # number is deliberately NOT exempt -- 1858 is a stroke count, and 2026
 # outside a date phrase is not obviously a year.
-_MONTHS = (r"jan(?:uary)?|feb(?:ruary)?|mar(?:ch)?|apr(?:il)?|may|jun(?:e)?|"
-           r"jul(?:y)?|aug(?:ust)?|sep(?:t|tember)?|oct(?:ober)?|"
-           r"nov(?:ember)?|dec(?:ember)?")
-
-CLOCK_SHAPES = re.compile(r"""
-      \d{4}-\d{2}-\d{2}(?:[T ]\d{1,2}:\d{2}(?::\d{2})?)?      # 2026-09-09, with time
-    | \d{1,2}[/]\d{1,2}[/]\d{2,4}                              # 09/09/2026
-    | \d{1,2}:\d{2}(?::\d{2})?(?:\s*[ap]\.?m\.?)?              # 12:15, 12:15:30, 3:04 pm
-    | \b\d{1,2}\s+(?:""" + _MONTHS + r""")\b\.?(?:,?\s*\d{4})?   # 09 September 2026
-    | \b(?:""" + _MONTHS + r""")\b\.?\s+\d{1,2}(?:st|nd|rd|th)?(?:,?\s*\d{4})?
-    """, re.IGNORECASE | re.VERBOSE)
-
-
-def without_clock(text: str) -> str:
-    """`text` with every date and clock expression blanked out.
-
-    Used by both number guards -- this one and the standup's -- so the two can
-    never disagree about what a date looks like.
-    """
-    return CLOCK_SHAPES.sub(" ", text or "")
-
-
-def _unsourced(said: str, facts: str) -> list[str]:
-    """Numbers and hashes in `said` that appear nowhere in `facts`.
-
-    Small integers (0-12) are words in prose and are not judged, and
-    numbers written as a date or a clock are not judged either (see
-    CLOCK_SHAPES). Everything else is.
-    """
-    have = {m.group(1).replace(",", "").rstrip(".") for m in _NUM_OR_HASH.finditer(facts or "")}
-    out = []
-    # `facts` keeps its dates -- they are a SOURCE. Only what is judged is
-    # stripped, so the door may say the date without being called a liar.
-    for m in _NUM_OR_HASH.finditer(without_clock(said)):
-        tok = m.group(1).replace(",", "").rstrip(".")
-        if tok.isdigit() and int(tok) <= 12:
-            continue
-        if tok in have or any(tok in h or h in tok for h in have if len(tok) >= 7):
-            continue
-        if tok not in out:
-            out.append(tok)
-    return out
 
 
 def _cmd_warm(sess: Session, quiet: bool = False) -> None:

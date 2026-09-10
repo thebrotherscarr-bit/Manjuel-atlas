@@ -1097,9 +1097,12 @@ Kept so nobody re-derives them and starts.
          tool result SAID, with nothing tying it to the result. The largest
          piece left in the spec; C+D first, because a citation is only worth
          checking once the source is a source.
-    [ ]  THE DOOR INVENTS NUMBERS (SPEC 4.7). "35 for 37"; "300 to 1200
-         bytes" 2026-09-09. Intermittent, which is why a green gate is not
-         evidence it is gone.
+    [x]  THE DOOR INVENTS NUMBERS (SPEC 4.7) -- STAMPED 2026-09-10. "35 for
+         37"; "300 to 1200 bytes" 2026-09-09. recompose compares the
+         delivery's numbers with the run's tool results and stamps the
+         difference; the guard moved from cli.py to intent.py so the ENGINE
+         can use it, not just /brief. Intermittent still: a stamp catches it,
+         it does not cure it, and RESEATING IS STILL OPEN.
     [ ]  THE DOOR PARROTS. The record's labels; the previous question; an
          empty flag scaffold. Includes the mild case the new door prose
          showed on 2026-09-10 ("I can raise flags", echoed at him).

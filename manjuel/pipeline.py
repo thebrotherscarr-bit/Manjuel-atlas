@@ -2362,12 +2362,31 @@ def recompose(ctx: RunContext, report=print) -> bool:
     fails = list(getattr(ctx, "failures", ()) or [])
     partial = unread_parts(ctx)
     late = list(getattr(ctx, "out_of_time", ()) or [])
+    # A NUMBER NO TOOL RETURNED (SPEC 4.7, built 2026-09-10). The same
+    # arithmetic as the lists below, on the other half of the fault: those
+    # catch what was OMITTED, this catches what was INVENTED. Sitting 94's
+    # brief said "master@0917c6d4a, clean at open" over facts reading f1da1a4
+    # DIRTY; 2026-09-09's standup had the door report "37 markdown files,
+    # ranging from 300 to 1200 bytes in size" with 300 and 1200 in no tool
+    # result that run. The check existed and ran in ONE place, /brief, never
+    # on an ordinary turn.
+    #
+    # ONLY WHEN A TOOL RAN. With no tool results there is nothing to check
+    # against, and stamping a plain conversational answer would be sitting
+    # 27's compliment-drift again.
+    made_up = []
+    results = [r for r in (getattr(ctx, "tool_results", ()) or []) if str(r).strip()]
+    if results:
+        from .intent import unsourced_numbers
+        spoken = next((s.output for s in reversed(ctx.steps)
+                       if s.ok and (s.output or "").strip()), "")
+        made_up = unsourced_numbers(spoken, "\n".join(str(r) for r in results))
     # A SEAT THAT FAILED (the review of 2026-09-08). ctx.failures held
     # tools only; a seat cut at its bound or errored was in the toll and
     # nowhere in the delivery -- sitting 96's court said OUT OF TIME for
     # Manjuel and nothing about Jesster's 577s. Same arithmetic.
     cut = [(s.agent, s.error) for s in ctx.steps if s.error]
-    if not fails and not partial and not late and not cut:
+    if not fails and not partial and not late and not cut and not made_up:
         return False
     last = next((s for s in reversed(ctx.steps)
                  if s.ok and (s.output or "").strip()), None)
@@ -2382,6 +2401,12 @@ def recompose(ctx: RunContext, report=print) -> bool:
         ctx.steps.append(last)
 
     blocks: list[str] = []
+    if made_up:
+        blocks.append(
+            "A NUMBER NO TOOL RETURNED. These appear in the words above and in "
+            "none of this run's tool results: " + ", ".join(made_up[:8]) + ". "
+            "Dates, clock times and small numbers are not judged. Machine-"
+            "emitted by comparing the two, not a seat's account of itself.")
     if fails:
         lines = [f"NOT EVERYTHING RAN. {len(fails)} "
                  f"tool{'' if len(fails) == 1 else 's'} failed or were refused "
