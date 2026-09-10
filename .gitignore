@@ -29,9 +29,20 @@ bin/
 # worlds/ (268 of them under a vault/) entered history at e1c0ae6 and 0bfd8c4.
 # `git rm -r --cached worlds/` was run by the operator (d0d6426, 2026-09-02);
 # `git ls-files worlds/` is 0. The two old commits still hold them. The existing commits are a separate question and
-# LAW 1 cuts against rewriting them. Not an exposure while this repo has no
-# remote -- it has never had one, and pushes are gated behind
-# CHAINKIT_GIT_REMOTE.
+# LAW 1 cuts against rewriting them.
+#
+# THAT REASONING EXPIRED 2026-09-10. This line used to end "Not an exposure
+# while this repo has no remote -- it has never had one." The repo now has a
+# remote and it has been public. The CONCLUSION still holds, and it was
+# checked rather than assumed: `git rev-list --objects origin/main` finds ZERO
+# paths under worlds/, because those three commits (d0d6426, 0bfd8c4, e1c0ae6)
+# are local history that was never pushed. But it holds by fact, not by the
+# argument that used to sit here, and a safety note resting on a premise that
+# has changed is worse than no note.
+#
+# THE SAME COMMITS MAKE `git bundle --all` CARRY THE VAULT -- 240 MB against
+# 2.3 MB for `git bundle create <file> main`. Bundle the BRANCH, never --all,
+# when the bundle leaves this machine.
 worlds/
 
 # Packaging artifacts. `pip install .` / `python -m build` leave these in the

@@ -33,6 +33,16 @@ satisfy the release gate. Where to look for anything it names: BUILDMAP.md.
 Two processes and a browser. Neither starts by itself, and nothing opens a
 sitting behind you.
 
+**You need Go for this half.** The engine wants only Python and Ollama; these
+two servers are Go, built from source. QUICKSTART's "You need" is the ENGINE's
+list and does not name a Go toolchain, because nothing in the REPL wants one.
+If `go version` answers, you are ready.
+
+**And atlas is its own repository.** Since 2026-09-10 the core and atlas are
+two repos sharing one ground (`atlas/` is gitignored by the core). Cloning the
+core does NOT bring the dashboard: without atlas there is nothing here to
+build, which is what a second machine finds first.
+
 **Build them once.** Both binaries are `*.exe`, which `.gitignore` already
 covers, so they live beside their own source and never reach a commit.
 
@@ -49,7 +59,12 @@ and restart it -- editing the file on disk does nothing to a running server.
 is the only thing that spawns a Manjuel engine. It holds `127.0.0.1:8090`.
 
     cd atlas\line
-    .\atlas-mcp.exe --http 127.0.0.1:8090 --tenant research=C:/Users/novad/Desktop/Research --default-project research --manjuel "python C:/Users/novad/Desktop/Research/manjuel.py" *> mcp.log
+    .\atlas-mcp.exe --http 127.0.0.1:8090 --tenant research=<PATH-TO-YOUR-GROUND> --default-project research --manjuel "python <PATH-TO-YOUR-GROUND>/manjuel.py" *> mcp.log
+
+`<PATH-TO-YOUR-GROUND>` is the folder holding `manjuel.py` -- an ABSOLUTE
+path, forward slashes, no trailing slash. This line carried the author's own
+`C:/Users/novad/Desktop/Research` twice until 2026-09-10: it worked on exactly
+one machine and pointed at nothing on any other.
 
 `--tenant name=path` declares a world; repeat it for more. `--default-project`
 is the one the dashboard uses when you do not name another. `--manjuel` is the

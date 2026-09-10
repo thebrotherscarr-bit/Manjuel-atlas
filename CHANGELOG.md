@@ -34,6 +34,52 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE BOOTSTRAP COUNT, AND SIX DOCS THAT ONLY EVER WORKED ON ONE MACHINE
+- **THE COUNT, run on a clean clone rather than argued about.** From bare
+  machine to a booting engine: install Python and Ollama, pull the models,
+  clone, `pip install .`, `python manjuel.py`. **It booted** — sitting 1,
+  llama3.2 warmed in 3.7s, the full report printed. The engine's half of his
+  claim ("anyone can bootstrap on a semi-modern gaming PC") holds. The
+  dashboard's half did not: atlas has no remote, so it cannot be obtained at
+  all, which is what a second machine found first.
+- **THE MODEL LIST WAS A PERSONAL CONFIGURATION WEARING THE WORD "NEED".**
+  QUICKSTART opened "You need — Eight pulls", reading as a 33 GB requirement.
+  His correction: "this thing doesnt *need* 25gb of models, you can load up
+  whatever the hell you want in the slots... mine are just my custom tuned
+  ones." The floor is one pull per DISTINCT tag named in `agents/*.md` plus an
+  embedder — three or four gigabytes if the seats point at one small model.
+  Rewritten as a SHAPE with slots (a small fast door, a step up for the router
+  that must actually think, a coder if you code, an overwatch that may be slow,
+  and the embedder as the one tag you cannot improvise).
+- **VOICE: THE DOC DESCRIBED A MACHINE THAT HAD ALREADY BUILT IT.** "The
+  whisper.cpp build in `bin/` — already there, nothing to download." `bin/` is
+  gitignored (144 MB), and the faster-whisper fallback lives in a HuggingFace
+  cache under the user profile. On a fresh clone NEITHER is present: speaking
+  works, listening does not, and nothing said so.
+- **`OLLAMA_MODELS` is set to a non-default path here and was documented
+  nowhere**, so a second machine puts 33 GB somewhere the first one did not.
+- **RUNBOOK carried the author's own absolute path TWICE** in the door's start
+  command — correct on exactly one machine, silently pointing at nothing on any
+  other. Now `<PATH-TO-YOUR-GROUND>`. It also never said the dashboard half
+  needs a **Go toolchain**, which QUICKSTART deliberately does not list because
+  the ENGINE does not want one; and it now says outright that cloning the core
+  does not bring atlas.
+- **WHAT A CLONE DOES NOT HAVE is now a section of its own**, with the reason
+  each thing is absent — and it says plainly that **the first boot's RED GATE is
+  correct**: the gate refuses to call proven what YOU have not proven. It also
+  warns that `tests/last_run.json` is tracked, so the report can quote a tally
+  earned on another machine; a proof older than the code is not a proof, and a
+  proof from another machine is hearsay.
+- **`.gitignore` HELD A SAFETY ARGUMENT THAT HAD EXPIRED.** It read "Not an
+  exposure while this repo has no remote -- it has never had one." The repo now
+  has a remote and has been public. **The conclusion was CHECKED rather than
+  assumed and still holds** — `git rev-list --objects origin/main` finds zero
+  paths under `worlds/`; those three commits are local history never pushed —
+  but it holds by fact, not by the argument that sat there. The same commits
+  make `git bundle --all` carry the vault: **240 MB against 2.3 MB** for
+  `git bundle create <file> main`. Bundle the BRANCH, never `--all`.
+- Proven: 2048/2048 strokes, 60/60 smoke, BUILDMAP regenerated.
+
 ### 2026-09-10 — THE SPLIT TURNED CI RED ONE LEVEL DOWN FROM WHERE IT WAS FIXED
 - **THE FAULT.** `index_roots.txt` follows the control centre spec to
   `atlas/docs/SPEC_CONTROL_CENTER.md`, and atlas is a separate repository now —
