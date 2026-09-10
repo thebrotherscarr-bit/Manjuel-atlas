@@ -34,6 +34,40 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — TWO MORE REASONS CI COULD NEVER PASS, FOUND IN A CLEAN-CLONE MIRROR
+- **THE NUMPY FIX WORKED AND REVEALED THE NEXT ONE.** With the extra installed
+  the strokes got further and died on
+  `FileNotFoundError: SEAT_LOG.md` — `test_a_python_file_is_cut_by_definition`
+  read the RECORD to get a large markdown file, and SEAT_LOG is untracked on
+  his 2026-09-08 ruling, so it does not exist in a fresh clone. The stroke
+  never wanted that file; it wanted markdown big enough to window. It builds
+  its own now, which also frees it from a file whose size could drift.
+- **THEN I STOPPED PUSHING TO FIND OUT.** A push-and-wait loop would have taken
+  one CI run per fault. Instead: **a clean-clone mirror** — every TRACKED file
+  copied to a scratch tree (680 of them; no record, no logs, no index) and the
+  whole CI matrix run against it. That found the next fault immediately, and
+  it is one no run on his machine can ever show.
+- **`every listed root actually exists` WAS ASKING FOR MORE THAN THE ESTATE
+  PROMISES.** Four index roots are THE RECORD — `logs`, `agent_workspace`,
+  `SEAT_LOG.md`, `memory.md` — untracked by ruling. `index_roots.txt` says so
+  IN ITS OWN HEADER and always has: "NOT every root exists in a fresh clone ...
+  the indexer skips an absent root and names it." The file and the stroke
+  disagreed about the same fact, which is LAW 6's exact shape, and the file was
+  right. The stroke now asserts the REAL promise — a listed root exists, or is
+  one the estate deliberately does not ship — with the exempt set READ FROM
+  `.gitignore` (tracked, so present in any clone) rather than listed here,
+  because a second list drifts the first time a root moves.
+- **ALL SIX CI STEPS NOW PASS IN THE MIRROR:** strokes 1962/1962 (two fewer
+  than the ground, which has the record), smoke 60/60, `law --prove`,
+  `buildmap --check`, `standup --dry`, and the record audit. The mirror also
+  caught BUILDMAP as stale before CI could.
+- **A SHELL TRAP, AGAIN.** The first attempt at the markdown fix went through a
+  bash heredoc, which turned the source's escaped newline into a real one
+  inside an f-string and left the file unparseable. Written by tool the second
+  time. That is the third time this session the shell has rewritten bytes on
+  the way to a file.
+- Proven: 1964/1964 in the ground, 1962/1962 in the mirror, 60/60 smoke.
+
 ### 2026-09-10 — CI HAS NEVER BEEN GREEN, AND NOW IT CAN BE (operator: "fix the numpy CI first")
 - **30 OF 30 RUNS RED, INCLUDING THE 0.1.9 TAG.** `gh run list` shows no green
   run on record. The error is the same on all four matrix legs

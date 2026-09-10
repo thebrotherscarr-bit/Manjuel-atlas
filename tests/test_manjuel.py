@@ -4497,9 +4497,28 @@ def test_index_stays_in_research_and_off_the_keys(reg, lib, book):
     check("nothing outside Research is listed",
           not any(x.startswith(("..", "/", "C:", "~")) or "Archive" in x
                   for x in listed), str(listed))
-    check("every listed root actually exists",
-          all((ROOT / x).exists() for x in listed),
-          str([x for x in listed if not (ROOT / x).exists()]))
+    # EVERY LISTED ROOT EXISTS, OR IS ONE THE ESTATE DOES NOT SHIP. Four of
+    # them are THE RECORD -- logs, agent_workspace, SEAT_LOG.md, memory.md --
+    # untracked on his 2026-09-08 ruling, and index_roots.txt says so in its
+    # own header: "NOT every root exists in a fresh clone ... the indexer skips
+    # an absent root and names it." The stroke used to demand all of them and
+    # was therefore red in every fresh clone and every CI run that reached it,
+    # while passing on the one machine that has the record. Found 2026-09-10 in
+    # a clean-clone mirror.
+    #
+    # The exempt set is READ FROM .gitignore, which is tracked and present in
+    # any clone; a list here would drift the first time a root moved.
+    _ignored = {l.strip().rstrip("/") for l in
+                (ROOT / ".gitignore").read_text(encoding="utf-8").splitlines()
+                if l.strip() and not l.startswith("#")}
+    absent = [x for x in listed if not (ROOT / x).exists()]
+    unexplained = [x for x in absent if x.rstrip("/") not in _ignored]
+    check("every listed root exists, or is one the estate does not ship",
+          not unexplained,
+          f"absent and not gitignored: {unexplained}")
+    check("and an absent root is absent BY DESIGN, never by accident",
+          all(x.rstrip("/") in _ignored for x in absent),
+          f"absent: {absent}")
 
     # Worlds are indexed ONE AT A TIME, by name, on the operator's call.
     # This guard is stated as a PROPERTY rather than a list of his folders:
@@ -8383,7 +8402,14 @@ def test_a_python_file_is_cut_by_definition_not_by_character(reg, lib, book):
           "character windows" in out or "part 1 of" in out, out[:200])
 
     # ---- NOT FIRING: nothing else changed ----------------------------
-    md = (ROOT / "SEAT_LOG.md").read_text(encoding="utf-8")
+    # A LARGE MARKDOWN FILE, BUILT HERE. This read ROOT/"SEAT_LOG.md" --
+    # and SEAT_LOG is THE RECORD, untracked on purpose since 2026-09-08, so
+    # it does not exist in a fresh clone and the whole suite died on it in
+    # CI with FileNotFoundError. The stroke never wanted that file; it
+    # wanted markdown big enough to window. Building it makes the check
+    # deterministic and frees it from a file whose size could drift.
+    _para = "## Sitting %d" + chr(10) * 2 + "A paragraph of the record." + chr(10) * 2
+    md = "".join(_para % i for i in range(1, 400))
     mdout = windowed(md, "SEAT_LOG.md")
     check("a MARKDOWN file is untouched by any of this",
           "part 1 of" in mdout and "THIS IS NOT THE WHOLE FILE" in mdout,
