@@ -34,6 +34,40 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — A COMMIT IS NOT A TAG (operator: "the live standup is the issue ... whats the deal?")
+- **THE FAULT WAS MINE, ON THE DAY git_cycle LANDED.** Its six proofs were
+  lifted whole from `tests/release.py` — which is THE RELEASE GATE, and gates a
+  TAG. One of them demands a LIVE standup stamped after the newest edit, so
+  every commit inherited tag ceremony: any code edit staled it, and shipping
+  meant nine cases of live model work on a single rack, again and again.
+- **HE WAS RIGHT ABOUT THE COST AND WRONG ABOUT THE CAUSE, and the record
+  settled both.** It never took twenty minutes: every nine-case standup that
+  morning ran in 62–135 seconds, and across the whole record a standup is the
+  CHEAPEST thing per unit of work there is — 69 engine-seconds per run against
+  208 for sittings of two runs or fewer. What he was actually watching was this
+  hand's own wait loops. But the standup still had no business gating a commit.
+- **THE LINE IS WHAT A COMMIT INVALIDATES.** A commit changes code, so strokes
+  and smoke must be green AND fresh — those two REFUSE. A commit does not close
+  a session (DAYBOOK), does not end a day (HANDOFF), does not cut a tag (SPEC
+  against the CHANGELOG) and must never need a live rack (standup). Those four
+  are still READ and still PRINTED, marked `note` rather than `REFUSED`, with a
+  line naming them as the tag's to answer. Trading one bad gate for a blind one
+  would be no better.
+- **`tests/release.py` IS UNTOUCHED. The tag still wants all nine**, and a
+  stroke asserts that so this change cannot quietly loosen the release gate.
+- **PROVEN BY SHIPPING ITSELF THROUGH THE NEW GATE.** The standup was not
+  merely stale when this landed — it was RED (`8/9 -- failed: a question about
+  the ground`). The old gate would have refused outright; the new one reported
+  it and committed `ea31735`, verifying local against remote as always.
+- Ten strokes: only strokes and smoke are in `GATES`; the other four are still
+  read; a non-gating red is marked `note`; the release gate still names all
+  nine; and git_cycle still refuses outright with no commit message.
+- **LAW 6.** `RUNBOOK.md`'s git_cycle section now says which two gate and which
+  four only report. **This entry itself is late** — `ea31735` shipped without
+  it, which is the exact conflict LAW 6 exists to prevent, caught on the pass
+  after and written down rather than quietly backfilled.
+- Proven: 2046/2046 strokes, 60/60 smoke, BUILDMAP regenerated.
+
 ### 2026-09-10 — AN ENGINE OPEN AND DOING NOTHING IS THE MOST EXPENSIVE THING IN THE RECORD (operator: "add the line")
 - **THE MEASUREMENT, over every sitting ever recorded:**
 
