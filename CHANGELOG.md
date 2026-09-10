@@ -34,6 +34,43 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — git_cycle: the whole version-control turn, with no seat in it (operator: "the full git workflow cycle for version control ... the full CI pipeline as a skill")
+- **ZERO SEATS PAST THE GATE, his ruling and his words.** The law gate stamps
+  the objective, the work runs, and what comes back is what the tools said.
+  Nothing narrates a commit hash. Every wobble in this flow came from a model
+  narrating a mechanical act — "the commit message still raises a question
+  about untracked files", a turn that ran ZERO tools and said delivered, and
+  the push that named `git_push`, ran `git_status`, and reported success while
+  origin sat a commit behind. There is nothing for a seat to add to
+  `git commit`: the hash IS the answer.
+- **FIVE STEPS, EACH REFUSING BY NAME:** read the proofs; show what is about to
+  be committed; commit; push; VERIFY.
+- **IT READS THE SUITES' VERDICT; IT DOES NOT RUN THEM — and that is the whole
+  design constraint.** Running them means spawning python inside the engine,
+  which is MEASURED unsafe here: a first cut of the boot gate did exactly that
+  this morning and never returned (two processes blocked three minutes on 0.6
+  CPU seconds between them, no engine opened). So it asks the same six
+  file-readable checks the boot report asks — strokes, smoke, standup,
+  SPEC↔CHANGELOG, DAYBOOK, HANDOFF — and REFUSES TO SHIP on a red or STALE one.
+  buildmap, law and manifest need a child process or the rack and are named as
+  not asked, exactly as boot names them. That is not a weaker gate: shipping is
+  gated on proofs that already exist, and a proof older than the code is
+  refused by name.
+- **IT VERIFIES THE PUSH.** `git push` exiting 0 is not proof the remote moved,
+  and the fault this closes is a push that never ran while everything
+  downstream said success. `gitstate.head_and_remote` compares the local head
+  with the upstream's and BOTH SHAS ARE PRINTED — reads only, never a fetch,
+  because a fetch inside a report is a network act nobody asked for.
+- **AND IT REFUSES RATHER THAN HALF-RUNS.** No message, a red or stale proof,
+  nothing to commit, the wall shut, not a repository, or a head that did not
+  move after the commit — each stops the cycle by name, and nothing downstream
+  of a refusal runs.
+- Declared like any other skill: `skills/git_cycle.md`, a record with its wall
+  in `us/manjuel.us` (`writes: true`), the Router's clearance, and
+  WRITING_SKILLS — so the dedup's write rule and the law gate both see it for
+  what it is. The manifest agrees with the disk.
+- Proven: 1971/1971 strokes, 60/60 smoke, 39 skills on the ground.
+
 ### 2026-09-10 — A PUSH THAT REPORTED SUCCESS WITHOUT PUSHING (operator: "fix the push reporting delivered when it didn't")
 - **THE FAULT, WHOLE, FROM ONE TRANSCRIPT.**
   `logs/2026-09-10_082854_push_the_committed_work_to_the_remote.md`:

@@ -300,6 +300,25 @@ def pull(ground: Path) -> str:
     return out or "Up to date."
 
 
+def head_and_remote(ground: Path) -> tuple[str, str, str]:
+    """(local head, remote head, why the remote could not be read).
+
+    A push exiting 0 is not proof the remote moved. On 2026-09-10 a turn
+    named `git_push`, ran `git_status` instead, and reported success while
+    `origin/main` sat a commit behind -- so what a push SAYS is checked
+    against what the remote HAS. Reads only; never fetches, because a fetch
+    inside a report is a network act nobody asked for.
+    """
+    ground = Path(ground)
+    rc, local = _run(["rev-parse", "HEAD"], ground)
+    if rc != 0:
+        return "", "", "no local head"
+    rc, remote = _run(["rev-parse", "@{u}"], ground)
+    if rc != 0:
+        return local[:9], "", "no upstream is tracked"
+    return local[:9], remote[:9], ""
+
+
 def push(ground: Path) -> str:
     if not remote_allowed():
         raise GitRefused(

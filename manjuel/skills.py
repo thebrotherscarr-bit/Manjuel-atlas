@@ -333,6 +333,8 @@ REVIEW_ONLY_SKILLS = {
 # about "writers" that drifts from the writers is worse than no rule.
 WRITING_SKILLS = {
     "write_file", "remember", "embed_text", "git_commit", "git_init",
+    # git_cycle commits AND pushes; it is the most writing thing here.
+    "git_cycle",
     "index_ground", "rack_sync",
     # 2026-09-08 (the REPL read): pull and push were missing, so the
     # write-claim check refused a TRUE claim on a turn where only one of
@@ -1876,6 +1878,112 @@ def _git_push(env: SkillExecutionEnv, args: dict) -> str:
         return _git.push(env.ground)
     except _git.GitRefused as exc:
         return f"Refused: {exc}"
+
+
+@skill("git_cycle")
+def _git_cycle(env: SkillExecutionEnv, args: dict) -> str:
+    """The whole version-control turn: prove, status, commit, push, VERIFY.
+
+    ZERO SEATS PAST THE GATE (his ruling 2026-09-10). The law gate stamps the
+    objective, this runs, and what comes back is what the tools said. Nothing
+    narrates a commit hash.
+
+    IT READS THE SUITES' VERDICT; IT DOES NOT RUN THEM. Running them means
+    spawning python inside the engine, and that is measured unsafe here: a
+    first cut of the boot gate did it on 2026-09-10 and never returned -- two
+    processes blocked for three minutes, no engine opened. So the same six
+    file-readable checks the boot report asks are asked here, and a red or
+    STALE one refuses the ship. buildmap, law and manifest need a child
+    process or the rack; they are named as not asked, as boot names them.
+
+    AND IT VERIFIES THE PUSH. `git push` exiting 0 is not proof the remote
+    moved, and the fault this closes is a push that never ran while everything
+    downstream reported success. The local and remote heads are compared and
+    both are printed.
+    """
+    message = (args.get("content") or "").strip()
+    if not message:
+        return ("Refused: git_cycle needs a commit message. The message is the "
+                "one part of this a machine cannot supply -- everything else "
+                "is read from the ground.")
+
+    out = []
+
+    # ---- 1. THE PROOFS, READ ------------------------------------------
+    try:
+        import importlib.util
+        path = env.ground / "tests" / "release.py"
+        spec = importlib.util.spec_from_file_location("_release_for_cycle", path)
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        edited = mod.newest_edit(env.ground)
+        checks = list(mod.suites(env.ground, edited))
+        checks.append(mod.standup(env.ground, edited))
+        checks.append(mod.spec(env.ground, None))
+        checks.append(mod.daybook(env.ground))
+        checks.append(mod.handoff(env.ground))
+    except Exception as exc:
+        return (f"Refused: the proofs could not be read "
+                f"({type(exc).__name__}: {exc}). Nothing ships unproven.")
+
+    bad = [c for c in checks if not c.ok]
+    out.append(f"THE PROOFS  {len(checks) - len(bad)}/{len(checks)} read here "
+               f"(buildmap, law and manifest need a child process or the rack "
+               f"and are not asked from inside the engine)")
+    for c in checks:
+        out.append(f"  {'ok     ' if c.ok else 'REFUSED'} {c.name:9} {c.why}")
+    if bad:
+        return ("\n".join(out) + "\n\nREFUSED: " + ", ".join(c.name for c in bad)
+                + ". Nothing was committed and nothing was pushed.")
+
+    # ---- 2. WHAT IS ABOUT TO BE COMMITTED ------------------------------
+    st = _git.read(env.ground)
+    if not st.is_repo:
+        return "\n".join(out) + "\n\nRefused: this ground is not a git repository."
+    out.append("")
+    out.append(f"THE GROUND  {st.stamp()}")
+    if not st.dirty:
+        return ("\n".join(out) + "\n\nNothing to commit; the ground is clean. "
+                "No commit, no push.")
+
+    # ---- 3. THE COMMIT --------------------------------------------------
+    before = st.head or ""
+    try:
+        out.append("")
+        out.append("THE COMMIT")
+        out.append("  " + _git.commit(env.ground, message).replace("\n", "\n  "))
+    except _git.GitRefused as exc:
+        return "\n".join(out) + f"\n\nRefused at the commit: {exc}"
+
+    after = _git.read(env.ground)
+    if (after.head or "") == before:
+        return ("\n".join(out) + "\n\nRefused: the head did not move, so no "
+                "commit was made. Nothing was pushed.")
+
+    # ---- 4. THE PUSH ----------------------------------------------------
+    try:
+        out.append("")
+        out.append("THE PUSH")
+        out.append("  " + _git.push(env.ground).replace("\n", "\n  "))
+    except _git.GitRefused as exc:
+        return ("\n".join(out) + f"\n\nCommitted at {after.head}, NOT PUSHED: "
+                f"{exc}")
+
+    # ---- 5. VERIFY IT ACTUALLY LANDED -----------------------------------
+    # A push exiting 0 is not proof the remote moved, and a report of success
+    # that nobody checked is the fault this skill exists to end.
+    local, remote, why = _git.head_and_remote(env.ground)
+    out.append("")
+    out.append("THE PROOF IT LANDED")
+    out.append(f"  local  {local or '?'}")
+    out.append(f"  remote {remote or '?'}" + (f"   ({why})" if why else ""))
+    if not remote:
+        out.append("  ** the remote head could not be read; the push is UNVERIFIED **")
+    elif local != remote:
+        out.append("  ** THEY DISAGREE: the push did not land. **")
+    else:
+        out.append("  they agree: the work is on the remote.")
+    return "\n".join(out)
 
 
 @skill("linear_regression")

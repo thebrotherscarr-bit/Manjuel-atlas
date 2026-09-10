@@ -27,6 +27,7 @@ reason the estate can say a seat never touches the filesystem.
     "embed_text",
     "extract_facts",
     "git_commit",
+    "git_cycle",
     "git_init",
     "git_pull",
     "git_push",

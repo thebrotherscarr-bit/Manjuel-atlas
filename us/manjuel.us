@@ -293,6 +293,21 @@ other (LAW 5); now a record that lies is a finding.
 {
   "can_approve": false,
   "covenant": "1512741580b7239b",
+  "id": "git_cycle",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/git_cycle.md",
+  "us": 1,
+  "wall": "reads the suites' stamps and the repository; commits and pushes this ground, and refuses on a red or stale proof",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
   "id": "git_push",
   "kind": "skill",
   "office": "MANJUEL",
