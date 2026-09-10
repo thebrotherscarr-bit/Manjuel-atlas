@@ -34,6 +34,46 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-10 — THE TOOL-LOOP DEDUP COVERS THE RUN (operator: "finish the tool loop dedup")
+- **MEASURED FIRST.** `ran` was created INSIDE the per-seat tool loop, so every
+  seating started empty and a run that seats a tool-capable seat twice could
+  repeat a call. Across the **235 runs with tools since the dedup landed**,
+  **18 (7.7%) ran a skill more than once** — including a **doubled
+  `git_commit`**, which the dedup's own comment says it exists to kill, and
+  `index_ground` three times, which DAYBOOK session 6 records failing with
+  "UNIQUE constraint failed: docs.path: the first thread still writing".
+- **A BLANKET PER-RUN DEDUP WOULD HAVE BEEN WRONG**, and the same measurement
+  said so: `git_status x2` is in that list and is LEGITIMATE — the status
+  before a commit and after it are different facts about a changed ground.
+  Refusing the second would hand a seat a stale answer and call it a duplicate.
+- **SO A WRITE REOPENS THE READS.** `reopen_reads` drops every READ from the
+  set when a writing skill runs and KEEPS THE WRITES, so a doubled commit is
+  still refused by its own signature while status/commit/status all run. Which
+  skills write is `WRITING_SKILLS`' answer — already imported by pipeline.py; a
+  second list would drift from it, the same rule that put `is_transcript` and
+  the number guard each in one place.
+- **A BUG OF MINE, CAUGHT BY THE STANDUP AND FIXED.** Yesterday's number stamp
+  read `ctx.tool_results` — but `tool_results` is a **StepResult** field ("what
+  the tools RETURNED at this seat"), not a RunContext one, so THE CHECK SILENTLY
+  NEVER RAN IN A LIVE TURN. **The stroke passed because it SET that field on the
+  context** — a test proving its own fixture, which is the worst kind of green.
+  Found when the standup flagged an invented "196 to 1,200 bytes" and the stamp
+  was absent from the delivery. It now reads from the steps, the same read the
+  standup uses (`tests/standup.py:297`), so the two cannot disagree — and the
+  stroke builds the run the way the engine does.
+- **AND THAT FLAG WAS ITSELF A FALSE POSITIVE, checked rather than assumed.**
+  Replaying the recorded run: the `ground_list` output DOES contain 196 and
+  "1,200" (they are real file sizes), and both number guards return `[]` on that
+  data. The 07:34 red is NOT REPRODUCIBLE from the record; the 07:37 re-run was
+  9/9. Recorded as unexplained rather than explained away.
+- **LAW 6 (his, 2026-09-10): the docs move with the change.** DESIGN's guard
+  table, SPEC's dedup invariant and pipelines.md's worked example all said "in a
+  turn" and now state the run scope and the write rule. His law is recorded as
+  his ruling; SEALING IT ONTO THE CHAIN IS HIS ACT, not a hand's — SITTING LAW 6
+  is already taken (every law read before the first command), so what he stated
+  is a NEW law and needs a new link.
+- Proven: 1958/1958 strokes (9 new), 60/60 smoke, live standup 9/9, gate 9 of 9.
+
 ### 2026-09-10 — THE DOOR PARROTS: read, not built (operator: "the door parroting next")
 - **NOTHING WAS BUILT, AND THAT IS THE FINDING.** The task line names three
   shapes. The record already answers all three, and one of them must NOT be

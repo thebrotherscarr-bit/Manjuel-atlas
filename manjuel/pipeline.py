@@ -1716,7 +1716,13 @@ def run_pipeline(
             # rise to 5 without buying more duplicates: the extra hop is for
             # genuinely different work. This is arithmetic, and it covers every
             # skill -- a doubled write or a doubled commit dies here too.
-            ran: dict[tuple, str] = {}
+            # PER RUN, NOT PER SEATING (TASKS, built 2026-09-10). This was
+            # `{}` here, so a run that seats a tool-capable seat twice started
+            # empty the second time and could repeat a call. Measured across
+            # the 235 runs with tools since the dedup landed: 18 ran a skill
+            # more than once, including a doubled `git_commit` -- the exact
+            # thing the comment above says this exists to kill.
+            ran: dict[tuple, str] = ctx.ran_calls
             repeats = 0
             for hop in range(MAX_TOOL_STEPS):
                 action, args = extract_tool_call(output)
@@ -1817,6 +1823,14 @@ def run_pipeline(
                     result = skills.execute(action, args, env)
                     tool_calls.append(action)
                     ran[sig] = result
+                    # A WRITE REOPENS THE READS. The ground has moved, so a
+                    # read taken before it may legitimately be taken again --
+                    # `git_status`, `git_commit`, `git_status` is three real
+                    # facts, and it is in the measured list above. The WRITES
+                    # stay, so a doubled commit is still refused by its own
+                    # signature. Which skills write is WRITING_SKILLS' answer,
+                    # already imported here; a second list would drift from it.
+                    reopen_reads(ran, action)
                     # A read that came back in PART is stamped as it
                     # happens (note_partial_read); the recompose carries
                     # it into the delivery.
@@ -2332,6 +2346,26 @@ def _sub_runner(parent: RunContext, registry, runtime, skills, env, report):
     return sub_run
 
 
+def reopen_reads(ran: dict, action: str) -> int:
+    """A write reopens the reads. Returns how many were dropped.
+
+    When a writing skill runs the ground has moved, so a read taken before it
+    may legitimately be taken again -- `git_status`, `git_commit`,
+    `git_status` is three real facts, and it is in the measured record. The
+    WRITES stay in the set, so a doubled commit is still refused by its own
+    signature.
+
+    Which skills write is `WRITING_SKILLS`' answer, not a second list here.
+    A non-write drops nothing, so this is safe to call on every call.
+    """
+    if action not in WRITING_SKILLS:
+        return 0
+    stale = [k for k in ran if k[0] not in WRITING_SKILLS]
+    for k in stale:
+        del ran[k]
+    return len(stale)
+
+
 def recompose(ctx: RunContext, report=print) -> bool:
     """Put what actually happened back into what is delivered.
 
@@ -2375,7 +2409,17 @@ def recompose(ctx: RunContext, report=print) -> bool:
     # against, and stamping a plain conversational answer would be sitting
     # 27's compliment-drift again.
     made_up = []
-    results = [r for r in (getattr(ctx, "tool_results", ()) or []) if str(r).strip()]
+    # FROM THE STEPS, which is where tool results live. This read `ctx`
+    # directly and got nothing: `tool_results` is a StepResult field ("what
+    # the tools RETURNED at this seat"), not a RunContext one, so the check
+    # silently never ran in a live turn. The stroke passed because it SET
+    # that field on the context -- a test proving its own fixture. Found
+    # 2026-09-10 when the standup caught an invented "196 to 1,200 bytes"
+    # and the stamp was absent from the delivery. Same read the standup
+    # uses (tests/standup.py:297), so the two cannot disagree.
+    results = [str(r) for st in ctx.steps
+               for r in (getattr(st, "tool_results", None) or [])
+               if str(r).strip()]
     if results:
         from .intent import unsourced_numbers
         spoken = next((s.output for s in reversed(ctx.steps)

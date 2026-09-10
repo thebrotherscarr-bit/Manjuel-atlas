@@ -226,6 +226,13 @@ class RunContext:
     # words. Carried so the payload survives the moment of recognition --
     # before this, matching a keyword threw the rest of the sentence away.
     tool_args: dict = field(default_factory=dict)
+    # EVERY TOOL CALL THIS RUN HAS ALREADY MADE, keyed on the DECLARED
+    # arguments (sitting 77). It lives on the run, not on the seat's tool
+    # loop, because a run can seat a tool-capable seat more than once and
+    # each seating used to start empty: 18 of the 235 runs with tools
+    # since the dedup landed ran a skill twice, one of them a DOUBLED
+    # COMMIT. A write empties the READS from it -- see run_pipeline.
+    ran_calls: dict = field(default_factory=dict)
     # THE FILE THE OPERATOR NAMED, and whether it is really in the ground
     # (sitting 88, the operator: "a step that checks to see if it's even
     # viable and a returned argument"). Set by the pipeline at intent; read

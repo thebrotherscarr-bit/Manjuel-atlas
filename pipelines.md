@@ -150,7 +150,9 @@ law: chain whole (4 links, head ...)        THE LAW GATE, first on every run:
                                             checked (REFUSALS §19). A refusal
                                             here means no seat sat.
 THIS TOOL FAILED — NOTHING WAS DONE.        a skill errored or was refused
-Tool NOT re-run: git_status                 the dedup: same call twice in a turn
+Tool NOT re-run: git_status                 the dedup: same call twice in a RUN
+                                            (a WRITE reopens the reads, so a
+                                             status after a commit still runs)
 NOT EVERYTHING RAN. N tools failed...       the recompose, appended to the delivery
 note: <Seat> claimed the contents of x.md;  the claim-check: a file cited, no read
       no read ran this turn.

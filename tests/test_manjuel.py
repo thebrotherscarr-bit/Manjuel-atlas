@@ -1140,6 +1140,70 @@ def test_rack(reg, lib):
           "models installed" in quiet and "returned nothing" in quiet, quiet[:160])
 
 
+def test_the_dedup_covers_the_run(reg, lib, book):
+    """The dedup was per SEATING, not per run (TASKS, built 2026-09-10).
+
+    `ran` was created inside the per-seat tool loop, so a run that seats a
+    tool-capable seat twice started empty the second time. Measured over the
+    235 runs with tools since the dedup landed: 18 -- 7.7% -- ran a skill more
+    than once, including a DOUBLED `git_commit`, which the dedup's own comment
+    says it exists to kill.
+
+    A blanket per-run dedup would be wrong, and the same measurement says so:
+    `git_status x2` is in that list and is LEGITIMATE -- the status before a
+    commit and after it are different facts about a changed ground.
+    """
+    from manjuel.pipeline import reopen_reads
+    from manjuel.skills import WRITING_SKILLS
+
+    def ran_with(*calls):
+        return {(c, "[]"): "result" for c in calls}
+
+    # a read does not disturb anything
+    r = ran_with("git_status", "ground_read", "git_commit")
+    check("a READ reopens nothing", reopen_reads(r, "ground_read") == 0, str(r))
+    check("and the set is untouched", len(r) == 3)
+
+    # a write drops the reads and keeps the writes
+    r = ran_with("git_status", "ground_read", "git_commit")
+    dropped = reopen_reads(r, "git_commit")
+    check("a WRITE reopens the reads", dropped == 2, str(dropped))
+    check("so the same read may be taken again on a changed ground",
+          ("git_status", "[]") not in r and ("ground_read", "[]") not in r)
+    check("but the WRITE stays, so a doubled commit is still refused",
+          ("git_commit", "[]") in r, str(sorted(r)))
+
+    # the sequence the record actually contains
+    seq, seen = ["git_status", "git_commit", "git_status"], {}
+    allowed = []
+    for c in seq:
+        sig = (c, "[]")
+        allowed.append(sig not in seen)
+        seen[sig] = "result"
+        reopen_reads(seen, c)
+    check("git_status, git_commit, git_status: all three run",
+          allowed == [True, True, True], str(allowed))
+
+    # and the doubled commit the record caught, refused
+    seq, seen = ["git_commit", "git_commit"], {}
+    allowed = []
+    for c in seq:
+        sig = (c, "[]")
+        allowed.append(sig not in seen)
+        seen[sig] = "result"
+        reopen_reads(seen, c)
+    check("git_commit twice: the second is refused",
+          allowed == [True, False], str(allowed))
+
+    check("which skills write is WRITING_SKILLS' answer, not a list here",
+          "git_commit" in WRITING_SKILLS and "git_status" not in WRITING_SKILLS)
+
+    # the run, not the seating, carries it
+    ctx = RunContext(objective="x")
+    check("a run context carries the calls it has already made",
+          hasattr(ctx, "ran_calls") and ctx.ran_calls == {})
+
+
 def test_a_number_no_tool_returned(reg, lib, book):
     """SPEC 4.7: the door invents numbers, and until 2026-09-10 the check for
     it ran in ONE place -- /brief -- never on an ordinary turn.
@@ -1153,9 +1217,16 @@ def test_a_number_no_tool_returned(reg, lib, book):
 
     def turn(said, results):
         c = RunContext(objective="what is in the skills dir")
+        # THE RESULTS GO ON A STEP, not on the context. The first version of
+        # this stroke set `c.tool_results` and passed while the engine read
+        # nothing -- a test proving its own fixture. tool_results is a
+        # StepResult field; the engine and the standup both read it from the
+        # steps, so this stroke must too.
+        c.steps.append(StepResult(agent="Router", model="qwen3.5:4b",
+                                  output="Tool executed", elapsed=1.0,
+                                  tool_results=list(results)))
         c.steps.append(StepResult(agent="Steward", model="llama3.2",
                                   output=said, elapsed=1.0))
-        c.tool_results = list(results)
         return c
 
     tool = "skills/: 37 entries listed (0 folders, 37 files)"
@@ -10425,6 +10496,7 @@ def main() -> int:
     test_vram(reg, book)
     test_shared_card(reg, book)
     test_rack(reg, lib)
+    test_the_dedup_covers_the_run(reg, lib, book)
     test_a_number_no_tool_returned(reg, lib, book)
     test_an_uncited_claim_is_measured(reg, lib, book)
     test_the_corpus_is_split(reg, lib, book)

@@ -1132,7 +1132,17 @@ Kept so nobody re-derives them and starts.
          So nothing is built here, and that is the finding. The mild case of
          2026-09-10 ("I can raise flags", echoed back) is the same family and
          goes to the tally by the same ruling.
-    [ ]  THE TOOL-LOOP DEDUP is per Router sitting, not per run.
+    [x]  THE TOOL-LOOP DEDUP -- BUILT 2026-09-10. `ran` was created inside
+         the per-seat tool loop, so a run that seats a tool-capable seat
+         twice started empty the second time. Measured over the 235 runs
+         with tools since the dedup landed: 18 (7.7%) ran a skill more than
+         once, including a DOUBLED git_commit. It now lives on the run
+         (`ctx.ran_calls`), and A WRITE REOPENS THE READS -- the ground
+         moved, so git_status/git_commit/git_status is three real facts,
+         while the writes stay so a doubled commit is still refused
+         (`reopen_reads`, keyed on WRITING_SKILLS, not a second list).
+         Nine strokes. DESIGN, SPEC and pipelines.md updated to match
+         (LAW 6).
 
     MOVED OUT, deliberately, to 0.1.10 (the seal): the gate in CI, ESTATE
     LAW 2 as a gate, SITTING LAW 5 sealed, the terminator ruling, the client

@@ -276,7 +276,7 @@ in the seats, is the Router calling a tool because a tool is there).
 - A named tool whose one argument comes from the words is decided, not
   offered. Acceptance: `time_align <content>` and `semantic_search <q>`
   run first, the Router reads.
-- A prompt skill is deduped on (skill, args) and refused on empty
+- A prompt skill is deduped on (skill, DECLARED args) across the whole RUN, and refused on empty
   content; the brief's numbers are the engine's, not the door's.
 
 **P1 -- deliveries that do not match the record (0.1.7):** the number

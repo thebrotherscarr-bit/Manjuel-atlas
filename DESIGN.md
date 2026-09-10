@@ -771,8 +771,15 @@ judgement, and names itself in the record when it fires.
     THE CITATION-CHECK  a cited path+cosine that is not in this turn's search
                         results is refused; the tool output is the exhaustive
                         list, so this is arithmetic (s61)
-    THE DEDUP           an identical (skill, args) is refused, not re-run;
-                        told once, then the loop breaks (s63)
+    THE DEDUP           an identical (skill, declared args) is refused, not
+                        re-run; told once, then the loop breaks (s63; keyed on
+                        the DECLARED call since s77). It covers THE WHOLE RUN,
+                        not one seating (2026-09-10): 18 of the 235 runs with
+                        tools since it landed still ran a skill twice, one a
+                        doubled commit. A WRITE REOPENS THE READS -- the ground
+                        moved, so `git_status, git_commit, git_status` is three
+                        real facts -- while the writes stay, so the doubled
+                        commit is still refused (`reopen_reads`)
     THE SEAM            tool results and the seat's reading of them are split
                         by a named line, so a paraphrase can never read as
                         file content (s63)
