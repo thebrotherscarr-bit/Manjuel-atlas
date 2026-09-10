@@ -10772,6 +10772,48 @@ def test_doctrine():
     faults, _v = D.versions(g)
     check("two files disagreeing about the version is a fault", len(faults) == 1, faults)
 
+    # ---- the idle-engine line ---------------------------------------------
+    # 63 idle sittings cost 5.3 engine-hours for 91 runs, against a standup's
+    # 69 seconds per run, and 22 sittings were never closed at all. The record
+    # had known for weeks; nothing read it. Sitting 166 held an engine SIXTEEN
+    # MINUTES FOR ZERO RUNS while the operator watched.
+    sess = g / "sessions"
+    sess.mkdir()
+    import json as _json
+
+    def _row(n, started, ended, runs):
+        return _json.dumps({"n": n, "started": started, "ended": ended,
+                            "runs": [{} for _ in range(runs)]})
+
+    (sess / "sessions.jsonl").write_text("\n".join([
+        _row(1, "2026-09-09T08:00:00", "", 0),                    # abandoned
+        _row(2, "2026-09-09T09:00:00", "2026-09-09T09:30:00", 1),  # idle, 30m
+        _row(3, "2026-09-09T10:00:00", "2026-09-09T10:02:00", 9),  # a standup
+        _row(4, "2026-09-09T11:00:00", "2026-09-09T11:05:00", 2),  # idle, 5m
+    ]) + "\n", encoding="utf-8")
+
+    live, age, never, idle_secs, idle_runs = D.sittings(g)
+    check("a closed newest sitting is not reported open", live is None, live)
+    check("an older unclosed sitting still counts as never closed", never == 1)
+    check("only sittings of 2 runs or fewer count as idle",
+          abs(idle_secs - (30 + 5) * 60) < 1, idle_secs)
+    check("the standup's minutes are not counted as idle waste",
+          idle_secs < 40 * 60, idle_secs)
+    check("and its runs are not counted either", idle_runs == 3, idle_runs)
+
+    # THE CASE THE LINE EXISTS FOR: newest row open, no runs.
+    with (sess / "sessions.jsonl").open("a", encoding="utf-8") as fh:
+        fh.write(_row(5, "2026-01-01T00:00:00", "", 0) + "\n")
+    live, age, never, _s, _r = D.sittings(g)
+    check("an open newest sitting is reported open", live is not None)
+    check("the open sitting is the NEWEST one, not the oldest unclosed",
+          live and live.get("n") == 5, live and live.get("n"))
+    check("its age is measured, not guessed", age > 0)
+    said = D.doc_pass_report(g)
+    check("the report names an engine open and doing nothing",
+          "doing nothing" in said,
+          [l for l in said.splitlines() if "SITTING" in l])
+
     # ---- neither report writes anything -----------------------------------
     # doc_pass reads TASKS.md, and READ FIRST item 6 says no hand adds work to
     # it. A tool that could write it would be the fastest way to break that.

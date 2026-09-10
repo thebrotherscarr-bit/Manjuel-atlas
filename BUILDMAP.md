@@ -115,7 +115,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `RunContext.history_block` | 365-374 | Prior stage outputs, oldest first. |
 | def | `RunContext.slug` | 376-379 |  |
 
-### manjuel/doctrine.py — 538 lines
+### manjuel/doctrine.py — 636 lines
 
 *THE RECORD, AND WHETHER IT STILL AGREES WITH THE GROUND. Reads; never writes.*
 
@@ -131,11 +131,12 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `daybook_last` | 209-222 | The DAYBOOK's newest entry heading, and whether it was closed. |
 | def | `handoff_today` | 225-231 | Is there a HANDOFF block for today, and what is the newest one? |
 | def | `unreleased` | 234-241 | The CHANGELOG entry headings that have landed since the last tag. |
-| def | `proofs` | 244-266 | The file-readable half of the release gate, and why the rest is absent. |
-| def | `open_tasks` | 269-292 | The lines of TASKS.md that are still on the table, as (mark, text). |
-| def | `doc_pass_report` | 331-422 | WHERE THIS ESTATE STANDS, AND WHAT IS ON THE TABLE. |
-| def | `doctrine_report` | 425-523 | DOES THE RECORD STILL DESCRIBE WHAT THE SYSTEM PERFORMS? |
-| def | `main` | 525-534 | Both reports, from the command line and from atlas. Reads; never writes. |
+| def | `sittings` | 244-316 | The open sitting if there is one, and what idle engines have cost. |
+| def | `proofs` | 319-341 | The file-readable half of the release gate, and why the rest is absent. |
+| def | `open_tasks` | 344-367 | The lines of TASKS.md that are still on the table, as (mark, text). |
+| def | `doc_pass_report` | 406-520 | WHERE THIS ESTATE STANDS, AND WHAT IS ON THE TABLE. |
+| def | `doctrine_report` | 523-621 | DOES THE RECORD STILL DESCRIBE WHAT THE SYSTEM PERFORMS? |
+| def | `main` | 623-632 | Both reports, from the command line and from atlas. Reads; never writes. |
 
 ### manjuel/dotenv.py — 110 lines
 
@@ -763,7 +764,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `GroundWatch.start` | 109-134 |  |
 | def | `GroundWatch.stop` | 136-142 |  |
 
-manjuel/: 29 files, 16719 lines.
+manjuel/: 29 files, 16817 lines.
 
 ## GUARDS — by the failure that earned them
 
@@ -833,8 +834,10 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 | line | in | marker |
 |---|---|---|
 | 88 | `stale_tallies` | HIS RULING, sitting 79, after he swept six of these by hand: "No doc now |
-| 300 | `(module)` | They were skills for about an hour on 2026-09-10 and the cost landed |
-| 497 | `doctrine_report` | out.append("  His ruling, sitting 79: no doc names a suite tally, because " |
+| 255 | `sittings` | and then not using it. Sitting 74 held one thirty minutes for 2 runs, 82 |
+| 289 | `sittings` | row" and reported sitting 99 -- ABANDONED the previous day -- as open for |
+| 375 | `(module)` | They were skills for about an hour on 2026-09-10 and the cost landed |
+| 595 | `doctrine_report` | out.append("  His ruling, sitting 79: no doc names a suite tally, because " |
 
 ### manjuel/gitstate.py
 
@@ -1310,6 +1313,6 @@ its line range. The suites are the memory (HANDOFF: test discipline).
 | `test_math` | 10466-10489 | `M`, `M.MathError`, `M.cosine`, `M.linear_regression`, `M.matmul`, `M.parse_numbers`, `M.stdev`, `M.transpose`, `M.variance` |
 | `test_says_is_a_phrase_list_not_a_paragraph` | 10492-10557 | `SkillLibrary`, `SkillLibrary.load`, `parse_says` |
 | `test_the_stamp_is_not_an_edit` | 10560-10668 | `_BOOT_STAMPS`, `_H`, `_sf`, `suite_tally` |
-| `test_doctrine` | 10671-10803 | `D`, `D.dead_paths`, `D.doc_pass_report`, `D.doctrine_report`, `D.living`, `D.open_tasks`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_SL`, `_SL.load` |
-| `test_record_and_git` | 10806-10910 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
+| `test_doctrine` | 10671-10845 | `D`, `D.dead_paths`, `D.doc_pass_report`, `D.doctrine_report`, `D.living`, `D.open_tasks`, `D.sittings`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_SL` |
+| `test_record_and_git` | 10848-10952 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
 

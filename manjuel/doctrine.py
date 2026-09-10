@@ -241,6 +241,81 @@ def unreleased(ground: Path) -> list[str]:
             for ln in m.group(1).splitlines() if ln.startswith("### ")]
 
 
+def sittings(ground: Path) -> tuple[dict | None, float, int, float, int]:
+    """The open sitting if there is one, and what idle engines have cost.
+
+    THE MEASUREMENT THIS EXISTS FOR, taken 2026-09-10 across the whole record:
+
+        standup (>=9 runs)   58 sittings   14.9 engine-hours   775 runs    69 s/run
+        working  (3-8 runs)  23 sittings    3.8 engine-hours   112 runs   122 s/run
+        idle     (0-2 runs)  63 sittings    5.3 engine-hours    91 runs   208 s/run
+
+    A standup gets THREE TIMES more work per engine-second than anything else;
+    it was never the expensive thing. The expensive thing is booting an engine
+    and then not using it. Sitting 74 held one thirty minutes for 2 runs, 82
+    held one fifty-four minutes for 5, and 166 held one SIXTEEN MINUTES FOR
+    ZERO -- that last was this hand, while the operator watched.
+
+    Twenty-two sittings were never closed at all.
+
+    `sessions.jsonl` has known all of this for weeks and NOTHING READ IT. The
+    operator's word: "add the line." It is one line, and it would have caught
+    this hand today.
+
+    A closing line supersedes an opening one, so the file is folded by `n`
+    before anything is counted -- reading it as a flat list would report every
+    closed sitting as open.
+    """
+    import json as _json
+
+    path = Path(ground) / "sessions" / "sessions.jsonl"
+    if not path.is_file():
+        return None, 0.0, 0, 0.0, 0
+    seen: dict = {}
+    for line in read(path).splitlines():
+        if not line.strip():
+            continue
+        try:
+            r = _json.loads(line)
+        except ValueError:
+            continue
+        seen[r.get("n")] = r
+
+    import datetime as _dt
+
+    live, never, idle_secs, idle_runs, age = None, 0, 0.0, 0, 0.0
+
+    # ONLY THE NEWEST SITTING CAN BE OPEN. A first cut took "the last unclosed
+    # row" and reported sitting 99 -- ABANDONED the previous day -- as open for
+    # 1,698 minutes. An older unclosed row is a sitting nobody ever tolled, not
+    # an engine standing right now, and the two need different words. This is
+    # the rule CLAUDE.md states: the LAST line without `ended` is the lock.
+    newest = max(seen) if seen else None
+    if newest is not None and not seen[newest].get("ended"):
+        live = seen[newest]
+
+    for r in seen.values():
+        runs = len(r.get("runs") or ())
+        if not r.get("ended"):
+            never += 1
+            continue
+        try:
+            a = _dt.datetime.fromisoformat(r["started"])
+            b = _dt.datetime.fromisoformat(r["ended"])
+        except (KeyError, ValueError):
+            continue
+        if runs <= 2:
+            idle_secs += (b - a).total_seconds()
+            idle_runs += runs
+    if live:
+        try:
+            age = (_dt.datetime.now()
+                   - _dt.datetime.fromisoformat(live["started"])).total_seconds()
+        except (KeyError, ValueError):
+            age = 0.0
+    return live, age, never, idle_secs, idle_runs
+
+
 def proofs(ground: Path) -> tuple[list, str]:
     """The file-readable half of the release gate, and why the rest is absent.
 
@@ -373,6 +448,29 @@ def doc_pass_report(ground: Path) -> str:
     in_hand = sum(1 for m, _ in tasks if m == "[~]")
     out.append(f"  TASKS      {len(tasks)} on the table"
                + (f" ({in_hand} in hand)" if in_hand else ""))
+
+    # THE LINE. An engine that is open and doing nothing is the most expensive
+    # thing in this record -- 63 idle sittings cost 5.3 engine-hours for 91
+    # runs, against a standup's 69 seconds per run -- and nothing has ever read
+    # sessions.jsonl to say so. An open sitting with no runs is named outright,
+    # because that is the shape the fault takes every time.
+    live, age, never, idle_secs, idle_runs = sittings(ground)
+    if live:
+        runs = len(live.get("runs") or ())
+        mins = age / 60.0
+        line = (f"  SITTING    {live.get('n')} OPEN — {mins:.0f} min, "
+                f"{runs} run{'' if runs == 1 else 's'}")
+        if runs == 0 and mins >= 5:
+            line += "   ** an engine open and doing nothing **"
+        elif runs and age / runs > 300:
+            line += f"   ** {age / runs / 60:.0f} min per run **"
+        out.append(line)
+    else:
+        out.append("  SITTING    none open")
+    if never or idle_secs:
+        out.append(f"             {never} never closed · {idle_secs / 3600:.1f} "
+                   f"engine-hours in sittings of 2 runs or fewer "
+                   f"({idle_runs} runs)")
 
     # ---- 2. THE REPO ----------------------------------------------------
     out.append("")

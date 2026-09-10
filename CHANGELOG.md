@@ -34,6 +34,41 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — AN ENGINE OPEN AND DOING NOTHING IS THE MOST EXPENSIVE THING IN THE RECORD (operator: "add the line")
+- **THE MEASUREMENT, over every sitting ever recorded:**
+
+        standup (>=9 runs)   58 sittings   14.9 engine-hours   775 runs    69 s/run
+        working  (3-8 runs)  23 sittings    3.8 engine-hours   112 runs   122 s/run
+        idle     (0-2 runs)  63 sittings    5.3 engine-hours    91 runs   208 s/run
+
+  A standup gets THREE TIMES more work per engine-second than anything else —
+  it was never the expensive thing. Booting an engine and then not using it is.
+  Sitting 74 held one thirty minutes for 2 runs, 82 held one fifty-four minutes
+  for 5, and **166 held one sixteen minutes for ZERO** — that last was this
+  hand, today, while he watched. Twenty-two sittings were never closed at all.
+- **`sessions.jsonl` HAS KNOWN ALL OF THIS FOR WEEKS AND NOTHING READ IT.** The
+  file records every open, every toll and every run; no report has ever asked
+  it the one question it can answer. `doc_pass` now names an open sitting, its
+  age and its run count, and says outright when an engine is open and doing
+  nothing.
+- **ONLY THE NEWEST SITTING CAN BE OPEN.** A first cut took "the last unclosed
+  row" and reported sitting 99 — abandoned the previous day — as open for 1,698
+  minutes. An older unclosed row is a sitting nobody tolled, not an engine
+  standing now; the two get different words. That is the rule CLAUDE.md states.
+- **WHAT THE SAME DIG SETTLED ABOUT THE STANDUP** (his question: "it takes like
+  20 minutes now versus like 45 seconds before"): it does not. Every nine-case
+  standup this morning ran in 62-135 seconds. The covenant case did drift from
+  ~33s to ~60s in one window, and the cause was CONTENTION, not the engine —
+  same tool count, MORE thinking, fewer tokens per second, because this hand
+  was running full stroke suites **five times in six minutes**, interleaved
+  with live standups, on the same box. The rack was fighting the tests.
+- Ten strokes: a closed newest sitting is not called open; an older unclosed
+  one still counts as never-closed; only sittings of two runs or fewer count as
+  idle; a standup's minutes and runs are excluded; the open sitting is the
+  NEWEST row, not the oldest unclosed one; and the report says "doing nothing"
+  when it should.
+- Proven: 2036/2036 strokes, 60/60 smoke, BUILDMAP regenerated.
+
 ### 2026-09-10 — THE CORE AND ATLAS ARE TWO REPOSITORIES (operator: "two smaller repos, one for the core and one for atlas ... they are two seperate systems that are symbiotic")
 - **THE DISK ALREADY AGREED WITH HIM.** atlas was **509 of this repository's
   682 tracked files — three quarters of the ground** — carrying its own
