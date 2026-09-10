@@ -208,8 +208,9 @@ knows Ollama; nothing else knows either.**
                       class and function with line ranges; every guard by
                       the sitting that earned it; every stroke and what it
                       touches. `--check` in CI refuses a stale map.
-    tests/standup.py  LANDED 2026-09-04. The seats through ten fixed
-                      objectives, live, with mechanical expectations and a
+    tests/standup.py  LANDED 2026-09-04. The seats through nine fixed
+                      objectives (the court split out 2026-09-09, --court),
+                      live, with mechanical expectations and a
                       reviewable report; a sitting opened and tolled. The
                       first live run (sitting 86) found four things in
                       six minutes. `--dry` proves the harness in CI.

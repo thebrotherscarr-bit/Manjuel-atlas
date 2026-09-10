@@ -182,13 +182,32 @@ corrections, the interrupt, the spoken cap.
     python tests/standup.py --dry     the standup harness itself, on a stub
 
     LIVE, the operator's terminal only (models, VRAM, a sitting opened):
-    python tests/standup.py           the seats through the standup set;
-                                      report to logs/standup_<stamp>.md,
-                                      toll paid, run_history appended as
-                                      suite "standup". Expectations are
-                                      mechanical (a tool ran, a gate fired,
-                                      no markup in a delivery); the prose is
-                                      the reviewer's judgement.
+    python tests/standup.py           the MORNING SET: nine cases, ~90s,
+                                      unattended. Report to
+                                      logs/standup_<stamp>.md, toll paid,
+                                      run_history appended as suite
+                                      "standup". Expectations are mechanical
+                                      (a tool ran, a gate fired, no markup in
+                                      a delivery); the prose is the
+                                      reviewer's judgement.
+
+    python tests/standup.py --court   the court alone: six seats, the big
+                                      models, minutes. Split out 2026-09-09.
+    python tests/standup.py --all     both sets.
+
+    ONLY A WHOLE MORNING SET IS WRITTEN AS "standup". A partial run (--court,
+    or --only naming fewer) is recorded as "court" or "partial", because
+    release.py reads the newest "standup" line and asks whether it is live
+    and green -- a green 1/1 from one case would satisfy a gate that never
+    measured it.
+
+    python tests/release.py --check   the nine-check release gate. Six of the
+                                      nine are also read at every boot and
+                                      printed under GATE in the boot report;
+                                      buildmap, law and manifest are not
+                                      asked there (they spawn a process or
+                                      dial the rack, and boot is a door being
+                                      opened under somebody).
 
     python -m manjuel.us             the MANIFEST reconciled to the code
     python tests/audit_record.py      the RECORD swept for refused shapes

@@ -8,11 +8,23 @@ seat's account of what it did is testimony (LAW 5); the file is the fact.
 Run everything below from `Desktop\Research`.
 
 **The morning, in one command.** `python tests\standup.py` runs the seats
-through ten fixed objectives on the live rack, opens and tolls a sitting,
-and writes `logs\standup_<stamp>.md`. Read REVIEW THESE FIRST, then the
-deliveries; write what feels off in TASKS.md. `--only <name>` runs one
-case; `--dry` runs the harness on a stub with no models. Where to look
-for anything it names: BUILDMAP.md.
+through nine fixed objectives on the live rack, opens and tolls a sitting,
+and writes `logs\standup_<stamp>.md`. About ninety seconds, and it runs
+unattended. Read REVIEW THESE FIRST, then the deliveries; write what feels
+off in TASKS.md.
+
+    --court    the court alone: six seats, deepseek-r1 and gemma4, minutes.
+               Out of the morning set on his ruling 2026-09-09 -- it was 73%
+               of the run, and the only case that could not finish without a
+               terminal (a failed seat there asks `retry / skip / abort?`).
+    --all      both sets.
+    --only <name>   the cases whose name contains it, the court included --
+                    naming one is asking for it.
+    --dry      the harness on a stub, no models.
+
+Only a run of the WHOLE morning set is written to the record as suite
+"standup"; anything less is "court" or "partial", so a one-case run cannot
+satisfy the release gate. Where to look for anything it names: BUILDMAP.md.
 
 ---
 
@@ -247,7 +259,7 @@ operator's act, not a hand's.
 
 ## Before a tag: the release gate
 
-    python tests\release.py --check v0.1.5
+    python tests\release.py --check 0.1.8
 
 One command, run ON YOUR TERMINAL before every tag, that refuses by name:
 the suites green and stamped after the newest edit; buildmap clean; the

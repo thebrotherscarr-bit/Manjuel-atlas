@@ -34,6 +34,52 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — THE DOCS SAY WHAT THE BUILD IS, AT 0.1.8 (operator: "review all the docs within the research dir and update everything with the latest state of the build. 0.1.8")
+- **`__version__` 0.1.7 → 0.1.8**, on his word. `python manjuel.py --version`
+  reports it; the banner and the door read the same constant. THE TAG IS STILL
+  HIS (RULE 6), and the CHANGELOG's Unreleased block stays Unreleased until he
+  cuts it — this file's own rule: "everything after the last one is Unreleased
+  and is the next checkpoint once the operator tags it."
+- **EVERY LINE MEASURED AGAINST THE DISK, never memory.** The standup's case
+  list parsed from tests/standup.py; PROTOCOL 1's surface parsed from serve.py;
+  the tool count parsed from tools.go.
+- **The standup is nine, and the docs said ten.** README, RUNBOOK and BUILDPATH
+  all carried "ten fixed objectives" from before this morning's split. Now nine,
+  ~90s, unattended — with the court named as its own ask. RUNBOOK and TESTING
+  also carry the flags (`--court`, `--all`, `--only`, `--dry`) and THE
+  SUITE-NAME RULE, which nothing documented: only a whole morning set is written
+  to the record as "standup", so a one-case run cannot satisfy the release gate.
+- **PROTOCOL 1 had outgrown its own spec.** `SPEC_CONTROL_CENTER` said "takes
+  four commands" and "4 commands in, 17 events out". Parsed from serve.py:
+  **5 commands** (objective, answer, listen, cancel, close), **19 events**,
+  **6 terminal**. `listen` landed with the mic and the doc never followed.
+- **atlas's docs claimed 25 tools; the registry serves 72.** Fixed in README,
+  DELIVERABLE, docs/ACCEPTANCE and docs/PIPELINES. `atlas/CHANGELOG.md` keeps
+  its 25 — it was true the day it was written, and the record is folded, never
+  rewritten (LAW 1).
+- **TESTING now documents the release gate**, including which six of its nine
+  are read at boot and why the other three are not (they spawn a process or dial
+  the rack, and boot is a door being opened under somebody).
+- RUNBOOK's gate example named `v0.1.5`; it names the version being cut.
+- **THE GATE PASSES 9 OF 9**, exit 0: strokes 1915/1915, smoke 60/60, buildmap
+  matching, standup 9/9 live, law 9 strokes, manifest agreeing, spec 23
+  section-4 lines, daybook closed, handoff dated. The tag may be cut — by him.
+- **REPORTED, NOT TOUCHED — two things a hand must not decide:**
+  - **SPEC section 4 still has NINE OPEN lines**, and BUILDPATH's own ladder
+    defines 0.1.8 as "the seal ... SPEC section 4 with no OPEN line". By the
+    record's own definition this build is not that yet. A status there is his
+    ruling on whether a thing is done; a hand flipping one to MET to make a
+    version look finished is the worst edit available in this ground.
+  - **THE STANDUP'S FAULT IS INTERMITTENT, and a green gate does not mean it is
+    gone.** The 16:53 run failed "a folder": the seat reported the skills dir
+    holds "37 markdown files, ranging from 300 to 1200 bytes in size" while 300
+    and 1200 appeared in NO tool result. The 17:10 run, same objective and same
+    seat, passed. Same fabrication class as TASKS' open line ("the door invents
+    numbers (35 for 37; 34 for 37)"), and it is a coin-flip, not a fixed fault.
+    The gate is green because the newest live run was; that is what the gate
+    measures, and it is worth knowing it is not the same as the fault being out.
+
+
 ### 2026-09-09 — THE COURT LEAVES THE MORNING STANDUP (operator: "split it, the court is used for parity and larger discussing either way, it doesnt need to be in the boot path")
 - **MEASURED FIRST**, from sitting 117's report: nine cases **65.5s** total, all
   on the `default` pipeline (Router `qwen3.5:4b` + Steward `llama3.2`), three of

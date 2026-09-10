@@ -24,8 +24,9 @@ The suites are offline and stubbed: no rack, no network, no GPU, no
 model. `python tests/test_manjuel.py && python tests/smoke_cli.py`
 runs anywhere, and CI runs them (with the law's prover, the build map's
 check and the standup's dry run) on Windows and Ubuntu on every push.
-`python tests/standup.py` is the live one: the seats through ten fixed
-objectives on your rack, a report to read.
+`python tests/standup.py` is the live one: the seats through nine fixed
+objectives on your rack in about ninety seconds, a report to read. The
+court -- six seats, the big models, minutes -- is `--court`, on its own.
 
 ## What a turn looks like
 
