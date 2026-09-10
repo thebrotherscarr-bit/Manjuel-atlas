@@ -1222,3 +1222,60 @@ minimum line, that's our fourth line, that's the a-c jump we needed.
 just tiny-recursive loops instead of massive ones"; on the turn bound:
 "yea, that's fine" (600 on the turn); on parity: "not run often ... just
 for measurement between models when the 'new batch' comes out".
+
+## Session 7 — 2026-09-09 (Wednesday), sittings 112–124, the glass and the gate
+
+**Standing** — follows session 6 (2026-09-08), which closed at `baa4f32c` with
+the seat bound built. Today was his: the docs reconciled to one name, the
+launchpad made to tell the truth, Records built, the estate indexed, the release
+gate wired into boot, the standup split, and the version moved to 0.1.8.
+
+**Version** — git: `main@031b62e` at close; `__version__` 0.1.8. THE TAG IS NOT
+CUT; the gate passes 9 of 9 and the cutting is his (RULE 6).
+
+**Every act went through the panel, not the shell.** Boot, commit, push and
+close-sitting were clicked in atlas; the law gate stamped each one, and every
+commit body carries its sitting id. His ruling and the reason: "DO NOT tell me
+to manually type anything in, that is the atlas job, for the last damn time."
+
+**Sittings 112–124, all closed and tolled.** One orphan, repaired: 118 was
+opened by a boot that a first-cut release gate WEDGED — it spawned subprocesses
+inside the engine and never returned — and killing the blocked processes left
+its opening line standing. Closed by appending, never by editing what was
+written. It is the 14th gap in SEAT_LOG and it is honest.
+
+**What the day FOUND, as opposed to what it built.** Four faults measured
+rather than guessed: the launchpad rendered once and never again (which is why
+he read a closed sitting off it an hour later); `proofs` was fetched by that
+same page and thrown away; 11 of 24 root documents were in no index root, SPEC
+among them, so a seat asked what DONE means could not retrieve the file that
+says; and the webapp served its own JavaScript with no ETag, no Last-Modified
+and no Cache-Control, so an open tab kept the same bytes across four rebuilds.
+
+**His rulings tonight, on SPEC section 4.** 4.3 rack_report facts only. 4.2
+phrases for the door, keywords for the Router — "that's what the chat/router
+gating is for". 4.5 the SEAT_LOG note stops carrying an OPEN status. All three
+recorded; none built.
+
+**MY OWN FAULT, RECORDED BECAUSE IT REACHED THE RECORD.** Three files were
+written by handing a newline= argument to write_text on content that already
+carried its terminator. That translates the line feed of every existing pair a
+SECOND time and leaves a carriage return doubled on every line. SPEC.md,
+SPEC_CONTROL_CENTER.md and HANDOFF.md were doubled throughout; SPEC.md twice
+over, so one repair pass was not enough. The MIXED guard I ran all day CANNOT
+SEE THIS: a doubled ending still counts one pair per line feed. Two of the three
+reached pushed commits (62a889c, 031b62e). Repaired in the working tree by
+replacing until stable, and committed forward — the history keeps its blobs,
+because rewriting history is the thing this estate refuses. The lesson is one
+line: APPEND BYTES using the file's own terminator, and never hand a newline=
+argument content that already has one.
+
+**At close** — git: `main@031b62e` plus tonight's repair and handoff. Strokes
+1915/1915, smoke 60/60, law chain whole at 4 links / 9 strokes, BUILDMAP
+matching, index 995 documents over 39 roots, release gate 9 of 9, sittings
+112–124 closed and tolled with none open. **Next session:** the two rulings that
+are now builds — 4.3 rack_report facts-only (smallest), then 4.2 phrases for the
+door — and after them the citation check, the largest thing left in the spec.
+Still his: sealing SITTING LAW 5 onto the chain (it is written in
+law/SITTING_LAWS_2.md, but the chain seals four files and that is not one of
+them), the terminator ruling, and the client token's last two places.

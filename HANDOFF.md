@@ -721,6 +721,100 @@ carried `worlds/tbc/vault` in seven old commits is kept as
 `pre-strip-master` and is NOT what is published; the published line is the
 clean one. Do not force-push `pre-strip-master`.
 
+
+### THE EVENING OF 2026-09-09 — where it stands for the night
+
+**The ground.** `main@031b62e`, version **0.1.8** (`__version__`; the TAG is
+still his, RULE 6). Strokes 1915/1915, smoke 60/60, law chain whole at 4
+links / 9 strokes, BUILDMAP matching, index **995 documents / 6593
+passages** over **39 roots**. **THE RELEASE GATE PASSES 9 OF 9** — the tag
+may be cut.
+
+**Sittings 112–124 are all closed and tolled.** One orphan happened and was
+repaired: 118 was opened by a boot that a first-cut release gate WEDGED (it
+spawned subprocesses inside the engine and never returned), and killing the
+blocked processes left its opening line standing. Closed by APPENDING a closing
+line through `seatlog.close_sitting` + `record`, never by editing what was
+already written. That gap is the 14th in SEAT_LOG's count and it is honest.
+
+**What landed today, in order.**
+
+    the docs        reconciled to Manjuel and atlas -- 180 lines, three
+                    guarded passes, 80 law-chain lines left whole, the sealed
+                    law and the record untouched. A live wall divergence found
+                    on the way: rack_pull was gated on two different dials
+                    with two different truthiness. One reading now.
+    the launchpad   it rendered ONCE and never again -- which is why it showed
+                    him a sitting that had closed an hour earlier. Repaints
+                    every 15s, pauses hidden, and confesses its own age past a
+                    minute. The suites' verdict, which that page already
+                    fetched and threw away, now reaches the brief.
+    Records         a sidebar tab under Evals. The sittings, the proof cards
+                    and the standup logs moved off Dashboard and Evals; a new
+                    read-only `records` tool serves **140 documents in 7
+                    kinds** with sha256 receipts. The engine card moved to the
+                    top of the dashboard; the Chat "no engine" pill came off.
+    the index       11 of 24 root documents were in NO index root -- SPEC.md
+                    among them, so a seat asked what DONE means could not
+                    retrieve the file that says. 17 roots -> 39;
+                    828 -> 995 documents.
+    the gate        `tests/release.py` was a nine-check gate called by NOTHING.
+                    Now read at every boot and printed under GATE -- six of
+                    the nine, the ones that read a file, in 0.058s. The other
+                    three spawn a process or dial the rack and are NAMED as
+                    not asked, because boot is a door being opened under him.
+    the standup     the court split out on his ruling: nine cases, ~90s,
+                    UNATTENDED, where before every scheduled run died on the
+                    court's failure prompt. A partial run can no longer wear
+                    the name "standup" and satisfy the gate.
+    the docs, 0.1.8 the standup was ten and said ten; PROTOCOL 1 had outgrown
+                    its own spec (4 commands / 17 events -> 5 / 19 / 6
+                    terminal); atlas claimed 25 tools and serves 72.
+    SPEC section 4  every one of the nine OPEN lines re-measured against the
+                    disk. Measurement closed 4.1 and narrowed three more.
+
+**Everything landed through the panel, not the shell.** Boot, commit, push and
+close-sitting were clicked in atlas; the law gate stamped each one and every
+act is a run in the record, with the sitting id in the commit body.
+
+**WHAT IS WAITING ON HIM.** SPEC section 4, after tonight's rulings:
+
+    RULED, NOT BUILT   4.3 rack_report facts-only. He ruled it tonight; the
+                       change is not made.
+    HIS, STILL         4.4 SITTING LAW 5 sealed. It IS written -- law 5 of
+                       law/SITTING_LAWS_2.md -- but the chain seals FOUR
+                       files (FOUNDING, THE_TWELVE, ESTATE_LAWS,
+                       SITTING_LAWS) and SITTING_LAWS_2 is not one of them.
+                       Sealing it is a DIRECT by the operator.
+    HIS, STILL         4.5 the terminators (528 LF / 84 CRLF / 4 MIXED --
+                       three of the four MIXED are atlas goldens; the fourth,
+                       tests/run_history.jsonl, is the only defect).
+    HIS, STILL         4.5 the client token's last two places: sessions.jsonl
+                       (24) and the git pack. 0 log filenames now, 0 indexed.
+    HIS ASK, CONFLICTED  4.5 "sorted and numbered" -- sorting SEAT_LOG is
+                       rewriting it (LAW 1). Proposed: a generated index
+                       beside it, regenerated like BUILDMAP.
+
+**THE BUILDS LEFT, unstarted, in the order I would take them.**
+
+    1. 4.3 rack_report facts only -- he has ruled it; smallest of the three.
+    2. 4.2 phrases for the door, keywords for the Router. The door is STEWARD
+       on llama3.2, and handing it a bare list of tool keywords is the
+       provocation it answers with a tool call.
+    3. 4.3 the citation check -- a claim about what a tool result SAID with
+       nothing tying it to the result. "The harder half; still the one real
+       build left from sitting 82." The largest thing left in the spec.
+    4. 4.4 ESTATE LAW 2 as a gate (the `ground` jail still contains
+       `worlds/`); LAWS 3 and 4 have no mechanism.
+
+**ONE THING NOT TO MISREAD.** The gate is green and the fault it refused on an
+hour earlier is INTERMITTENT. At 16:53 the standup's `a folder` case had
+Steward (llama3.2, the door) report "37 markdown files, ranging from 300 to
+1200 bytes in size" with 300 and 1200 in no tool result; at 17:10 the same
+objective through the same seat passed. The count was right, the range
+invented. A green gate says the newest live run was green. It does not say the
+door has stopped inventing numbers.
+
 ## HANDOFF FOR 2026-09-08 — read this before anything below it
 
 **Newest first (12:45–): 0.1.6 IS BUILT but for his seal. THE STORY:

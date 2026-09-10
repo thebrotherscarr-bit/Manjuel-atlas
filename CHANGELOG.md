@@ -34,6 +34,48 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-09 — THE NIGHT'S HANDOFF, HIS THREE RULINGS, AND A FAULT OF MINE THAT REACHED THE RECORD
+- **HIS RULINGS ON SPEC section 4, recorded; none built.** §4.3 `rack_report`
+  FACTS ONLY unless a judgement is asked for. §4.2 PHRASES FOR THE DOOR,
+  KEYWORDS FOR THE ROUTER — "that's what the chat/router gating is for". §4.5
+  the SEAT_LOG numbering note stops carrying an OPEN status.
+- **§4.5's second half carries a conflict, named rather than obeyed.** He asked
+  that SEAT_LOG "be sorted and numbered". Its own second line is "Append below;
+  never rewrite above", so sorting the FILE is rewriting the record — the one
+  thing LAW 1 forbids, and the reason that note exists. Proposed instead, not
+  built: a GENERATED INDEX beside it, every heading read out of SEAT_LOG.md,
+  sorted, gaps and duplicates marked, regenerated like BUILDMAP so it cannot
+  drift. The log stays append-only; the sorted view is derived.
+- **§4.4, corrected mid-answer.** SITTING LAW 5 IS written — law 5 of
+  `law/SITTING_LAWS_2.md` — and I nearly reported the line closed on the
+  filename alone. The chain seals FOUR files (FOUNDING, THE_TWELVE,
+  ESTATE_LAWS, SITTING_LAWS) and SITTING_LAWS_2 is not one of them. Written is
+  not sealed; sealing it is a DIRECT by the operator, exactly as the line says.
+- **The door is STEWARD on llama3.2** (default: Steward → Router when
+  needs_tool → Steward when worked), which is why §4.2 and §4.7 are the same
+  seat: the one that greets and the one that closes is the one being handed a
+  bare list of tool keywords, and the one that invented a byte range today.
+- **DAYBOOK Session 7 and the evening block of HANDOFF are written**, with the
+  ground's state at close, what landed in order, what the day FOUND rather than
+  built, and what is waiting on him.
+- **A FAULT OF MINE, AND IT REACHED TWO PUSHED COMMITS.** Three files were
+  written by handing a `newline=` argument to `write_text` on content that
+  already carried its terminator — which translates the line feed of every
+  existing pair a SECOND time and doubles the carriage return on every line.
+  `SPEC.md`, `SPEC_CONTROL_CENTER.md` and `HANDOFF.md` were doubled throughout,
+  SPEC.md twice over so one repair pass was not enough. **THE MIXED GUARD I RAN
+  ALL DAY CANNOT SEE THIS**: a doubled ending still counts one pair per line
+  feed, which is why it passed every check I made. `62a889c` and `031b62e` carry
+  it. Repaired in the working tree by replacing until stable and committed
+  FORWARD — the history keeps its blobs, because rewriting history is what this
+  estate refuses. And the prose describing the fault reproduced it once before
+  it was written safely. The rule, one line: **append BYTES with the file's own
+  terminator; never hand `newline=` content that already has one.**
+- Proven after the repair: 0 doubled endings anywhere in the tracked tree, all
+  four record files CRLF clean, 1915/1915 strokes, 60/60 smoke, release gate
+  9 of 9.
+
+
 ### 2026-09-09 — SPEC SECTION 4 SAYS WHAT THE DISK SAYS (operator: "then finish up spec 4")
 - **WHAT FINISHING COULD AND COULD NOT MEAN.** Four of the nine OPEN lines say
   IN THE LINE ITSELF that the decision is his, and one says it is a record note
