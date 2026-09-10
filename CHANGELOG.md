@@ -34,6 +34,32 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — CI IS GREEN ON ALL FOUR LEGS, AND THE WORKFLOW ITSELF AUDITED
+- **GREEN.** windows 3.10, windows 3.13, ubuntu 3.10, ubuntu 3.13 — the first
+  green run this repository has had. It took FIVE stacked faults: numpy absent,
+  a stroke reading the untracked record, a stroke demanding roots the estate
+  does not ship, my own LAW 6 stroke needing 3.11 on a 3.10 matrix, and the
+  jail answering in two spellings of one path.
+- **THEN THE WORKFLOW FILE ITSELF, audited rather than assumed good.** Two
+  faults in it:
+  - **ITS HEADER HAD GONE STALE.** It still told the "one dependency, ollama
+    only" story after numpy was added. That header is where a stranger learns
+    what "NO RACK, NO NETWORK, NO GPU, NO MODEL" actually covers, so it now
+    names both installs and says why numpy is a LIBRARY and not a model — the
+    offline promise is untouched. LAW 6.
+  - **NOTHING CANCELLED A SUPERSEDED RUN.** Every push started a four-leg
+    matrix and the old one kept going: five pushes in half an hour meant twenty
+    jobs, most proving commits already replaced. `concurrency` keyed on the ref,
+    cancel-in-progress.
+- **THREE THINGS LEFT ALONE DELIBERATELY**, each with its reason: `fail-fast:
+  false` stays, because one red leg must not hide the others — that is how
+  "Windows only" was diagnosed today; `continue-on-error` stays on the record
+  audit, because its own comment earns it (the corpus is ambient, so an
+  assertion over it goes red because someone ran the CLI); and the release gate
+  stays OUT of CI, because it cannot go in wholesale — its standup check
+  demands a LIVE run with real models.
+- Proven: 1965/1965 strokes, 60/60 smoke, gate 9 of 9, and the matrix itself.
+
 ### 2026-09-10 — THE JAIL ANSWERED IN TWO SPELLINGS, AND ONLY WINDOWS COULD SEE IT
 - **THE LAST RED LEG.** `escape collapses to basename inside the jail`, failing
   on both Windows Pythons while BOTH UBUNTU LEGS PASSED — the first green

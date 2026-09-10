@@ -6,10 +6,20 @@
 # meant a stranger had to take the guards on faith.
 #
 # NO RACK, NO NETWORK, NO GPU, NO MODEL. Every model call in both suites is
-# a stub. `ollama` is installed because manjuel/runtime.py imports it at
-# module load; nothing here ever reaches 127.0.0.1:11434. If a change makes
-# these suites need a live model, THAT IS THE REGRESSION -- the offline
-# property is the thing being protected, not an incidental convenience.
+# a stub; nothing here ever reaches 127.0.0.1:11434. If a change makes these
+# suites need a live model, THAT IS THE REGRESSION -- the offline property is
+# the thing being protected, not an incidental convenience.
+#
+# WHAT IS INSTALLED, AND WHY, because a stranger reads this to know what the
+# promise covers:
+#   ollama  manjuel/runtime.py imports it at module load. Never called.
+#   numpy   `.[test]`, added 2026-09-10. test_listening_follows_the_speaker
+#           imports it outright to drive voice.py's silence detector with
+#           real frames. numpy is optional to RUN manjuel (vectors.py wraps
+#           it in try/except) and NOT optional to prove the listening turn.
+#           Without it this workflow was red on every leg from 164ea2c
+#           onward -- 30 runs, no green. It is a library, not a model: the
+#           offline promise is untouched.
 #
 # law.py --prove is hermetic (9 strokes, temp dirs, exit 0) and runs beside
 # them. `verify` is NOT run here: it walks the committed chain, and a fork
@@ -22,6 +32,15 @@ on:
   push:
   pull_request:
   workflow_dispatch:
+
+# ONE RUN PER REF. Without this every push starts a four-leg matrix and the
+# superseded one keeps going: five pushes in half an hour on 2026-09-10 meant
+# twenty jobs, most of them proving commits that had already been replaced.
+# A newer push on the same ref supersedes the older run, so the older one is
+# cancelled rather than finished for nobody.
+concurrency:
+  group: prove-${{ github.ref }}
+  cancel-in-progress: true
 
 permissions:
   contents: read
