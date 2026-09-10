@@ -1140,6 +1140,47 @@ def test_rack(reg, lib):
           "models installed" in quiet and "returned nothing" in quiet, quiet[:160])
 
 
+def test_the_version_agrees_with_itself(reg, lib, book):
+    """LAW 6 (his, 2026-09-10), made mechanical: what the system STATES and
+    what it PERFORMS may not disagree.
+
+    Found 2026-09-10 by a `pip install --dry-run` that printed
+    "manjuel-0.1.7" while `manjuel.py --version` printed 0.1.9 -- the package
+    metadata had drifted TWO versions behind the code, so a build would have
+    announced a version the estate had already left. Nothing checked it, so
+    nothing caught it; a hand had to notice a line of pip output.
+
+    The test extra is asserted here too, because CI installs `.[test]` and a
+    silently-renamed extra would put the strokes back where they were: dead on
+    an import in every matrix leg, 30 runs red without one green.
+    """
+    import tomllib
+    from manjuel import __version__
+
+    raw = (ROOT / "pyproject.toml").read_text(encoding="utf-8")
+    meta = tomllib.loads(raw)["project"]
+    check("the packaged version is the version the code reports",
+          meta["version"] == __version__,
+          f"pyproject {meta['version']} vs code {__version__}")
+
+    extras = meta.get("optional-dependencies", {})
+    check("a `test` extra exists, because CI installs .[test]",
+          "test" in extras, str(sorted(extras)))
+    check("and it carries numpy, which a stroke imports outright",
+          any("numpy" in d for d in extras.get("test", [])),
+          str(extras.get("test")))
+
+    # The workflow must actually ASK for the extra. Declaring it and not
+    # installing it is the state that was red for 30 runs.
+    ci = (ROOT / ".github" / "workflows" / "prove.yml").read_text(encoding="utf-8")
+    check("and the workflow installs it, not the bare package",
+          '.[test]' in ci, "prove.yml installs `.` without the extra")
+
+    check("the homepage names a real repository, not a placeholder",
+          "OWNER" not in meta.get("urls", {}).get("Homepage", ""),
+          str(meta.get("urls")))
+
+
 def test_the_dedup_covers_the_run(reg, lib, book):
     """The dedup was per SEATING, not per run (TASKS, built 2026-09-10).
 
@@ -10496,6 +10537,7 @@ def main() -> int:
     test_vram(reg, book)
     test_shared_card(reg, book)
     test_rack(reg, lib)
+    test_the_version_agrees_with_itself(reg, lib, book)
     test_the_dedup_covers_the_run(reg, lib, book)
     test_a_number_no_tool_returned(reg, lib, book)
     test_an_uncited_claim_is_measured(reg, lib, book)

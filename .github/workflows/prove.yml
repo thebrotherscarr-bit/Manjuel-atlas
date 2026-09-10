@@ -47,8 +47,8 @@ jobs:
         with:
           python-version: ${{ matrix.python }}
 
-      - name: Install (one dependency)
-        run: python -m pip install --upgrade pip && python -m pip install .
+      - name: Install (one dependency, plus what the suites need)
+        run: python -m pip install --upgrade pip && python -m pip install ".[test]"
 
       - name: The strokes
         run: python tests/test_manjuel.py

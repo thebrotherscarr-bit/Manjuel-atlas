@@ -34,6 +34,44 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — CI HAS NEVER BEEN GREEN, AND NOW IT CAN BE (operator: "fix the numpy CI first")
+- **30 OF 30 RUNS RED, INCLUDING THE 0.1.9 TAG.** `gh run list` shows no green
+  run on record. The error is the same on all four matrix legs
+  (windows/ubuntu × 3.10/3.13): `ModuleNotFoundError: No module named 'numpy'`
+  in **The strokes**.
+- **THE CAUSE.** `tests/test_manjuel.py:4505`,
+  `test_listening_follows_the_speaker`, imports numpy OUTRIGHT to drive
+  voice.py's silence detector with real frames. numpy is optional to RUN
+  manjuel — `vectors.py` wraps it in try/except and mathkit says "where numpy
+  IS present" — but it is not optional to PROVE the listening turn. CI ran
+  `pip install .` and `pyproject.toml` declared `dependencies = ["ollama"]`
+  and nothing else. It has been broken since `164ea2c`, the commit atlas
+  landed in.
+- **A `test` EXTRA, AND CI INSTALLS IT** (`pip install ".[test]"`). The step
+  name said "Install (one dependency)" and would have become a lie, so it says
+  what it now does.
+- **GUARDING THE IMPORT WAS THE OTHER OPTION AND WAS REFUSED.** The strokes
+  harness has no skip — `check(name, ok, detail)` is pass or fail — so a
+  skipped stroke would have to report itself as PASSING. That is the green that
+  means nothing, and it would have hidden the listening turn going untested on
+  every platform. The offline promise is untouched: CONTRIBUTING's rule is "no
+  rack, no network, no GPU, no model", and numpy is none of those.
+- **AND THE DRY RUN FOUND A SECOND, WORSE DRIFT.** `pip install --dry-run`
+  printed **"Would install manjuel-0.1.7"** while `manjuel.py --version`
+  printed **0.1.9**: the package metadata was TWO VERSIONS behind the code, so
+  a build would have announced a version the estate had already left. Nothing
+  checked it — a hand had to notice a line of pip output.
+- **SO LAW 6 IS MECHANICAL NOW, not remembered.** Five strokes assert that the
+  packaged version IS the version the code reports, that a `test` extra exists
+  and carries numpy, that **prove.yml actually installs `.[test]`** (declaring
+  it without installing it is exactly the state that was red for 30 runs), and
+  that the homepage names a real repository — it said
+  `https://github.com/OWNER/manjuel`, a placeholder nobody filled in.
+- Proven locally: 1963/1963 strokes (5 new), 60/60 smoke, live standup 9/9,
+  gate 9 of 9. THE REAL PROOF IS A GREEN CI RUN, which only a push can give.
+
+
+
 ## 0.1.9 — 2026-09-10 — THE GLASS, THE GATE, THE DOOR AND THE ROUTE
 
 **THIS TAG CARRIES 0.1.8 TOO.** 0.1.8 was built and never tagged — the

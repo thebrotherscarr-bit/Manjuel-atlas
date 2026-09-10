@@ -15,7 +15,13 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "manjuel"
-version = "0.1.7"
+# KEPT IN STEP WITH manjuel/__init__.py BY HAND, and it had drifted two
+# versions: this said 0.1.7 while the code reported 0.1.9, so a build of
+# the package announced a version the estate had already left behind.
+# Found 2026-09-10 by a `pip install --dry-run` printing "manjuel-0.1.7"
+# while `manjuel.py --version` printed 0.1.9. LAW 6: what the system
+# states and what it performs may not disagree.
+version = "0.1.9"
 description = "A local multi-agent harness that refuses to land anything."
 readme = "README.md"
 requires-python = ">=3.10"
@@ -37,6 +43,24 @@ classifiers = [
 ]
 
 [project.optional-dependencies]
+# WHAT THE SUITES NEED, and nothing more. `test_listening_follows_the_speaker`
+# imports numpy outright to drive voice.py's silence detector with real
+# frames -- numpy is optional to RUN manjuel (vectors.py wraps it in
+# try/except and mathkit says "where numpy IS present") but it is not
+# optional to PROVE the listening turn.
+#
+# CI has never been green because of this: `pip install .` brought only
+# `ollama`, and the strokes died on the import in all four matrix legs from
+# 164ea2c onward -- 30 of 30 runs red, including the 0.1.9 tag.
+#
+# GUARDING THE IMPORT WAS THE OTHER OPTION AND WAS REFUSED: the strokes
+# harness has no skip -- `check(name, ok, detail)` is pass or fail -- so a
+# skipped stroke would have to report itself as passing, which is the green
+# that means nothing. Install it and let the stroke actually run.
+#
+# The offline promise is untouched. CONTRIBUTING's rule is "no rack, no
+# network, no GPU, no model"; numpy is none of those.
+test = ["numpy"]
 # Voice is Windows-bound (SAPI out, whisper.cpp in) and DEGRADES ALONE --
 # boot.py reports GROUND / RACK / RECORD / GATE / VOICE separately, so a
 # machine with no voice still boots and says so. Kept out of the default
@@ -45,7 +69,7 @@ classifiers = [
 voice = []
 
 [project.urls]
-Homepage = "https://github.com/OWNER/manjuel"
+Homepage = "https://github.com/thebrotherscarr-bit/Manjuel-atlas"
 Documentation = "https://github.com/OWNER/manjuel/blob/master/QUICKSTART.md"
 
 [project.scripts]
