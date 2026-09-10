@@ -34,6 +34,68 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-10 — 0.1.9 OPENS: the ladder rewritten, and the corpus split (operator: "c with d folded in, i like that" / "write up the plan and start implementing")
+- **THE LADDER SAID SOMETHING THAT DID NOT HAPPEN.** BUILDPATH's plan of
+  2026-09-08 named "0.1.7 the door and the court" and "0.1.8 the seal". 0.1.7
+  shipped WITHOUT the door work, and 0.1.8 became a theme the plan never named.
+  A plan describing a version nobody shipped is the same fault as a doc naming
+  a command that does not run, so BUILDPATH now carries what ACTUALLY went —
+  **0.1.8 THE GLASS AND THE GATE**, **0.1.9 THE DOOR AND THE ROUTE**, **0.1.10
+  THE SEAL** (which inherits the original 0.1.8 nearly unchanged) — with the
+  old plan kept beside it, because it is the record of what was intended.
+- **WHAT MAKES 0.1.9 ONE VERSION** rather than a pile: four of its five pieces
+  are the same fault in different clothes — A SEAT SAYING SOMETHING IT DID NOT
+  GET FROM A TOOL. The corpus loop, the citation check, the invented numbers,
+  the parroted labels. TASKS carries the list, in the order I would take it.
+- **C — A RUN IS INDEXED BY ITS DELIVERY.** `transcript.index_text` reads the
+  objective and the `## Delivery` and nothing else. It lives in transcript.py
+  because that module WRITES the shape; a parser in vectors.py would be a
+  second opinion that drifts the first time the writer changes. And it RETURNS
+  EMPTY rather than guessing: logs/ holds three shapes, and a standup report
+  and a parity run have no delivery and are already summaries — they fall back
+  to whole-file chunking instead of being silently dropped. Measured on a real
+  transcript: **9,541 characters to 1,233**.
+- **D — TWO CORPORA, ONE LINE.** `VectorIndex.search` takes a scope;
+  `is_transcript` draws the boundary in ONE place; `semantic_search` answers
+  from SOURCES and a new `search_transcripts` reaches the runs. **A weight was
+  refused in favour of a split**: a cosine penalty is a number nobody can
+  defend, needs retuning as the corpus grows, and would still return
+  transcripts for a question about doctrine — just fewer. The second reach is a
+  KEYWORD, not an argument, because the Router chooses between keywords; it
+  costs nothing at the door, which no longer sees the roster at all.
+- **THE NUMBERS, before and after a rebuild from scratch:**
+  - passages **6,705 → 3,945**; from transcripts **4,060 (60.6%) → 1,335 (33.8%)**
+  - "what does the covenant say" returned **eight old runs and never the
+    covenant**; it now returns sources only
+  - "what are the estate laws" now puts `law/ESTATE_LAWS.md` FIRST (it was
+    second, beaten by a transcript from 2026-08-29)
+  - "how does the router choose a tool" now puts `manjuel/pipeline.py` second
+    (it was seventh, behind three old runs)
+  - and the TRANSCRIPT corpus got better too: its top hit for the covenant
+    scores **0.7379** against 0.6167 before, because it now ranks deliveries
+    rather than mid-run noise
+- **A SECOND WIN THAT WAS NOT THE POINT.** The full rebuild that refused at the
+  300s skill bound on 2026-09-09 now completes in **191s** from scratch. The
+  bound never needed raising; the corpus needed to stop carrying every model's
+  working prose.
+- **AND A GAP THE SPLIT EXPOSED.** There is no covenant DOCUMENT — the word
+  appears across many docs and nothing defines it. So the old answer was one
+  model's paraphrase, written to logs/, indexed, and handed back as the record
+  every time the question was asked. The loop was manufacturing an answer to a
+  question the sources do not answer. Reported, not fixed: writing that
+  document is his.
+- **A CORRECTION I MADE MID-RUN.** I first reported the corpus had fallen to
+  1,630 passages. That was the count of NEWLY EMBEDDED chunks — `build()` is
+  incremental, the old full-text chunks were still there, and the total had
+  actually gone UP to 6,867. The real reduction needed a rebuild from scratch,
+  which is what the numbers above are measured on.
+- Proven: **1938/1938 strokes** (12 new, and the suite's own meta-stroke caught
+  the new one before it was registered in main), 60/60 smoke, BUILDMAP
+  regenerated. The new strokes assert PROPERTIES, not that code runs: that
+  mid-run prose is absent, that both summary shapes fall back, that the line
+  holds for both path separators, and that NEITHER reach is simply empty —
+  which a stroke checking only "sources has no logs" would have missed.
+
 ### 2026-09-10 — SPEC 4.2 BUILT: phrases for the door, keywords for the Router (operator: "4.2 next, phrases for the door")
 - **THE RECORD CORRECTED THE SPEC BEFORE ANYTHING WAS TOUCHED**, which is the
   whole reason he said to read it. SPEC 4.2 said "the door is handed the bare

@@ -298,6 +298,57 @@ knows Ollama; nothing else knows either.**
     OPEN line). The final goal is SPEC's: every line MET or RULED OUT,
     and the operator has run the standup on his own terminal.
 
+## The ladder as it ACTUALLY went, and where it goes next (2026-09-10)
+
+The plan above is kept because it is the record of what was intended. It is
+not what happened, and a plan that describes a version nobody shipped is the
+same fault as a doc naming a command that does not run.
+
+    0.1.7  shipped WITHOUT the door work it was named for.
+    0.1.8  THE GLASS AND THE GATE -- a theme the plan never named. atlas as
+           the control plane; Records and the `records` tool; the release gate
+           read at every boot; the standup split so it runs unattended; the
+           estate fully indexed (17 roots -> 39); the runbook that says how to
+           start it. SPEC 4.1, 4.2 and 4.3 closed.
+    0.1.9  THE DOOR AND THE ROUTE. The operator's own words for what it is
+           for: "a chatty front door with enough smarts to know when to route
+           externally and actually use the tools/skills that it has access to
+           through a larger routed system."
+    0.1.10 THE SEAL. Inherits the original 0.1.8 almost unchanged: the gate in
+           CI, ESTATE LAW 2 as a gate, SITTING LAW 5 sealed, the terminator
+           ruling, the client token, the small-honesty list. Half of it is his
+           to rule, which is why it is last.
+
+WHAT MAKES 0.1.9 ONE VERSION. Four of its five pieces are the same fault in
+different clothes -- A SEAT SAYING SOMETHING IT DID NOT GET FROM A TOOL:
+
+    1. the corpus split (C+D, his ruling 2026-09-10). semantic_search answers
+       from SOURCES; the transcripts are a separate, explicit reach; and a log
+       is indexed by its DELIVERY, not its mid-run reasoning. Measured before
+       the ruling: 812 of 996 indexed documents (81.5%) and 4,060 of 6,705
+       ranked passages (60.6%) are old transcripts, and "what does the
+       covenant say" returns eight old runs and never the covenant. The estate
+       answers from its own echo, and each answer is written back to logs/ and
+       indexed, so an error laundered once becomes the record. `transcript.py`
+       already names this risk in a comment ("logs/ is an index root: the next
+       rebuild would embed it, and semantic_search would hand it to a seat as
+       a tool result") and fixed one instance of it; this generalises that.
+    2. the citation check (SPEC 4.3; TASKS s82 finding 4) -- a claim about
+       what a tool result SAID with nothing tying it to the result. The
+       largest thing left in the spec, and C+D makes it tractable: citations
+       are worth checking only once the source is a source.
+    3. the door invents numbers (TASKS; SPEC 4.7) -- "300 to 1200 bytes", seen
+       again 2026-09-09, intermittent.
+    4. the door parrots the record's labels / answers the previous question /
+       ships an empty flag scaffold (TASKS). The new door prose already showed
+       a mild case: it echoed "I can raise flags" back at the operator.
+    5. the tool-loop dedup is per Router sitting, not per run (TASKS) -- the
+       Router's half of the same split.
+
+    THE GATE IS UNCHANGED: `python tests/release.py --check` must pass before
+    any of these is tagged, and the tag is his (RULE 6).
+
+
 ## Reading order for a new hand
 
 `CLAUDE.md` (the operator's rules) → `DAYBOOK.md` (what the last session

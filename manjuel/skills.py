@@ -311,7 +311,8 @@ class SkillSpec:
 # What counsel may call: eyes, never hands. The operator's ruling,
 # sitting 39: "give it the ability to review, never write."
 REVIEW_ONLY_SKILLS = {
-    "semantic_search", "ground_read", "ground_list", "ground_report",
+    "semantic_search", "search_transcripts",
+    "ground_read", "ground_list", "ground_report",
     "read_file", "list_directory", "git_status", "rack_list",
     "skill_report", "extract_facts", "classify_sentiment", "statistics",
     "sitting", "when", "skill_search",
@@ -2332,6 +2333,16 @@ def _age_of(path) -> str:
 
 @skill("semantic_search")
 def _semantic_search(env: SkillExecutionEnv, args: dict) -> str:
+    return _search_scoped(env, args, "sources")
+
+
+@skill("search_transcripts")
+def _search_transcripts(env: SkillExecutionEnv, args: dict) -> str:
+    """What was SAID on a past run, as opposed to what the estate holds."""
+    return _search_scoped(env, args, "transcripts")
+
+
+def _search_scoped(env: SkillExecutionEnv, args: dict, scope: str) -> str:
     query = (args.get("content") or "").strip()
     if not query:
         # Sitting 26: the Router called search with no query, the error came
@@ -2357,7 +2368,7 @@ def _semantic_search(env: SkillExecutionEnv, args: dict) -> str:
         except Exception as exc:
             return f"Query embedding failed: {exc}"
 
-        hits = idx.search(qvec, limit=8, per_doc=2)
+        hits = idx.search(qvec, limit=8, per_doc=2, scope=scope)
     finally:
         idx.close()
 

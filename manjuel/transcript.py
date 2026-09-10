@@ -39,6 +39,42 @@ _HEADING_RE = re.compile(r"^(#{1,6})(\s)", re.MULTILINE)
 _MIN_DEPTH = 5
 
 
+# The RUN shape, as written below: `## Objective` ... `## Delivery`. Read here
+# rather than in vectors.py because this module writes it; a parser elsewhere
+# would be a second opinion about the same file and would drift the first time
+# `write` changed.
+_OBJECTIVE_RE = re.compile(r"^## Objective\s*\n+(?P<t>.*?)(?=\n## |\Z)", re.S | re.M)
+_DELIVERY_RE = re.compile(r"^## Delivery\s*\n+(?P<t>.*?)(?=\n## |\Z)", re.S | re.M)
+
+
+def index_text(text: str) -> str:
+    """What of a run transcript belongs in the semantic index: the objective
+    and the DELIVERY. Empty string if this is not a run transcript.
+
+    THE MID-RUN PROSE IS DELIBERATELY LEFT OUT (his ruling 2026-09-10). Before
+    it was, "what does the covenant say" returned eight old runs and never the
+    covenant, and the hits were chunks 4, 8, 10, 12 -- tool output and a seat's
+    working prose, the least trustworthy text in the estate. The delivery is
+    the part a seat stood behind.
+
+    EMPTY IS THE HONEST ANSWER for the other two shapes under logs/: a standup
+    report and a parity run have no `## Delivery`, and both are already
+    summaries. The caller falls back to whole-file chunking rather than
+    dropping them out of the corpus.
+    """
+    d = _DELIVERY_RE.search(text or "")
+    if not d:
+        return ""
+    delivery = d.group("t").strip()
+    if not delivery:
+        return ""
+    o = _OBJECTIVE_RE.search(text or "")
+    objective = (o.group("t").strip() if o else "")
+    # The objective rides with it so the passage is findable by what was ASKED,
+    # not only by how it was answered.
+    return (f"Asked: {objective}\n\n{delivery}" if objective else delivery)
+
+
 def quote_structure(text: str) -> str:
     """Demote every markdown heading in recorded text below stage level."""
     def demote(m):

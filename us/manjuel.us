@@ -583,6 +583,21 @@ other (LAW 5); now a record that lies is a finding.
 {
   "can_approve": false,
   "covenant": "1512741580b7239b",
+  "id": "search_transcripts",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/search_transcripts.md",
+  "us": 1,
+  "wall": "reads the transcripts under logs/ in the index; writes nothing",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
   "id": "semantic_search",
   "kind": "skill",
   "office": "MANJUEL",

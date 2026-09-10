@@ -31,6 +31,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import memory as _memory
+from . import transcript as _transcript
 
 SCHEMA_VERSION = "2"
 
@@ -134,6 +135,16 @@ except Exception:
 
 class IndexError_(Exception):
     pass
+
+
+# THE LINE BETWEEN THE TWO CORPORA, in one place so nothing can draw it twice.
+# logs/ is the transcripts; everything else is a source. index_roots.txt
+# already draws this boundary in prose -- "what the chain IS", "what it is
+# CONFIGURED as", "what it has DONE" -- and logs/ sits alone under the third.
+def is_transcript(path) -> bool:
+    """Is this indexed path a past run rather than a source?"""
+    p = str(path).replace("\\", "/")
+    return "/logs/" in p or p.startswith("logs/")
 
 
 # ---------------------------------------------------------------------
@@ -355,7 +366,22 @@ class VectorIndex:
             if not text.strip():
                 continue
 
-            if p.name == _memory.MEMORY_FILE:
+            # A RUN TRANSCRIPT IS INDEXED BY ITS DELIVERY (his ruling
+            # 2026-09-10). transcript.index_text returns "" for anything that
+            # is not a run -- a standup report, a parity run -- and those fall
+            # through to whole-file chunking below, because both are already
+            # summaries and dropping them would be a silent loss.
+            trimmed = ""
+            if p.suffix.lower() == ".md":
+                try:
+                    trimmed = _transcript.index_text(text)
+                except Exception:
+                    trimmed = ""
+
+            if trimmed:
+                pieces = [(st, tx, "delivery", "", "")
+                          for st, tx in chunk_text(trimmed)]
+            elif p.name == _memory.MEMORY_FILE:
                 # One chunk per remembered entry, carrying its stamp and the
                 # session that produced it, instead of one growing blob.
                 pieces = [(st, tx, lb, sp, ss)
@@ -491,13 +517,34 @@ class VectorIndex:
 
     # ---- searching --------------------------------------------------
 
-    def search(self, qvec: list[float], limit: int = 5, per_doc: int = 2):
+    def search(self, qvec: list[float], limit: int = 5, per_doc: int = 2,
+               scope: str = "all"):
+        """Rank the index. `scope` picks the corpus (his ruling 2026-09-10):
+
+            sources      everything that is not a transcript -- the code, the
+                         doctrine, the seats, the record's own documents
+            transcripts  logs/ only: what was SAID on a past run
+            all          both, the old behaviour, kept for callers that mean it
+
+        WHY THIS EXISTS. Measured 2026-09-10: 812 of 996 indexed documents and
+        4,060 of 6,705 ranked passages were old runs, and "what does the
+        covenant say" returned eight transcripts and never the covenant. Each
+        answer is written back to logs/ and indexed, so the estate was
+        answering from its own echo and laundering an error into the record.
+        A weight was refused in favour of a split -- a cosine penalty is a
+        number nobody can defend and would still return transcripts for a
+        question about doctrine, just fewer of them.
+        """
         q = _norm(qvec)
         rows = self.db.execute(
             "SELECT c.id, c.doc_id, c.ord, c.start, c.text, c.vec, d.path, "
             "c.label, c.stamp, c.session "
             "FROM chunks c JOIN docs d ON d.id = c.doc_id"
         ).fetchall()
+
+        if scope in ("sources", "transcripts"):
+            want_log = scope == "transcripts"
+            rows = [r for r in rows if is_transcript(r[6]) == want_log]
 
         usable = [r for r in rows if len(r[5]) // 4 == len(q)]
         if not usable:

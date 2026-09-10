@@ -1140,6 +1140,84 @@ def test_rack(reg, lib):
           "models installed" in quiet and "returned nothing" in quiet, quiet[:160])
 
 
+def test_the_corpus_is_split(reg, lib, book):
+    """SOURCES answer questions; TRANSCRIPTS are an explicit ask (2026-09-10).
+
+    Measured before the ruling: 812 of 996 indexed documents and 4,060 of
+    6,705 ranked passages were old runs, and "what does the covenant say"
+    returned eight transcripts and never the covenant. Every answer is written
+    back to logs/ and indexed, so the estate answered from its own echo.
+    """
+    from manjuel import transcript as T
+    from manjuel.vectors import is_transcript
+
+    # ---- C: a run is indexed by its delivery ---------------------------
+    run = ("# Run - what does the covenant say\n\n"
+           "- **when:** 2026-09-10T06:14:39\n\n"
+           "## Objective\n\nwhat does the covenant say\n\n"
+           "## Stages\n\n### 1. Router\n\n"
+           "Tool executed: semantic_search\nResult:\n"
+           "1. logs/older.md [chunk 4] cosine 0.61\n"
+           "I think this probably means the covenant is about MIDRUN GUESSWORK.\n\n"
+           "## Delivery\n\nThe covenant binds one operator and one machine.\n")
+    got = T.index_text(run)
+    check("a run transcript is indexed by its delivery",
+          "binds one operator" in got, got[:80])
+    check("and its mid-run guesswork is not indexed at all",
+          "MIDRUN GUESSWORK" not in got and "cosine" not in got, got[:120])
+    check("the objective rides along, so it is findable by what was ASKED",
+          "what does the covenant say" in got)
+
+    # The other two shapes under logs/ have no Delivery and are already
+    # summaries. Empty means "fall back to whole-file", not "drop it".
+    check("a standup report is not mistaken for a run",
+          T.index_text("# Standup - 2026-09-10\n\n9 cases, 9 met.\n") == "")
+    check("nor a parity run",
+          T.index_text("# Parity run\n\n  case  score  verdict\n") == "")
+
+    # ---- the line, drawn once ------------------------------------------
+    check("a log path is a transcript, in either separator",
+          is_transcript("C:/x/logs/a.md") and is_transcript("C:\\x\\logs\\a.md"))
+    check("and a source is not",
+          not is_transcript("C:/x/SPEC.md") and not is_transcript("C:/x/manjuel/cli.py"))
+    check("`logs` inside a WORD is not a log ('catalogs/notes.md')",
+          not is_transcript("C:/x/catalogs/notes.md"))
+
+    # ---- D: the two reaches, on a real index ---------------------------
+    g = Path(tempfile.mkdtemp())
+    (g / "logs").mkdir()
+    (g / "SPEC.md").write_text("the covenant binds one operator and one machine",
+                               encoding="utf-8")
+    (g / "logs" / "run.md").write_text(
+        "# Run - x\n\n## Objective\n\nx\n\n## Delivery\n\n"
+        "the covenant binds one operator and one machine\n", encoding="utf-8")
+    (g / "index_roots.txt").write_text("SPEC.md\nlogs\n", encoding="utf-8")
+
+    from manjuel.vectors import VectorIndex
+    idx = VectorIndex(g / "vectors.db", "stub-embedder")
+
+    def embed(text):
+        # Deterministic and content-blind: every chunk gets the same vector,
+        # so RANK cannot be what makes a stroke pass -- only the scope filter
+        # can. That is the property under test.
+        return [1.0, 0.0, 0.0]
+
+    idx.build([g / "SPEC.md", g / "logs"], embed_fn=embed)
+    qv = [1.0, 0.0, 0.0]
+
+    src = idx.search(qv, limit=10, scope="sources")
+    runs = idx.search(qv, limit=10, scope="transcripts")
+    both = idx.search(qv, limit=10, scope="all")
+    check("sources returns no transcript",
+          src and not any(is_transcript(h["path"]) for h in src), str(len(src)))
+    check("transcripts returns nothing BUT transcripts",
+          runs and all(is_transcript(h["path"]) for h in runs), str(len(runs)))
+    check("and neither reach is simply empty, which would pass the other two",
+          len(src) >= 1 and len(runs) >= 1, f"{len(src)} / {len(runs)}")
+    check("`all` still sees both, for a caller that means it",
+          len(both) >= len(src) + len(runs) - 1)
+
+
 def test_rack_sync(reg, lib):
     """The written rack: pulled fresh, derived whole, honest about mismatches."""
     from manjuel import rack as R
@@ -10240,6 +10318,7 @@ def main() -> int:
     test_vram(reg, book)
     test_shared_card(reg, book)
     test_rack(reg, lib)
+    test_the_corpus_is_split(reg, lib, book)
     test_rack_sync(reg, lib)
     test_steward_hands_off(reg, lib, book)
     test_no_feed_is_not_a_blocker(reg, lib, book)

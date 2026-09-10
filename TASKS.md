@@ -1076,3 +1076,42 @@ Kept so nobody re-derives them and starts.
 ## Appended by the operator
 
 <!-- Kyler: add below. Anything here outranks everything above it. -->
+
+## 0.1.9 — THE DOOR AND THE ROUTE (his ruling 2026-09-10)
+
+    His words for the whole of it: "a chatty front door with enough smarts to
+    know when to route externally and actually use the tools/skills that it
+    has access to through a larger routed system."
+
+    Four of these five are ONE fault measured in different places: a seat
+    saying something it did not get from a tool. The order is the order I
+    would take them; the gate is unchanged and the tag is his.
+
+    [ ]  THE CORPUS SPLIT (C+D, ruled 2026-09-10). semantic_search answers
+         from SOURCES by default; the transcripts are a separate explicit
+         reach; a log is indexed by its DELIVERY, not its mid-run reasoning.
+         Measured: 81.5% of indexed documents and 60.6% of ranked passages
+         are old runs; "what does the covenant say" returns eight old runs
+         and never the covenant.
+    [ ]  THE CITATION CHECK (SPEC 4.3, s82 finding 4). A claim about what a
+         tool result SAID, with nothing tying it to the result. The largest
+         piece left in the spec; C+D first, because a citation is only worth
+         checking once the source is a source.
+    [ ]  THE DOOR INVENTS NUMBERS (SPEC 4.7). "35 for 37"; "300 to 1200
+         bytes" 2026-09-09. Intermittent, which is why a green gate is not
+         evidence it is gone.
+    [ ]  THE DOOR PARROTS. The record's labels; the previous question; an
+         empty flag scaffold. Includes the mild case the new door prose
+         showed on 2026-09-10 ("I can raise flags", echoed at him).
+    [ ]  THE TOOL-LOOP DEDUP is per Router sitting, not per run.
+
+    MOVED OUT, deliberately, to 0.1.10 (the seal): the gate in CI, ESTATE
+    LAW 2 as a gate, SITTING LAW 5 sealed, the terminator ruling, the client
+    token, and the small-honesty list. Half of that is his to rule.
+
+    DONE SINCE THE 2026-09-08 SCRUB, so the lines above it are stale:
+    rack_report facts-only (SPEC 4.3 MET); BUILDMAP in index_roots (he ruled
+    it: "index everything"); phrases for the door (SPEC 4.2 MET); the release
+    gate is READ AT BOOT though not yet in CI; SITTING_LAWS_2.md is written
+    though not sealed onto the chain.
+

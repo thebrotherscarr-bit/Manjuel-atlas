@@ -48,6 +48,7 @@ reason the estate can say a seat never touches the filesystem.
     "rack_unload",
     "read_file",
     "remember",
+    "search_transcripts",
     "semantic_search",
     "sitting",
     "skill_report",
