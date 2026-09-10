@@ -305,7 +305,9 @@ not what happened, and a plan that describes a version nobody shipped is the
 same fault as a doc naming a command that does not run.
 
     0.1.7  shipped WITHOUT the door work it was named for.
-    0.1.8  THE GLASS AND THE GATE -- a theme the plan never named. atlas as
+    0.1.8  THE GLASS AND THE GATE -- BUILT, NEVER TAGGED, folded into the
+           0.1.9 tag (2026-09-10), the way 0.1.6 folded into 0.1.7 the same
+           day it was built. A theme the plan never named. atlas as
            the control plane; Records and the `records` tool; the release gate
            read at every boot; the standup split so it runs unattended; the
            estate fully indexed (17 roots -> 39); the runbook that says how to

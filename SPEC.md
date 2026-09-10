@@ -305,6 +305,8 @@ unbounded interruptible speak; the dead code named in TASKS.
 0.1.5 is built and measured live once (sitting 96); the P0 list above
 is its second half and precedes its tag. Then 0.1.6, 0.1.7, 0.1.8 as
 TASKS "THE PATH TO 0.1.8" orders them, each ending at the release gate.
+THE LADDER MOVED (2026-09-10, BUILDPATH): 0.1.8 was built and never
+tagged, folded into the 0.1.9 tag; the seal is 0.1.10.
 DONE is section 4 with no OPEN line, and the operator having run the
 standup on his own terminal and read the report.
 

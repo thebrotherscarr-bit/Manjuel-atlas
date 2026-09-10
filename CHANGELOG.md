@@ -32,7 +32,20 @@ hand that iterates without updating this file is out of line.
 
 ---
 
-## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
+## Unreleased — since 0.1.9
+
+## 0.1.9 — 2026-09-10 — THE GLASS, THE GATE, THE DOOR AND THE ROUTE
+
+**THIS TAG CARRIES 0.1.8 TOO.** 0.1.8 was built and never tagged — the
+glass (atlas as the control plane, Records, the release gate read at every
+boot, the standup split, the estate fully indexed, the runbook) — and it
+folds into this tag the way 0.1.6 folded into 0.1.7 the same day it was
+built. 0.1.9 itself is THE DOOR AND THE ROUTE: the corpus split, the
+citation check, the invented-number stamp, the parroting read rather than
+built, and the run-wide dedup.
+
+Everything below this heading down to 0.1.7 is what the tag contains.
+Cut on the operator's word (RULE 6) with the release gate at 9 of 9.
 
 ### 2026-09-10 — THE TOOL-LOOP DEDUP COVERS THE RUN (operator: "finish the tool loop dedup")
 - **MEASURED FIRST.** `ran` was created INSIDE the per-seat tool loop, so every
