@@ -1270,6 +1270,52 @@ def test_the_dedup_covers_the_run(reg, lib, book):
           hasattr(ctx, "ran_calls") and ctx.ran_calls == {})
 
 
+def test_a_named_tool_that_did_not_run(reg, lib, book):
+    """A push that reports success without pushing (2026-09-10).
+
+    logs/2026-09-10_082854_push_the_committed_work...: intent named `git_push`
+    and woke the Router to run it, the Router ran `git_status`, and the closing
+    seat delivered "all commits have already been staged and are ready for
+    pushing" -- verdict DELIVERED, while origin/main sat a commit behind. The
+    delivery said the push had not happened and the verdict said it had.
+    """
+    from manjuel.pipeline import recompose
+
+    def turn(named, called, notes=()):
+        c = RunContext(objective="Push the committed work to the remote.")
+        c.named_tool = named
+        for n in notes:
+            c.notes.append(n)
+        c.steps.append(StepResult(agent="Router", model="qwen3.5:4b",
+                                  output="Tool executed", elapsed=1.0,
+                                  tool_calls=list(called)))
+        c.steps.append(StepResult(agent="Steward", model="llama3.2", elapsed=1.0,
+                                  output="Pushed to the remote, all good."))
+        return c
+
+    ctx = turn("git_push", ["git_status"])
+    check("a named tool that did not run is stamped on the delivery",
+          recompose(ctx, report=lambda *a: None))
+    out = ctx.steps[-1].output
+    check("and the stamp names BOTH what was asked and what ran instead",
+          "git_push" in out and "git_status" in out
+          and "THE NAMED TOOL DID NOT RUN" in out, out[-200:])
+
+    ran = turn("git_push", ["git_status", "git_push"])
+    check("a named tool that DID run is not stamped",
+          not recompose(ran, report=lambda *a: None), ran.steps[-1].output)
+
+    # NEVER ON A REFUSAL. A gate that refuses runs no tool, and the refusal IS
+    # the answer -- a guard that cries there teaches him to skip it.
+    ref = turn("git_push", [], notes=["hard gate: REFUSED -- reaches outside the ground"])
+    check("a refused run is never accused of skipping its tool",
+          not recompose(ref, report=lambda *a: None), ref.steps[-1].output)
+
+    plain = turn("", [])
+    check("a turn that named no tool is not judged on one",
+          not recompose(plain, report=lambda *a: None), plain.steps[-1].output)
+
+
 def test_a_number_no_tool_returned(reg, lib, book):
     """SPEC 4.7: the door invents numbers, and until 2026-09-10 the check for
     it ran in ONE place -- /brief -- never on an ordinary turn.
@@ -10604,6 +10650,7 @@ def main() -> int:
     test_rack(reg, lib)
     test_the_version_agrees_with_itself(reg, lib, book)
     test_the_dedup_covers_the_run(reg, lib, book)
+    test_a_named_tool_that_did_not_run(reg, lib, book)
     test_a_number_no_tool_returned(reg, lib, book)
     test_an_uncited_claim_is_measured(reg, lib, book)
     test_the_corpus_is_split(reg, lib, book)

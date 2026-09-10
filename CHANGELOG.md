@@ -34,6 +34,42 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — A PUSH THAT REPORTED SUCCESS WITHOUT PUSHING (operator: "fix the push reporting delivered when it didn't")
+- **THE FAULT, WHOLE, FROM ONE TRANSCRIPT.**
+  `logs/2026-09-10_082854_push_the_committed_work_to_the_remote.md`:
+
+        note: intent: objective names `git_push` -- Router woken directly
+        Tool executed: git_status
+        Delivery: "...all commits have already been staged and are ready
+                   for pushing."
+        verdict: delivered
+
+  The objective named a tool, the engine woke the Router SPECIFICALLY to run
+  it, the Router ran something else, and the turn reported success. THE
+  DELIVERY ITSELF SAYS THE PUSH HAD NOT HAPPENED — "ready for pushing" — while
+  the verdict said it had, and `origin/main` sat a commit behind. A push that
+  reports success without pushing is worse than one that fails.
+- **IT IS RECOMPOSE'S ARITHMETIC, not a new idea.** That function's whole
+  contract is that what actually happened "simply travels with the answer,
+  every time ... no judgement about whether the seat mentioned it". Both sides
+  were already in the record: `ctx.named_tool` is what intent named,
+  `step.tool_calls` is what ran. The check is a comparison.
+- **NEVER ON A REFUSAL.** A gate that refuses runs no tool and the refusal IS
+  the answer; a guard that cries there is one he learns to skip. Explicitly
+  guarded, and stroked.
+- **PROVEN BY REPLAYING THE TURN THAT LIED.** Rebuilt from its own transcript,
+  the stamp now reads: "THE NAMED TOOL DID NOT RUN. This objective named
+  `git_push` and the engine woke the Router to run it; what ran instead was
+  git_status." Six strokes hold it, including that a named tool which DID run
+  is not stamped, that a refusal is never accused, and that a turn naming no
+  tool is not judged on one.
+- **SAME FAMILY AS TWO EARLIER SIGHTINGS**, and this closes all three shapes:
+  the commit turn that ran ZERO tools and said delivered, this push, and the
+  invented-number stamp from earlier today. What a seat SAYS is now checked
+  against what the record shows in three ways — tools that failed, numbers no
+  tool returned, and a named tool that never ran.
+- Proven: 1970/1970 strokes (5 new), 60/60 smoke, live standup 9/9.
+
 ### 2026-09-10 — A STALENESS STROKE WAS RACING THE CLOCK, ON ONE LEG
 - **windows-latest 3.10 alone** went red on `and a fresh run is not called
   stale` while the other three legs passed. Not the workflow change, and not

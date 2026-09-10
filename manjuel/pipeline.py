@@ -2408,6 +2408,27 @@ def recompose(ctx: RunContext, report=print) -> bool:
     # ONLY WHEN A TOOL RAN. With no tool results there is nothing to check
     # against, and stamping a plain conversational answer would be sitting
     # 27's compliment-drift again.
+    # A NAMED TOOL THAT DID NOT RUN. intent names a tool outright and the
+    # engine wakes the Router SPECIFICALLY to run it; if it ran something else
+    # instead, the answer is about work that never happened. Measured
+    # 2026-09-10: `push the committed work to the remote` named `git_push`,
+    # ran `git_status`, delivered "all commits have already been staged and
+    # are ready for pushing" -- and was reported DELIVERED while origin sat a
+    # commit behind. A push that reports success without pushing is worse than
+    # one that fails.
+    #
+    # Same arithmetic as the lists below: both sides are already in the
+    # record -- what intent named, and what actually ran -- so this is a
+    # comparison, not a judgement about the seat's prose.
+    #
+    # NEVER ON A REFUSAL. When a gate refuses, no tool runs and the refusal IS
+    # the answer; crying about it there teaches him to skip the guard.
+    named = (getattr(ctx, "named_tool", "") or "").strip()
+    called = {c for st in ctx.steps for c in (st.tool_calls or ())}
+    refused = any(n.startswith(("hard gate:", "gate:")) or "REFUSED" in n
+                  for n in (getattr(ctx, "notes", ()) or ()))
+    missed = named if (named and named not in called and not refused) else ""
+
     made_up = []
     # FROM THE STEPS, which is where tool results live. This read `ctx`
     # directly and got nothing: `tool_results` is a StepResult field ("what
@@ -2430,7 +2451,8 @@ def recompose(ctx: RunContext, report=print) -> bool:
     # nowhere in the delivery -- sitting 96's court said OUT OF TIME for
     # Manjuel and nothing about Jesster's 577s. Same arithmetic.
     cut = [(s.agent, s.error) for s in ctx.steps if s.error]
-    if not fails and not partial and not late and not cut and not made_up:
+    if (not fails and not partial and not late and not cut and not made_up
+            and not missed):
         return False
     last = next((s for s in reversed(ctx.steps)
                  if s.ok and (s.output or "").strip()), None)
@@ -2445,6 +2467,13 @@ def recompose(ctx: RunContext, report=print) -> bool:
         ctx.steps.append(last)
 
     blocks: list[str] = []
+    if missed:
+        blocks.append(
+            f"THE NAMED TOOL DID NOT RUN. This objective named `{missed}` and "
+            f"the engine woke the Router to run it; what ran instead was "
+            f"{', '.join(sorted(called)) or 'nothing'}. Whatever the words "
+            f"above say, `{missed}` did not happen. Machine-emitted by "
+            f"comparing what was named with what was called.")
     if made_up:
         blocks.append(
             "A NUMBER NO TOOL RETURNED. These appear in the words above and in "
