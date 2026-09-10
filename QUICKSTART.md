@@ -1,5 +1,9 @@
 # Quickstart
 
+This is the first hour with the REPL. If what you want is the DASHBOARD --
+building and starting the two atlas servers, the four-click loop, the skills
+and the tools -- that is RUNBOOK.md, "Starting the system".
+
 ## You need
 
 - **Ollama** running locally (`ollama serve`; usually already a service).

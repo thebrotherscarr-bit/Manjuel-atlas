@@ -62,6 +62,13 @@ memory.md
 atlas/target/
 *.exe
 *.exe~
+
+# The two servers' own stdout. atlas-mcp and atlas-webapp are started by
+# hand (RUNBOOK, 'Starting the system'), and a doc that tells him to run a
+# command which dirties his repo is a bad doc. The binaries beside them are
+# already covered by *.exe above.
+atlas/line/mcp.log
+atlas/webapp/web.log
 *.obj
 atlas/webapp/data/
 node_modules/

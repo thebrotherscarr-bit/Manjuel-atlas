@@ -34,6 +34,47 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.7 (b22bf81, 2026-09-09 13:22)
 
+### 2026-09-10 — HOW HE STARTS AND RUNS IT, WRITTEN DOWN (operator: "review all the docs so i have the proper information for starting and running the system on my end, including starting the servers, running the dashboard, skills tools, etc.")
+- **THE BINARIES HE HAS BEEN USING LIVED IN A SESSION TEMP DIRECTORY.** Every
+  Boot, Commit and Push he clicked yesterday went through `atlas-mcp.exe` and
+  `atlas-webapp.exe` built into this session's scratchpad. They vanish with the
+  session, and NOTHING in the record said where atlas comes from, what starts
+  it, what ports it holds, or how to stop it. That is the fault this fixes.
+- **Both now build in place** — `atlas/line/atlas-mcp.exe`,
+  `atlas/webapp/atlas-webapp.exe`. `*.exe` was already gitignored, so they sit
+  beside their own source and never reach a commit; no new folder (RULE 8).
+- **RUNBOOK gains six sections**, and RUNBOOK rather than QUICKSTART because
+  QUICKSTART is the first hour with the REPL and this is the machine's
+  operating procedure: **Starting the system** (build, the door's full argument
+  line, the glass, the ports, how to stop), **Running it from the dashboard**
+  (what each of the six pages is, and the four-click loop — Boot, type and Run,
+  Commit/Push through the council, Close sitting), **Running it from the
+  terminal instead**, **The skills and the tools** (37 skills a SEAT can do vs
+  72 tools ATLAS serves — two different things, and 33 of the 72 still have no
+  button), **The dials**, and **When starting goes wrong**.
+- **EVERY COMMAND WAS RUN BEFORE IT WAS WRITTEN**, from the real binaries:
+  the door answered `/tools` with 72, the webapp answered `/api/health`, a tool
+  call went webapp → door → `git`, and the whole loop booted sitting 126, ran
+  `git status` through Router and Steward in 57.2s, and closed tolled.
+- **TWO THINGS THE PROVING CAUGHT, both of which would have failed on his
+  machine:**
+  - The build block was written `cd atlas\line && go build ...`. **PowerShell
+    5.1 has no `&&`** — it is a parser error, not a no-op. Measured here:
+    `$PSVersionTable.PSVersion = 5.1.26100.9444`. Separate lines now.
+  - The server redirects were `> log 2>&1`, which on 5.1 wraps a native exe's
+    stderr in ErrorRecords. Both forms were run; the doc uses `*> log`, the
+    all-streams redirect, which has no such trap.
+- **The two server logs are gitignored** in the same pass. A runbook that tells
+  him to run a command which dirties his repo is a bad runbook.
+- README now names the control plane and points at that section; QUICKSTART
+  says plainly which door it is, so neither entry doc leaves him guessing.
+- The scratchpad pair was stopped and replaced by the real binaries — which
+  also answers his question about two tasks running thirteen hours: they were
+  those servers, started by me and never named.
+- Proven: 1915/1915 strokes, 60/60 smoke; RUNBOOK, README and QUICKSTART all
+  written as bytes and checked for doubled endings after yesterday's fault.
+
+
 ### 2026-09-09 — THE NIGHT'S HANDOFF, HIS THREE RULINGS, AND A FAULT OF MINE THAT REACHED THE RECORD
 - **HIS RULINGS ON SPEC section 4, recorded; none built.** §4.3 `rack_report`
   FACTS ONLY unless a judgement is asked for. §4.2 PHRASES FOR THE DOOR,

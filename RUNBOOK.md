@@ -28,6 +28,162 @@ satisfy the release gate. Where to look for anything it names: BUILDMAP.md.
 
 ---
 
+## Starting the system
+
+Two processes and a browser. Neither starts by itself, and nothing opens a
+sitting behind you.
+
+**Build them once.** Both binaries are `*.exe`, which `.gitignore` already
+covers, so they live beside their own source and never reach a commit.
+
+    cd atlas\line
+    go build -o atlas-mcp.exe .\cmd\atlas-mcp
+    cd ..\webapp
+    go build -o atlas-webapp.exe .
+
+Rebuild after any Go change. The webapp EMBEDS its own HTML, CSS and
+JavaScript (`go:embed`), so a change to a page is not live until you rebuild
+and restart it -- editing the file on disk does nothing to a running server.
+
+**Start the door.** `atlas-mcp` is the MCP door: it serves the 72 tools and it
+is the only thing that spawns a Manjuel engine. It holds `127.0.0.1:8090`.
+
+    cd atlas\line
+    .\atlas-mcp.exe --http 127.0.0.1:8090 --tenant research=C:/Users/novad/Desktop/Research --default-project research --manjuel "python C:/Users/novad/Desktop/Research/manjuel.py" *> mcp.log
+
+`--tenant name=path` declares a world; repeat it for more. `--default-project`
+is the one the dashboard uses when you do not name another. `--manjuel` is the
+command the door runs to raise an engine -- `--headless` and `--ground` are
+appended by the door itself, so do not add them.
+
+**Start the glass.** `atlas-webapp` serves the dashboard on `:8091` and talks
+to the door at `127.0.0.1:8090`.
+
+    cd atlas\webapp
+    .\atlas-webapp.exe *> web.log
+
+    ATLAS_WEB_PORT=<n>   serve on another port
+    OLLAMA_HOST=<url>    if the rack is not on the default loopback
+
+**Open it.** `http://127.0.0.1:8091`
+
+**Stop them.** They are servers; they run until stopped. Nothing is lost --
+the engine already exits with every sitting, and both processes keep no state
+of their own.
+
+    Get-Process atlas-mcp,atlas-webapp | Stop-Process
+
+## Running it from the dashboard
+
+The pages, in the order the panel lists them:
+
+    Dashboard   the launchpad. THE ENGINE card is first because nothing below
+                it runs until one is open. Then the box you type in, the
+                brief (silent when there is nothing to say), and THE
+                REPOSITORY with its Commit and Push buttons. It repaints
+                itself every 15s and says so when what it shows is stale.
+    Chat        the same conversation, kept. The composer is disabled with
+                the reason written under it when no engine is open.
+    Agents      the fourteen seats as they declare themselves in agents/.
+    Evals       the last run whole -- every seat, tool, result, timing --
+                and evals scored by hand.
+    Records     the estate's own memory: the suite and standup proof cards,
+                the sittings, and 140 documents in seven kinds (doctrine,
+                record, spec, agents, commands, skills, logs), each opening
+                whole with a sha256 receipt.
+    Settings    the dials.
+
+**The loop, four clicks.**
+
+    1. Boot            opens an engine AND a sitting. Nothing opens one for
+                       you; a sitting nobody meant to start is what every
+                       refusal in this system guards against.
+    2. type and Run    the turn runs on the Dashboard, the answer lands under
+                       the box, and the whole trace goes to Evals.
+    3. Commit / Push   type the message in THE REPOSITORY's field first. Both
+                       go THROUGH THE COUNCIL, not around it: the law gate
+                       stamps the act, the Router runs `git_commit`, and the
+                       commit body carries the sitting id. A button that
+                       shelled out to git would be a second write-path past
+                       everything the estate checks.
+    4. Close sitting   pays the toll, writes `ended`, and reaps the engine.
+                       DO THIS. A sitting left open is what makes the next
+                       Boot refuse.
+
+Push is disabled unless the wall is open (`MANJUEL_GIT_REMOTE` in `.env`) and
+there is something to push; hover it and it says which.
+
+## Running it from the terminal instead
+
+    python manjuel.py            the REPL -- the same engine, no glass
+    python manjuel.py --version  what version this is
+    python manjuel.py --help     the argument contract
+
+The REPL opens its own sitting and prints the boot report: GROUND (seats,
+skills, pipelines), RACK (what Ollama holds and what is warm), RECORD (index,
+memory, transcripts, what the suites last proved), GATE (git, whether remote
+operations are permitted, and the release gate's verdict) and VOICE. Every
+block degrades on its own -- if the rack is unreachable that block says so and
+the rest still prints.
+
+**One engine per world.** The dashboard and the REPL both open a sitting on
+`research`, so they refuse each other by design. Close one before opening the
+other.
+
+## The skills and the tools
+
+Two different things, and it is worth keeping them apart.
+
+**Skills** are what a SEAT can do -- 37 of them, declared as markdown in
+`skills\`, hot-reloaded into a running session at the next turn. A seat asks
+for one by keyword and the engine runs it; the law gate can refuse it, and a
+refusal names the law. Read them on Records -> skills, or `commands.md` for
+what can be asked for in words.
+
+**Tools** are what ATLAS serves over MCP -- 72 of them, listed at
+`http://127.0.0.1:8090/tools` and reachable from the glass through
+`POST /api/tools/call`. They are read-only unless their declaration says
+`Writes: true`. The ones the dashboard itself leans on:
+
+    git       branch, head, dirty counts, upstream, whether remote is walled
+    proofs    the suites, the standups, the parity runs and the sittings
+    seats     the seat declarations, read from agents/ and pipelines.md
+    records   the estate's documents by kind, one served whole with a receipt
+    muster    the declared worlds
+    rack_list what the rack holds
+
+Thirty-three of the seventy-two have no page yet -- the record and law readers,
+the rack commands, the mesh, keys and tenants. They answer over MCP today; they
+have no button.
+
+## The dials
+
+`.env` in this folder, gitignored and never printed. `.env.example` names every
+one with what it does. The ones that change how a run behaves:
+`MANJUEL_GIT_REMOTE` (the push wall), `MANJUEL_RACK_PULL` (may models be
+downloaded), `MANJUEL_VRAM_GB`, `MANJUEL_KEEP_ALIVE`, `MANJUEL_SEAT_TIMEOUT`,
+`MANJUEL_SKILL_TIMEOUT`. The older `CHAINKIT_` spellings still answer.
+
+## When starting goes wrong
+
+    "research has an open sitting (N, opened ...)"
+        A sitting is open, or one was left open by a killed process. Close it
+        from the dashboard's Close sitting; if no engine is running, the last
+        line of `sessions\sessions.jsonl` has no `ended` and it is closed by
+        APPENDING a closing line, never by editing the one already written.
+
+    the dashboard shows something that is not true
+        It repaints every 15s and confesses when it is over a minute stale.
+        If a page still looks old after a rebuild, that was the missing-ETag
+        fault -- fixed 2026-09-09; every static file now revalidates.
+
+    "mcp unreachable"
+        The door is not running, or not on 8090. Check `atlas\line\mcp.log`.
+
+    the rack is unreachable
+        `ollama serve`. The boot report's RACK block says so and the rest of
+        the report still prints.
+
 ## Manjuel will not start
 
 **`RACK UNREACHABLE — the ground is open, the models are not.`**

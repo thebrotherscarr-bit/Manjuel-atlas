@@ -28,6 +28,16 @@ check and the standup's dry run) on Windows and Ubuntu on every push.
 objectives on your rack in about ninety seconds, a report to read. The
 court -- six seats, the big models, minutes -- is `--court`, on its own.
 
+## The dashboard
+
+There is a control plane: `atlas`. Two processes -- an MCP door serving 72
+tools on `:8090`, and a web app on `:8091` -- and the browser is where the
+whole loop lives: boot an engine, type an objective, watch the seats run,
+commit and push through the council, close the sitting. Nothing opens a
+sitting behind you, and every act goes through the law gate rather than
+around it. **RUNBOOK.md, "Starting the system", is how to build and start
+both** -- every command in it was run before it was written.
+
 ## What a turn looks like
 
 Type, or speak (`/chat`). Before any model sees it, arithmetic decides: is
