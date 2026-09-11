@@ -34,6 +34,39 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### The guard for the suites' own writers, pinned
+
+Named in the last two entries and left standing twice; pinned now.
+`test_the_chain_writes_declared_newlines` scans `manjuel/*.py` and always has.
+The SUITES write the record too — all four stamps are tracked — and no stroke
+had ever asked how they terminate a line. That blind spot cost a mixed
+`run_history.jsonl` and three more LF writers into tracked records.
+
+`test_the_suites_write_the_record_in_crlf_too` sits beside it. Twenty-two
+checks, in two halves, and the split is the design:
+
+THE HALF THAT IS RUN. `begin_run`, `record_run` and `_append_history` are
+called against a TEMP ROOT and the bytes are read back — the tally, the report
+and the history, plus a second append, because one line cannot show a
+terminator that is only wrong BETWEEN records, which is exactly how the fault
+hid. Behaviour cannot be fooled by a declaration that is never reached. Safe
+by construction: all three load their own `book` from the root they are given,
+so a temp root cannot touch a live run's record.
+
+THE HALF THAT IS NAMED, NOT GLOBBED. `audit_record.py`, `buildmap.py` and
+`standup.py` write the record and nothing else, so the engine's own rule
+applies to them whole. This file is NOT in that list, and `smoke_cli.py` is
+excluded by name with its reason asserted: most of this file's `newline="\n"`
+calls write FIXTURES into temp grounds where LF is correct, and smoke_cli's
+single `write_text` is another. A guard that cannot tell a record-writer from
+a fixture-writer goes red on good code, and a guard that cries wolf gets
+widened again by being deleted.
+
+PROVEN BY REVERSAL, because a stroke that passes with the fix undone is worth
+nothing. Both writers were put back to `\n` on a mirror and the suite exited
+1: the behavioural half named the bytes (`\n{"suite": "probe"...`), the named
+half named the file and the ruling it broke. Restored, 2148/2148.
+
 ### And the last three suite writers, so the whole record is one terminator
 
 The pass before this fixed the file that was MIXED and the writer making it so,

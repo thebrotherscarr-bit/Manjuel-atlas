@@ -8531,6 +8531,101 @@ def test_the_chain_writes_declared_newlines(reg, lib, book):
           "the old LF stroke is still defined and would assert the opposite")
 
 
+def test_the_suites_write_the_record_in_crlf_too(reg, lib, book):
+    """The other half of the estate's writers, which nothing had ever watched.
+
+    `test_the_chain_writes_declared_newlines` above scans `manjuel/*.py` --
+    the ENGINE's writers. But THE SUITES WRITE THE RECORD TOO, and all four of
+    their stamps are tracked: last_run.json, last_run.md, run_history.jsonl,
+    last_audit.md. No stroke had ever asked how those were terminated.
+
+    WHAT IT COST, found 2026-09-11: `run_history.jsonl` stood at 36 CRLF and
+    273 LF. Not drift -- TWO WRITERS APPENDING TO ONE FILE AND DISAGREEING,
+    standup.py with \\r\\n and this file with \\n. Three more suite writers
+    were LF into tracked records; consistently, which is wrong without ever
+    being MIXED, so the mixed-file sweep could not see them either.
+
+    IT NAMES THE RECORD FILES. IT DOES NOT GLOB THE FOLDER, and that is the
+    whole design: most of this file's `newline="\\n"` calls write FIXTURES
+    into temp grounds, where LF is correct and deliberate, and smoke_cli.py's
+    single write_text is another. A guard that cannot tell a record-writer
+    from a fixture-writer goes red on good code -- and a guard that cries wolf
+    gets widened again by being deleted.
+
+    So the suites that write ONLY the record are checked by name, the way
+    manjuel/ is. This file writes both, so it is proved BEHAVIOURALLY instead:
+    its record writers are called against a temp root and the bytes read back.
+    Behaviour cannot be fooled by a declaration that is never reached.
+    """
+    # ---- the half that can be RUN ----------------------------------------
+    # begin_run and record_run load their own `book` from the tally file under
+    # `root`, so a temp root is fully isolated -- calling them here cannot
+    # touch the live run's record.
+    g = Path(tempfile.mkdtemp())
+    (g / "tests").mkdir(parents=True, exist_ok=True)   # write_text will not
+
+    begin_run(g, "probe")
+    tally = g / TALLY_FILE
+    check("begin_run writes the tally at all", tally.exists(), str(tally))
+    raw = tally.read_bytes()
+    check("the tally's CRASH stamp is CRLF",
+          b"\r\n" in raw and b"\n" not in raw.replace(b"\r\n", b""),
+          repr(raw[:60]))
+
+    record_run(g, "probe", [("a stroke that held", True, "", ""),
+                            ("one that did not", False, "why", "here:1")])
+    for name, path in (("tally", g / TALLY_FILE),
+                       ("report", g / REPORT_FILE),
+                       ("history", g / HISTORY_FILE)):
+        check(f"record_run wrote the {name}", path.exists(), str(path))
+        b = path.read_bytes()
+        check(f"and the {name} carries CRLF", b"\r\n" in b, repr(b[:50]))
+        check(f"and the {name} carries NO bare LF",
+              b"\n" not in b.replace(b"\r\n", b""), repr(b[:80]))
+
+    # The append path twice over, because one line cannot show a terminator
+    # that is only wrong BETWEEN records -- which is exactly how the fault hid.
+    _append_history(g, {"suite": "probe", "at": 1, "green": True})
+    _append_history(g, {"suite": "probe", "at": 2, "green": True})
+    hb = (g / HISTORY_FILE).read_bytes()
+    check("the history APPENDS in CRLF, line after line",
+          hb.count(b"\r\n") >= 3 and b"\n" not in hb.replace(b"\r\n", b""),
+          repr(hb[-60:]))
+
+    # ---- the half that is NAMED, not globbed -----------------------------
+    # These three write the record and nothing else, so the engine's own rule
+    # applies to them whole: no writer left on the platform default, and no LF
+    # declaration surviving the 2026-09-03 ruling.
+    RECORD_ONLY = {
+        "audit_record.py": "tests/last_audit.md",
+        "buildmap.py": "BUILDMAP.md",
+        "standup.py": "the standup page and run_history.jsonl",
+    }
+    for fname, writes in sorted(RECORD_ONLY.items()):
+        f = ROOT / "tests" / fname
+        check(f"{fname} is still here to be checked", f.exists(), str(f))
+        if not f.exists():
+            continue
+        src = f.read_text(encoding="utf-8")
+        writers = src.count("write_text(")
+        opens = (src.count('.open("a", encoding="utf-8"')
+                 + src.count('.open("w", encoding="utf-8"'))
+        check(f"{fname}: every writer declares newline= ({writes})",
+              src.count('newline="\\r\\n"') >= writers + opens,
+              f"{writers} write_text + {opens} open(), "
+              f"{src.count('newline=')} newline=")
+        check(f"{fname}: no writer is left on the platform default",
+              'newline="\\n"' not in src,
+              "an LF declaration survives the 2026-09-03 ruling")
+
+    # And the exclusion is DELIBERATE and named, so a later hand does not
+    # "finish the job" by globbing tests/ and breaking the fixtures.
+    smoke = (ROOT / "tests" / "smoke_cli.py").read_text(encoding="utf-8")
+    check("smoke_cli.py is excluded because its write_text is a FIXTURE",
+          "pipelines.md" in smoke and 'newline="\\r\\n"' not in smoke,
+          "if it ever writes the record, it belongs in RECORD_ONLY above")
+
+
 def test_a_python_file_is_cut_by_definition_not_by_character(reg, lib, book):
     """DESIGN 14.10 USE 3, built 2026-09-03. windowed() mapped a big file by
     `_HEADING` -- a markdown `#`, which in PYTHON IS A COMMENT. So a 99KB
@@ -11510,6 +11605,7 @@ def main() -> int:
     test_the_tool_loop_never_repeats_itself(reg, lib, book)
     test_the_boot_reports_what_was_proved(reg, lib, book)
     test_the_chain_writes_declared_newlines(reg, lib, book)
+    test_the_suites_write_the_record_in_crlf_too(reg, lib, book)
     test_a_python_file_is_cut_by_definition_not_by_character(reg, lib, book)
     test_parity_reads_the_seat_map_not_a_constant(reg, lib, book)
     test_index_ground_says_which_mode_it_ran(reg, lib, book)
