@@ -34,6 +34,95 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### THE ARCHIVE NEVER GOES ON GITHUB, written into RULE 1
+
+His word, 2026-09-11: *"the ARCHIVE never goes on github, EVER."* It is now in
+`CLAUDE.md` under RULE 1, where Archive is already named, and it is absolute in
+the way RULE 7 is absolute about `.env`: not a file, not a path, not a branch,
+bundle, fixture, vector, log or transcript that carries it, and no previous yes
+that covers the next one. The two mechanics that actually matter are written
+down with it — `push --all` / `--mirror` / `bundle --all` send EVERY local
+branch, and copying the folder copies `.git`, which carries every branch's
+full history.
+
+**The history check that prompted it, measured rather than assumed.** Objects
+under `worlds/` reachable from each ref's FULL history, not just its tip:
+
+    refs/remotes/origin/main .............. 0 objects
+    refs/remotes/origin/HEAD .............. 0 objects
+    refs/heads/main, push-main,
+      remote-main, atlas-only ............. 0 objects
+    refs/heads/pre-strip-master ......... 289 objects, 341,809,534 bytes
+
+**Nothing under `worlds/` is public.** Zero objects reachable from any
+remote-tracking ref. The 326 MB lives only on a local branch with NO upstream,
+`push.default` is unset (so `simple`: a bare push sends the current branch
+only), and `git push --dry-run` answers "Everything up-to-date". It is safe
+where it sits and unsafe only if someone runs `--all`, `--mirror`, or copies
+`.git` — which is exactly what RULE 1 now warns about.
+
+**The rule is already violated in atlas, and by the record it is public.**
+162 occurrences of an absolute path into the Archive across 24 tracked files, on
+`origin/main`. The largest are test fixtures and captured run results, and
+several sit INSIDE hashed payloads, so removing them re-cuts goldens. Counted
+by opening all 522 tracked files: `git grep -I` reports only 7 of them because
+it skips what git judges binary, which is how this stayed quiet. Contents were
+not read — paths and counts only (SITTING LAW 2). Not fixed here: it is
+already public, so a forward-only fix does not unpublish it, and the decision
+about rewriting history is the operator's.
+
+### The four things a second machine stops on
+
+Three audits were run against a clean clone of both repos — portability,
+bootstrap, and what the repo actually ships — and then the clone was BUILT and
+RUN rather than only read. A fresh checkout does work: both repos clone with a
+clean tree at any `core.autocrlf`, all four binaries build, the strokes prove
+**2104/2104 with nothing installed**, and the cloned webapp serves. What stops
+a stranger is four things, none of which is the code.
+
+- **The RUNBOOK said atlas was a separate repository and then gave no URL for
+  it.** A stop sign with nothing past it, and the first thing a second machine
+  hits. Both clone URLs are now in `README.md` and `RUNBOOK.md`, with the
+  ruling that atlas must land at exactly `<ground>/atlas` — every build path
+  and the core's own `.gitignore` assume that name and that place. The offline
+  route is documented too, and documented to be cut AT TRANSFER TIME:
+  `git bundle create atlas.bundle main`, never `--all`, because `--all` carries
+  every local branch and a local branch can hold what was kept off the remote.
+- **Every documented install was `pip install .`, and the suite it then tells
+  you to run crashes.** `tests/test_manjuel.py` imports numpy outright, which
+  `pip install .` does not bring; the suite dies mid-run having already stamped
+  `tests/last_run.json` as `running`. `pyproject.toml` and CI have both known
+  this since the CI was red thirty runs straight for it — the fix never reached
+  the four files a stranger actually reads. `README.md`, `QUICKSTART.md`,
+  `CONTRIBUTING.md` and `SPEC.md` now all say `pip install ".[test]"`, and
+  SPEC's "MET — one `pip install .`" no longer claims something untrue.
+- **`verify_chain` was dead on every fresh install, and is now fixed in code
+  rather than documented around.** `--atlas-bin` defaults to the bare word
+  `"atlas"`; `atlas-door` walked the built tree to find the Rust spine and
+  `atlas-mcp` never did, so the same estate answered differently depending on
+  which door you came through. The walk now lives in `internal/tools`, the one
+  place that actually shells the binary, and starts from the RUNNING BINARY's
+  own location — a first cut walked up from the tenant home, which for
+  atlas-mcp is the core ground, and the spine lives DOWN from there in
+  `atlas/target/`. Proved live: with no `--atlas-bin` passed at all,
+  `verify_chain law/chain.jsonl` went from
+  `exec: "atlas": not found in %PATH%` to `verdict=FLIP entries=4`.
+- **The Rust build was named nowhere in the core, and its linker nowhere at
+  all.** `RUNBOOK.md` now carries `cargo build -p atlas` before the Go builds,
+  and `atlas/README.md` names the MSVC toolchain that `store/src/ffi.rs`
+  requires by linking Windows' `winsqlite3`. A fresh PC with only rustup fails
+  on `linker 'link.exe' not found`, which says nothing about this project.
+  Its Go and Python version claims were corrected in the same pass (it
+  demanded Python 3.14; nothing here needs it), as was a build line that
+  produced no binaries: `go build ./...` over five main packages is a compile
+  check, and Go discards every result.
+
+Measured, not asserted: the same commit stamps **2106/2106 on the author's
+ground and 2104/2104 on a clean clone of it**, both green. The suite is not a
+fixed size across machines, so that tally is not an acceptance bar to carry to
+another PC.
+
+
 ### 2026-09-10 — EVERY SKILL WAS HANDED THE SAME TWO ARGUMENTS
 - **`tool_schemas` WAS A CONSTANT.** All thirty-nine skills were offered
   `content` and `filepath`, whatever their markdown declared. The docstring

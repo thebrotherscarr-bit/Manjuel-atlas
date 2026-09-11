@@ -61,7 +61,10 @@ and the tools -- that is RUNBOOK.md, "Starting the system".
   `index ground`, since each embedder's vectors mean nothing to another's.
 - **Python 3.10+**. One dependency, and it is the only one:
 
-      pip install .            # from a clone -- brings `ollama` with it
+      pip install ".[test]"     # from a clone. `ollama` runs it; `numpy`
+                               # PROVES it -- tests/test_manjuel.py imports
+                               # numpy outright, so plain `pip install .`
+                               # succeeds and then dies mid-suite.
 
   That puts a `manjuel` command on PATH. `python manjuel.py` from the clone
   still works and is what the record's examples use.

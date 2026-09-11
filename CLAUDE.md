@@ -102,6 +102,36 @@ Every read, every write, every search, every runtime dependency stays inside
 
 **Reaching outside means asking first — every single time.**
 
+### AND THE ARCHIVE NEVER GOES ON GITHUB. EVER.
+
+His word, 2026-09-11: *"the ARCHIVE never goes on github, EVER."*
+
+Not a file from it. Not a path out of it. Not a branch, a bundle, a fixture,
+a test vector, a log or a transcript that carries its contents. Not "just the
+one that is already scrubbed". There is no size, no urgency and no cleanup
+task that makes an exception, and no previous yes that covers the next one
+(RULE 2).
+
+This is absolute in the way RULE 7 is absolute about `.env`, and for the same
+reason: what reaches a public remote cannot be recalled, because someone may
+already have fetched it. A hand that is about to push, bundle, mirror, or copy
+a `.git` directory checks what it is carrying FIRST — the history, not only
+the branch tip. An object deleted in a later commit is still reachable from
+the branch that once held it.
+
+Two mechanics that have actually mattered here, both measured 2026-09-11:
+
+    - `git push --all` and `git push --mirror` send EVERY local branch, not
+      the one you are standing on. `git bundle create <f> --all` does the
+      same. Name the branch: `... main`.
+    - Copying the folder copies `.git`, and `.git` carries every branch's
+      full history. To hand this ground to another machine, transfer a
+      single-branch artifact: `git bundle create <f> main`, or
+      `git clone --single-branch --branch main`.
+
+The worlds are the same ruling by another name: `worlds/` is gitignored, and
+it stays out of every remote for the same reason and with the same force.
+
 ## RULE 2 — A "YES" IS FOR THAT ONE ACT, AND NOTHING ELSE.
 
 Permission is granted per-file, per-action, per-moment. It does not carry to:

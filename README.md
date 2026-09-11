@@ -9,7 +9,9 @@ the router and it still works — that property is the point.
 
 ## Install
 
-    pip install .          # one dependency: ollama
+    pip install ".[test]"   # ollama to run; numpy to PROVE (the strokes
+                           # import it outright, so plain `pip install .`
+                           # installs fine and then crashes the suite)
 
 Puts `manjuel` on PATH. `python manjuel.py` from a clone works too.
 Full prerequisites -- Ollama and the model pulls, seven since the rack
@@ -37,6 +39,12 @@ commit and push through the council, close the sitting. Nothing opens a
 sitting behind you, and every act goes through the law gate rather than
 around it. **RUNBOOK.md, "Starting the system", is how to build and start
 both** -- every command in it was run before it was written.
+
+atlas is a SEPARATE repository and must be cloned into this ground as
+`atlas`; cloning this repo alone gives you the engine and no dashboard.
+
+    core    https://github.com/thebrotherscarr-bit/Manjuel.git
+    atlas   https://github.com/thebrotherscarr-bit/Atlas.git
 
 ## What a turn looks like
 

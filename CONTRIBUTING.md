@@ -2,7 +2,8 @@
 
 ## Run the suites first
 
-    pip install .
+    pip install ".[test]"   # the [test] extra is not optional for the
+                           # strokes: one of them imports numpy outright.
     python tests/test_manjuel.py && python tests/smoke_cli.py
     python law/law.py verify
     python tests/buildmap.py            regenerate BUILDMAP.md after a code change

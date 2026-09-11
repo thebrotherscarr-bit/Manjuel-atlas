@@ -43,6 +43,36 @@ two repos sharing one ground (`atlas/` is gitignored by the core). Cloning the
 core does NOT bring the dashboard: without atlas there is nothing here to
 build, which is what a second machine finds first.
 
+**So clone it, INTO the ground, at exactly `atlas`.** Every build path below
+and the core's own `.gitignore` assume that name and that place.
+
+    cd <YOUR-GROUND>
+    git clone https://github.com/thebrotherscarr-bit/Atlas.git atlas
+
+The core itself is `https://github.com/thebrotherscarr-bit/Manjuel.git`. Both
+are public. Until 2026-09-11 this page told you atlas was a separate repo and
+then gave no URL for it — a stop sign with nothing past it, which is the first
+thing a second machine hits.
+
+**Offline?** Make the bundle at transfer time, never ship a stale one:
+
+    git bundle create atlas.bundle main          # run inside atlas/
+    git clone atlas.bundle atlas                 # on the other machine
+
+Use `main`, not `--all`. `--all` carries every local branch, and a local
+branch can hold material that was deliberately kept off the remote.
+
+**Build the Rust spine first.** `verify_chain` shells a Rust binary, and the
+Go halves are useless without it — `atlas/tests/prove.py` reports the door leg
+RED on any machine where it has not been built.
+
+    cd atlas
+    cargo build -p atlas        # -> atlas\target\debug\atlas.exe
+
+Nothing needs to be told where it is: the door walks out from its own
+location to find `target\{debug,release}\atlas.exe`. `--atlas-bin` and
+`ATLAS_BIN` still override, and both win over the walk.
+
 **Build them once.** Both binaries are `*.exe`, which `.gitignore` already
 covers, so they live beside their own source and never reach a commit.
 
