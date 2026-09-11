@@ -88,3 +88,21 @@ node_modules/
 # The files were untracked here with `git rm -r --cached atlas`; the history
 # that holds them is untouched, as LAW 1 requires.
 atlas/
+
+# A STRAY data/ AND A STALE BUNDLE, untracked 2026-09-11 at the operator's word.
+#
+# data/ is the webapp's own store. atlas/webapp/main.go opens it RELATIVE to
+# the working directory, so starting the glass from the ground root instead of
+# atlas\webapp silently makes a second, empty store here — which has already
+# happened on this disk. It is never authored and never belongs to the core.
+data/
+#
+# atlas.bundle was 1.1 MB of this repo's 3.7 MB and no tracked file mentioned
+# it. It held refs/heads/main at 41a0d51, EIGHTEEN commits behind atlas, so
+# the one artifact a second machine would reach for was silently out of date.
+# atlas is public and RUNBOOK now carries its clone URL; where a bundle really
+# is wanted it is cut AT TRANSFER TIME from the branch, never shipped stale:
+#     git bundle create atlas.bundle main
+# Never --all: that carries every local branch, and a local branch can hold
+# what was deliberately kept off the remote.
+*.bundle
