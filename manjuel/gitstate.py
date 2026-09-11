@@ -1,14 +1,36 @@
-"""Git state, read-only.
+"""Git, from the core's own hand.
 
-This module NEVER writes to the repository. It does not commit, push, stage,
-checkout, or tag. LAW 6 is explicit: "no commit, no push ... within the walls,
-the court may rule; across the wall, only he lands." So manjuel reads the
-repository's state, stamps it into the record, and hands the operator the exact
-command when one is wanted. Running it is his act, not the system's.
+THIS DOCSTRING WAS WRONG FOR MONTHS. It opened "Git state, read-only. This
+module NEVER writes to the repository. It does not commit, push, stage,
+checkout, or tag" -- while the bottom half of this same file has committed 29
+times and pushed 24, by the record's own count. The Write operations section
+below was added under it and the header was never revisited. A file that
+denies what its own second half does is worse than an undocumented one,
+because it is believed.
 
-Every subprocess call here is a plumbing read (`rev-parse`, `status
---porcelain`, `log -1`), bounded by a timeout, and safe on a directory that is
-not a repository at all.
+WHAT IS ACTUALLY TRUE, and the line LAW 6 actually draws:
+
+    LOCAL writes are the core's        init, add, commit, branch, switch.
+                                       Additive, confined to this ground,
+                                       and recoverable -- git keeps what it
+                                       is given.
+
+    REMOTE acts are walled             push, pull. They cross to somewhere
+                                       the operator does not control and a
+                                       push cannot be recalled once fetched.
+                                       OFF unless MANJUEL_GIT_REMOTE=1.
+
+    THE GATE IS STILL HIS              nothing here fires on its own. Every
+                                       call below is reached because he
+                                       asked for it, in the REPL or in words.
+
+THE CORE READS ITS OWN GROUND. Added 2026-09-10 at the operator's word: the
+REPL should not have to ask atlas what is going on in its own repository.
+diff, branches, switch and remotes land here so `/git` can answer without a
+door, an engine or a browser standing.
+
+Every subprocess call in this module closes its own stdin and is bounded by a
+timeout, and every one is safe on a directory that is not a repository.
 """
 
 from __future__ import annotations
@@ -333,3 +355,254 @@ def push(ground: Path) -> str:
     if rc != 0:
         raise GitRefused(err or out or "git push failed")
     return out or err or "Pushed."
+
+
+# =====================================================================
+# What the core could not see about itself
+# =====================================================================
+#
+# Until 2026-09-10 this module could say WHETHER the ground was dirty and
+# nothing about WHAT changed, could name the branch it was on and offer no
+# way to leave it, and could push to a remote it could not name. The door
+# (atlas) grew all three the same day, which left the core asking a browser
+# about its own repository. The operator: "it would make a lot more sense to
+# smarten up the REPL and add in the git functionality then just relying on
+# atlas to understand WTF is going on".
+#
+# These are the core's own. The door keeps its copy; that redundancy is
+# deliberate -- the court, the acting seats and the door each reach git by
+# their own path, and a layer that cannot see for itself is a layer that
+# cannot check anyone else.
+
+
+def _jailed(ground: Path, rel: str) -> str:
+    """Refuse a path that leaves this ground. Resolve first, judge after.
+
+    RULE 1 is about where a path LANDS, not how it is spelled, so the stated
+    form is never trusted -- `a/../../b` is judged where it ends up.
+    """
+    if not rel:
+        return ""
+    if rel.startswith(("/", "\\")) or ":" in rel:
+        return f"Refused: an absolute path is outside this ground ({rel})."
+    home = Path(ground).resolve()
+    try:
+        full = (home / rel).resolve()
+    except OSError:
+        return f"Refused: that path could not be resolved ({rel})."
+    if full != home and home not in full.parents:
+        return f"Refused: that path resolves outside this ground ({rel})."
+    return ""
+
+
+DIFF_CAP = 60_000
+
+
+def diff(ground: Path, path: str = "", cap: int = DIFF_CAP) -> str:
+    """What actually changed -- one file, or the whole tree.
+
+    UNTRACKED IS NOT A DIFF. `git diff` says nothing about a file git has
+    never seen, so a reader that only ran diff would show an empty page for
+    the one kind of file most likely to be lost. Those come back as their own
+    first bytes, and it says so.
+
+    BOUNDED, WITH THE BOUND NAMED. A truncated diff that does not admit it was
+    truncated is a lie about the size of a change.
+    """
+    ground = Path(ground)
+    if not read(ground).is_repo:
+        return "This ground is not a git repository."
+
+    rel = (path or "").strip()
+    refusal = _jailed(ground, rel)
+    if refusal:
+        return refusal
+
+    def clip(text: str, what: str) -> str:
+        if len(text) <= cap:
+            return text
+        return (text[:cap] +
+                f"\n\n... ({what} is {len(text)} bytes; this is the first {cap})")
+
+    if not rel:
+        _, staged = _run(["diff", "--cached"], ground)
+        _, unstaged = _run(["diff"], ground)
+        both = (staged + "\n" + unstaged).strip()
+        return clip(both, "the whole diff") if both else \
+            "Nothing has changed since the last commit."
+
+    for args, what in ((["diff", "--", rel], "the change"),
+                       (["diff", "--cached", "--", rel], "the staged change")):
+        rc, out = _run(args, ground)
+        if rc == 0 and out.strip():
+            return clip(out, what)
+
+    full = ground / rel
+    if not full.exists():
+        return f"No such file in this ground: {rel}"
+    try:
+        body = full.read_text(encoding="utf-8", errors="replace")
+    except OSError as exc:
+        return f"That file has no recorded change and could not be read: {exc}"
+    return (f"{rel} is new -- git has never seen it, so there is nothing to "
+            f"compare it against. Its contents:\n\n" + clip(body, "the file"))
+
+
+def branches(ground: Path) -> list[dict]:
+    """Every line of work, newest first, with where you stand marked.
+
+    `sent` answers what a branch list is usually asked for: is this only on my
+    machine? An upstream means the remote has seen it.
+    """
+    ground = Path(ground)
+    st = read(ground)
+    if not st.is_repo:
+        return []
+    here = st.branch
+    rc, raw = _run(
+        ["for-each-ref", "--sort=-committerdate",
+         "--format=%(refname:short)\t%(upstream:short)\t%(committerdate:relative)"
+         "\t%(contents:subject)", "refs/heads"],
+        ground)
+    if rc != 0:
+        return []
+    out: list[dict] = []
+    for line in raw.splitlines():
+        if not line.strip():
+            continue
+        parts = (line.split("\t") + ["", "", ""])[:4]
+        name, upstream, when, subject = parts
+        out.append({
+            "name": name,
+            "current": name == here,
+            "main": name in ("main", "master"),
+            "upstream": upstream,
+            "sent": bool(upstream),
+            "when": when,
+            "subject": subject,
+        })
+    return out
+
+
+_BRANCH_BAD = (" ", "..", "~", "^", ":", "?", "*", "[", "\\", "@{")
+
+
+def _bad_branch_name(name: str) -> str:
+    if not name:
+        return "Refused: name the line of work."
+    if name.startswith("-"):
+        return ("Refused: a branch name may not begin with '-' -- git reads it "
+                "as a flag.")
+    for bad in _BRANCH_BAD:
+        if bad in name:
+            return (f"Refused: {name!r} is not a lawful branch name "
+                    f"({bad!r} is not allowed).")
+    if name.endswith("/") or name.endswith(".lock"):
+        return f"Refused: {name!r} is not a lawful branch name."
+    return ""
+
+
+def switch(ground: Path, name: str, create: bool = False) -> str:
+    """Move to a line of work, or open one and move there.
+
+    A DIRTY TREE DOES NOT FOLLOW YOU QUIETLY. Uncommitted work carried onto
+    another branch confuses both, so this refuses and says what to do about
+    it. Opening a NEW line carries the work on purpose, which is the usual
+    reason to open one, so that case is allowed.
+    """
+    ground = Path(ground)
+    if not read(ground).is_repo:
+        raise GitRefused("this ground is not a git repository")
+    refusal = _bad_branch_name(name)
+    if refusal:
+        raise GitRefused(refusal)
+
+    blocked = lock_state(ground)
+    if blocked:
+        raise GitRefused(blocked)
+
+    if not create and read(ground).dirty:
+        raise GitRefused(
+            "there is uncommitted work here. Commit it first, or it follows "
+            "you onto the other line and confuses both.")
+
+    args = ["switch", "-c", name] if create else ["switch", name]
+    rc, out, err = _write(args, ground)
+    if rc != 0:
+        raise GitRefused(err or out or f"could not switch to {name}")
+    if create:
+        return (f"Opened {name} and moved onto it. It exists only here until "
+                f"it is pushed.")
+    return f"Now on {name}."
+
+
+def close_branch(ground: Path, name: str) -> str:
+    """Finish with a line of work.
+
+    UNMERGED WORK IS NOT DISCARDED ON A GUESS. Plain -d refuses a branch git
+    cannot see folded in; that refusal is reported, never escalated to -D.
+    Throwing away the only copy of something is the operator's act.
+    """
+    ground = Path(ground)
+    st = read(ground)
+    if not st.is_repo:
+        raise GitRefused("this ground is not a git repository")
+    refusal = _bad_branch_name(name)
+    if refusal:
+        raise GitRefused(refusal)
+    if name == st.branch:
+        raise GitRefused("you are standing on that line. Move to another first.")
+
+    rc, out, err = _write(["branch", "-d", name], ground)
+    if rc != 0:
+        both = (err or "") + (out or "")
+        if "not fully merged" in both:
+            raise GitRefused(
+                f"{name} holds work that is on no other line. Closing it would "
+                f"lose that work. Merge it first, or discard it yourself with "
+                f"`git branch -D {name}` if that is what you mean.")
+        raise GitRefused(both.strip() or f"could not close {name}")
+    return f"Closed {name}. Its work is already on another line."
+
+
+def remotes(ground: Path) -> list[dict]:
+    """Where this ground sends, by name and host.
+
+    READ-ONLY, DELIBERATELY. Adding, renaming or removing a remote points the
+    repository at a different server; that is a decision, not a verb a seat
+    gets.
+    """
+    ground = Path(ground)
+    if not read(ground).is_repo:
+        return []
+    rc, raw = _run(["remote", "-v"], ground)
+    if rc != 0:
+        return []
+    seen: dict[str, str] = {}
+    order: list[str] = []
+    for line in raw.splitlines():
+        bits = line.split()
+        if len(bits) < 2:
+            continue
+        if bits[0] not in seen:
+            order.append(bits[0])
+        seen[bits[0]] = bits[1]
+    return [{"name": n, "url": seen[n], "host": _host_of(seen[n])} for n in order]
+
+
+def _host_of(url: str) -> str:
+    """The server a remote points at, for both spellings git accepts.
+
+    LAW 9 reaches here: a remote URL can carry a token in its userinfo, so the
+    userinfo is cut before anything is returned. Only the host comes out --
+    never the credential half.
+    """
+    u = url
+    if "://" in u:
+        u = u.split("://", 1)[1]
+    if "@" in u:
+        u = u.rsplit("@", 1)[1]
+    for cut in ("/", ":"):
+        if cut in u:
+            u = u.split(cut, 1)[0]
+    return u

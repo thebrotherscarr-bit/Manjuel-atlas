@@ -492,7 +492,7 @@ COMMANDS = [
     ("last",      "record",    "reprint the previous answer"),
     ("remember",  "record",    "land an entry in memory.md (confirms first)"),
     ("memory",    "record",    "review what seats proposed; land or drop"),
-    ("git",       "record",    "repository state"),
+    ("git",       "record",    "the repository: state, diff, branches, commit, push; /git help"),
     ("toll",      "record",    "pay this sitting's toll"),
     ("sittings",  "record",    "past sittings"),
     ("brief",     "record",    "where the build is and what you said we are on; the door says it"),
@@ -782,7 +782,7 @@ def handle_command(cmd: str, sess: Session) -> bool:
         _cmd_parity(sess, arg)
 
     elif name == "git":
-        _cmd_git(sess)
+        _cmd_git(sess, arg)
     elif name == "toll":
         _cmd_toll(sess, attended=True)
     elif name == "sittings":
@@ -1433,21 +1433,181 @@ def _cmd_parity(sess: Session, arg: str = "") -> None:
         print(f"  (pairs not written: {exc})\n")
 
 
-def _cmd_git(sess: Session) -> None:
+GIT_USAGE = """  /git                    where this ground stands
+  /git diff [path]        what actually changed
+  /git branch             the lines of work
+  /git branch <name>      open a new line and move onto it
+  /git switch <name>      move to a line
+  /git close <name>       finish with a line
+  /git commit <message>   commit it (asks first)
+  /git push | /git pull   send | take        (walled by MANJUEL_GIT_REMOTE)
+  /git remote             where this ground sends"""
+
+
+def _cmd_git(sess: Session, arg: str = "") -> None:
+    """The core's own git, in the REPL.
+
+    THE REPL SHOULD NOT HAVE TO ASK ATLAS WHAT IS GOING ON IN ITS OWN
+    REPOSITORY. Until 2026-09-10 this printed a state line and then handed the
+    operator a shell command to run himself -- the exact pattern we spent that
+    day removing from the dashboard, and the one that misfired when a bash
+    line was pasted into a PowerShell prompt. His word: "it would make a lot
+    more sense to smarten up the REPL and add in the git functionality then
+    just relying on atlas to understand WTF is going on".
+
+    THE LINE THAT USED TO STAND HERE WAS FALSE. It read "manjuel never commits
+    (LAW 6: the gate is final)" while the `git_commit` skill had committed 29
+    times and pushed 24, by the record's own count. LAW 6 does not say the
+    machine never commits; it says the GATE IS HIS. So the gate is kept where
+    it belongs -- every write below asks first, in words, and a bare Enter is
+    a no -- and the sentence now says what is actually true.
+
+    REDUNDANT WITH THE DOOR, DELIBERATELY. atlas has its own copy of these
+    verbs. The operator: "there is a series of redundancies.. its called
+    safety, bud." A layer that cannot see for itself cannot check any other.
+    """
+    parts = (arg or "").strip().split(None, 1)
+    verb = parts[0].lower() if parts else ""
+    rest = parts[1].strip() if len(parts) > 1 else ""
+
     g = gitstate.read(ROOT)
-    print()
-    print(f"  {g.stamp()}")
-    if g.is_repo and g.subject:
-        print(f"  last: {g.subject}")
-    if not g.is_repo and not g.error:
-        print("  This ground is not under version control. To start:")
-        print(f'    git -C "{ROOT}" init && git -C "{ROOT}" add -A && '
-              f'git -C "{ROOT}" commit -m "manjuel: initial"')
-    elif g.is_repo and g.dirty:
-        print("  To version this sitting, run this YOURSELF:")
-        print("    " + gitstate.suggest_commit(ROOT, f"manjuel: sitting {sess.sitting.n}"))
-        print("  manjuel never commits (LAW 6: the gate is final).")
-    print()
+
+    if verb in ("help", "?"):
+        print("\n" + GIT_USAGE + "\n")
+        return
+
+    if not g.is_repo and verb not in ("", "init"):
+        print("\n  This ground is not under version control. `/git init` starts it.\n")
+        return
+
+    # ---- where we stand ------------------------------------------------
+    if not verb:
+        print()
+        print(f"  {g.stamp()}")
+        if g.is_repo and g.subject:
+            print(f"  last: {g.subject}")
+        if not g.is_repo and not g.error:
+            print("  This ground is not under version control. `/git init` starts it.")
+        elif g.is_repo:
+            local, remote, why = gitstate.head_and_remote(ROOT)
+            if remote and local != remote:
+                print(f"  local {local} and remote {remote} DISAGREE — unsent work.")
+            elif remote:
+                print(f"  level with the remote at {remote}.")
+            elif why:
+                print(f"  no remote comparison: {why}.")
+            if g.dirty:
+                print(f"  {g.changed} changed, {g.untracked} never seen before."
+                      f"  /git diff shows them; /git commit <message> lands them.")
+            wall = "allowed" if gitstate.remote_allowed() else \
+                   "OFF (MANJUEL_GIT_REMOTE) — push and pull refuse by name"
+            print(f"  sending: {wall}")
+        print()
+        print(ink.dim("  /git help for the rest"))
+        print()
+        return
+
+    # ---- reading -------------------------------------------------------
+    if verb == "diff":
+        out = gitstate.diff(ROOT, rest)
+        print("\n  " + out.replace("\n", "\n  ") + "\n")
+        return
+
+    if verb == "remote":
+        rows = gitstate.remotes(ROOT)
+        print()
+        if not rows:
+            print("  no remote is configured; this ground sends nowhere.")
+        for r in rows:
+            print(f"  {r['name']:<10} {r['host']:<20} {r['url']}")
+        print(f"  sending: {'allowed' if gitstate.remote_allowed() else 'OFF (MANJUEL_GIT_REMOTE)'}")
+        print()
+        return
+
+    if verb == "branch" and not rest:
+        rows = gitstate.branches(ROOT)
+        print()
+        if not rows:
+            print("  no lines of work yet.")
+        for b in rows:
+            marks = []
+            if b["current"]:
+                marks.append("you are here")
+            if b["main"]:
+                marks.append("the main line")
+            marks.append("on the remote" if b["sent"] else "only on this machine")
+            print(f"  {'*' if b['current'] else ' '} {b['name']:<22} "
+                  f"{ink.dim(' · '.join(marks))}")
+            if b["subject"]:
+                print(f"    {ink.dim(b['when'] + '  ' + b['subject'][:60])}")
+        print()
+        return
+
+    # ---- writing: every one of these asks first -------------------------
+    try:
+        if verb == "init":
+            if not _confirm(f"\n  start version control in {ROOT}?"):
+                print("  nothing done.\n")
+                return
+            print("\n  " + gitstate.init(ROOT) + "\n")
+
+        elif verb == "branch":
+            if not _confirm(f"\n  open a new line of work called {rest!r}?"):
+                print("  nothing done.\n")
+                return
+            print("\n  " + gitstate.switch(ROOT, rest, create=True) + "\n")
+
+        elif verb in ("switch", "use"):
+            print("\n  " + gitstate.switch(ROOT, rest) + "\n")
+
+        elif verb in ("close", "delete"):
+            if not _confirm(f"\n  finish with {rest!r}?"):
+                print("  nothing done.\n")
+                return
+            print("\n  " + gitstate.close_branch(ROOT, rest) + "\n")
+
+        elif verb == "commit":
+            if not rest:
+                print("\n  /git commit <message> — the message is the one part "
+                      "of this a machine cannot supply.\n")
+                return
+            if not g.dirty:
+                print("\n  Nothing to commit; the ground is clean.\n")
+                return
+            print(f"\n  {g.changed} changed, {g.untracked} never seen before, in:")
+            for a in gitstate.areas(ROOT):
+                print(f"    {a}")
+            if not _confirm(f'\n  commit all of it as "{rest}"?'):
+                print("  nothing committed.\n")
+                return
+            print("\n  " + gitstate.commit(ROOT, rest) + "\n")
+
+        elif verb == "push":
+            if not _confirm("\n  send this work to the remote? It cannot be "
+                            "recalled once fetched."):
+                print("  nothing sent.\n")
+                return
+            print("\n  " + gitstate.push(ROOT))
+            local, remote, why = gitstate.head_and_remote(ROOT)
+            # A push exiting 0 is not proof the remote moved.
+            if remote and local == remote:
+                print(f"  proven landed: local and remote both at {local}.\n")
+            elif remote:
+                print(f"  ** local {local}, remote {remote} — IT DID NOT LAND. **\n")
+            else:
+                print(f"  ** unverified: {why or 'the remote head could not be read'} **\n")
+
+        elif verb == "pull":
+            if not _confirm("\n  take the remote's work into this ground?"):
+                print("  nothing taken.\n")
+                return
+            print("\n  " + gitstate.pull(ROOT) + "\n")
+
+        else:
+            print(f"\n  /git does not know {verb!r}.\n\n" + GIT_USAGE + "\n")
+
+    except gitstate.GitRefused as exc:
+        print(f"\n  Refused: {exc}\n")
 
 
 def _cmd_sittings(sess: Session) -> None:

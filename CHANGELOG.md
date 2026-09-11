@@ -34,6 +34,38 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE CORE STOPPED ASKING ATLAS ABOUT ITS OWN REPOSITORY
+- **`/git` WAS A PRINT STATEMENT THAT HANDED YOU A SHELL COMMAND.** It reported a
+  state line and then said *"To version this sitting, run this YOURSELF"* followed by
+  a `git -C ... && ...` string -- the exact pattern removed from the dashboard the same
+  day, and the one that misfired when a bash line was pasted into a PowerShell prompt
+  and `&&` came back "not a valid statement separator".
+- **AND IT SAID SOMETHING FALSE.** The line read *"manjuel never commits (LAW 6: the
+  gate is final)"* while `git_commit` had committed **29 times** and `git_push` pushed
+  **24**, by `sessions/sessions.jsonl`'s own count. LAW 6 does not say the machine
+  never commits; it says the GATE IS HIS. `gitstate.py`'s module docstring carried the
+  same denial -- *"This module NEVER writes to the repository"* -- above a Write
+  operations section that does exactly that. Both now say what is true, and the gate is
+  kept where it belongs: **every write in `/git` asks first, and a bare Enter is a no.**
+- **THREE VERBS THE CORE NEVER HAD:** `diff`, `branches`/`switch`/`close_branch`, and
+  `remotes`. It could say WHETHER the ground was dirty and nothing about WHAT changed,
+  could name the branch it stood on and offer no way to leave it, and could push to a
+  remote it could not name. The first run found **five branches on this ground, three
+  of them local-only** -- `atlas-only`, `pre-strip-master`, `remote-main` -- leftovers
+  from the repo split that nothing in the core could see.
+- **`/git` IS A COMMAND NOW:** `diff [path]`, `branch`, `branch <name>`, `switch`,
+  `close`, `commit <message>`, `push`, `pull`, `remote`, `help`. A push reports whether
+  it actually **landed** -- local head against remote head -- because `git push` exiting
+  0 is not proof the remote moved.
+- **REDUNDANT WITH THE DOOR, DELIBERATELY.** atlas keeps its own copy of these verbs.
+  The operator: *"there is a series of redundancies.. its called safety, bud."* A layer
+  that cannot see for itself cannot check any other.
+- **LAW 9 REACHES THE REMOTE PARSER.** A remote URL can carry a token in its userinfo,
+  so `_host_of` cuts the userinfo before returning; a stroke pins that a token-bearing
+  URL gives back `github.com` and nothing else.
+- **Proven:** `2100/2100` strokes (was 2060 — **40 new**, hermetic, each building its
+  own repository in a temp dir) and `60/60` smoke. No `.git/index.lock` left behind.
+
 ### 2026-09-10 — THE ROUTER WAS BEING ASKED TO CHOOSE BETWEEN ONE OPTION (SPEC 4.2)
 - **THE LAST OPEN CLAUSE OF 4.2, AND IT HAD BEEN OPEN SINCE 2026-09-04.** `decided_call`
   ran the call itself when the engine had the tool AND an argument checked on disk. A

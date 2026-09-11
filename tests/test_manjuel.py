@@ -10994,6 +10994,127 @@ def test_doctrine():
               short[:160])
 
 
+def test_the_core_sees_its_own_repository():
+    """gitstate's diff, branches, switch, close and remotes (2026-09-10).
+
+    THE CORE SHOULD NOT HAVE TO ASK ATLAS ABOUT ITS OWN GROUND. The door grew
+    these verbs the same morning and the REPL had none of them: it could say
+    WHETHER the ground was dirty and nothing about WHAT changed, could name
+    the branch it stood on and offer no way to leave it, and could push to a
+    remote it could not name.
+
+    Hermetic: a repository built in a temp dir, nothing touching this ground.
+    """
+    g = Path(tempfile.mkdtemp())
+
+    # Absence is answered honestly before anything exists.
+    check("a non-repository has no branches to list", gitstate.branches(g) == [])
+    check("a non-repository has no remotes to name", gitstate.remotes(g) == [])
+    check("diff on a non-repository says so rather than raising",
+          "not a git repository" in gitstate.diff(g))
+
+    # LAW 9 reaches the remote parser: a URL can carry a token in its
+    # userinfo, and only the host may ever come back out.
+    leaky = "https://x-access-token:ghp_NOTAREALTOKEN@github.com/o/r.git"
+    host = gitstate._host_of(leaky)
+    check("a remote URL never hands back its credential half",
+          host == "github.com" and "ghp_" not in host and "token" not in host,
+          host)
+    check("both spellings of a remote resolve to the same host",
+          gitstate._host_of("git@github.com:o/r.git") == "github.com"
+          and gitstate._host_of("https://github.com/o/r.git") == "github.com")
+
+    # A path is judged where it LANDS, never as it is spelled.
+    for bad in ("../outside.md", "a/../../b", "/etc/passwd", "C:\\keys.txt"):
+        check(f"a path leaving the ground is refused: {bad}",
+              bool(gitstate._jailed(g, bad)), gitstate._jailed(g, bad)[:60])
+    check("a path inside the ground is admitted, however it is spelled",
+          gitstate._jailed(g, "sub/../f.txt") == "")
+
+    # A branch name that git would read as a flag never reaches git.
+    for bad in ("", "-rf", "two words", "a..b", "a~1", "a^", "a:b", "a@{0}",
+                "a.lock"):
+        check(f"an unlawful branch name is refused: {bad!r}",
+              bool(gitstate._bad_branch_name(bad)))
+    for ok in ("main", "fix/the-door", "v0.1.2", "a_b-c.d"):
+        check(f"a lawful branch name is admitted: {ok}",
+              gitstate._bad_branch_name(ok) == "")
+
+    if not HAVE_GIT:
+        return                    # reported once, in main(); never a crash
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=g)
+    subprocess.run(["git", "config", "user.email", "t@t"], cwd=g)
+    subprocess.run(["git", "config", "user.name", "t"], cwd=g)
+    (g / "f.txt").write_text("first\n", encoding="utf-8")
+    gitstate.commit(g, "the first save")
+
+    check("a clean ground says nothing changed rather than printing an empty diff",
+          "Nothing has changed" in gitstate.diff(g))
+
+    # UNTRACKED IS NOT A DIFF. `git diff` says nothing about a file git has
+    # never seen -- the one kind most likely to be lost -- so those come back
+    # as their own contents, and the answer says which it is.
+    (g / "new.txt").write_text("never seen\n", encoding="utf-8")
+    d = gitstate.diff(g, "new.txt")
+    check("a file git has never seen comes back as its contents, said plainly",
+          "git has never seen it" in d and "never seen" in d, d[:90])
+
+    (g / "f.txt").write_text("second\n", encoding="utf-8")
+    d = gitstate.diff(g, "f.txt")
+    check("a changed file comes back as a real diff",
+          d.startswith("diff --git") and "second" in d, d[:60])
+    check("an absent file is named, not invented",
+          "No such file" in gitstate.diff(g, "nope.txt"))
+
+    # BOUNDED, WITH THE BOUND NAMED. A stump that does not admit it is a
+    # stump lies about the size of a change.
+    (g / "big.txt").write_text("y" * 5000, encoding="utf-8")
+    clipped = gitstate.diff(g, "big.txt", cap=500)
+    check("an oversized diff is capped AND says it was capped",
+          len(clipped) < 1200 and "this is the first 500" in clipped)
+
+    rows = gitstate.branches(g)
+    check("the branch list marks where you stand and which is the main line",
+          len(rows) == 1 and rows[0]["current"] and rows[0]["main"]
+          and rows[0]["name"] == "main", rows)
+    check("a branch with no upstream does not claim it was sent",
+          rows[0]["sent"] is False)
+
+    # Opening a line CARRIES the work on purpose; that is the usual reason.
+    check("a new line of work opens and you land on it",
+          "Opened" in gitstate.switch(g, "spur", create=True))
+    check("and the ground agrees you are on it", gitstate.read(g).branch == "spur")
+
+    gitstate.commit(g, "work that exists only on the spur")
+    check("switching back to the main line works on a clean tree",
+          "Now on main" in gitstate.switch(g, "main"))
+
+    # A DIRTY TREE DOES NOT FOLLOW YOU QUIETLY.
+    (g / "f.txt").write_text("third\n", encoding="utf-8")
+    check("switching over uncommitted work is refused by name",
+          refuses(lambda: gitstate.switch(g, "spur"), gitstate.GitRefused))
+    check("and the refused switch did not move you",
+          gitstate.read(g).branch == "main")
+    gitstate.commit(g, "settle the tree")
+
+    check("you cannot close the line you are standing on",
+          refuses(lambda: gitstate.close_branch(g, "main"), gitstate.GitRefused))
+
+    # UNMERGED WORK IS NOT DISCARDED ON A GUESS: -d refuses, and that refusal
+    # is reported rather than escalated to -D behind the operator's back.
+    closed = refuses(lambda: gitstate.close_branch(g, "spur"), gitstate.GitRefused)
+    check("closing a line holding work found nowhere else is refused", closed)
+    check("and the line it refused to close still exists",
+          any(b["name"] == "spur" for b in gitstate.branches(g)))
+
+    gitstate.switch(g, "throwaway", create=True)
+    gitstate.switch(g, "main")
+    check("an empty line closes cleanly",
+          "Closed" in gitstate.close_branch(g, "throwaway"))
+    check("and it is gone from the list",
+          not any(b["name"] == "throwaway" for b in gitstate.branches(g)))
+
+
 def test_record_and_git():
     g = Path(tempfile.mkdtemp())
     check("git reports a non-repository honestly", gitstate.read(g).is_repo is False)
@@ -11295,6 +11416,7 @@ def main() -> int:
     test_the_stamp_is_not_an_edit()
     test_doctrine()
     test_record_and_git()
+    test_the_core_sees_its_own_repository()
 
     # ONE loud line about the environment, rather than a crash or a lie.
     # Six strokes drive real git. When it is absent they return instead of
