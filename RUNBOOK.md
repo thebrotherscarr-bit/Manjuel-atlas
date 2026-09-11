@@ -139,7 +139,7 @@ The pages, in the order the panel lists them:
     Evals       the last run whole -- every seat, tool, result, timing --
                 and evals scored by hand.
     Records     the estate's own memory: the suite and standup proof cards,
-                the sittings, and 140 documents in seven kinds (doctrine,
+                the sittings, and 141 documents in seven kinds (doctrine,
                 record, spec, agents, commands, skills, logs), each opening
                 whole with a sha256 receipt.
     Settings    the dials.
@@ -253,7 +253,7 @@ other.
 
 Two different things, and it is worth keeping them apart.
 
-**Skills** are what a SEAT can do -- 37 of them, declared as markdown in
+**Skills** are what a SEAT can do -- 39 of them, declared as markdown in
 `skills\`, hot-reloaded into a running session at the next turn. A seat asks
 for one by keyword and the engine runs it; the law gate can refuse it, and a
 refusal names the law. Read them on Records -> skills, or `commands.md` for

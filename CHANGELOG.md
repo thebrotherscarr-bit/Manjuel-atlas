@@ -34,6 +34,34 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### A pass over the living docs, measured against the disk
+
+His order: make the documents true to the build. The system's own instrument,
+`python -m manjuel.doctrine --check`, came back with four findings — all dead
+paths in SYSTEM_DESIGN.md — and it is right about those. It is also blind to the
+class that has cost this estate three separate corrections in one day: A COUNT
+THAT DRIFTED. It checks suite tallies and backticked paths. It does not count
+skills, seats, modules or documents, and it does not read atlas at all.
+
+So every countable claim in the living docs was measured off the disk rather
+than read back:
+
+    README.md    "28 modules"              manjuel/*.py is 29        CORRECTED
+    RUNBOOK.md   "37 of them" (skills)     skills/*.md is 39         CORRECTED
+    RUNBOOK.md   "140 documents"           the records tool says 141  CORRECTED
+    README.md    "thirty-nine skills"      39                        held
+    RUNBOOK.md   "fourteen seats"          agents/*.md is 14         held
+    SPEC.md      "fourteen named seats"    14                        held
+    RUNBOOK.md   "seven kinds"             the records tool says 7   held
+
+The skills count is the one that mattered. README said thirty-nine and RUNBOOK
+said 37 IN THE SAME GROUND, so the two front doors disagreed with each other and
+whichever a reader opened first decided what they believed. The disk says 39.
+
+Dated ledgers were not touched — a number in a ledger is a true record of its
+day. Neither were the four paths the doctrine check names in SYSTEM_DESIGN.md:
+they are findings, not a judgement, and they are his to rule on.
+
 ### The runbook stops promising a red that was really an absence
 
 "Starting the system" told a second machine that `atlas/tests/prove.py`

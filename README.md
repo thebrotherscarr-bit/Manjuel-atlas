@@ -96,7 +96,7 @@ widen a window, only cover more ground with each one.
     agents/        one seat per file: model, clearances, wake condition, prompt
     skills/        one tool per file: keyword, description, params
     pipelines.md   the running orders
-    manjuel/      the engine (28 modules — see BUILDPATH.md)
+    manjuel/      the engine (29 modules — see BUILDPATH.md)
     tests/         the strokes and the smoke suite — offline, seconds; both
                    print their own count, which is why none is written here.
                    They also write `tests/last_run.md`: the failures, with
