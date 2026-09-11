@@ -2715,6 +2715,199 @@ def _deep_research(env: SkillExecutionEnv, args: dict) -> str:
 
 
 # =====================================================================
+# MCP — the one skill that speaks to another server
+# =====================================================================
+#
+# THE ESTATE IS LOCAL, AND THIS IS THE FIRST SKILL THAT COULD BREAK THAT.
+# Thirty-four handlers stood here before this one and not one of them opened a
+# socket; the only thing this ground talked to was Ollama on loopback. So the
+# wall is written here, in code, and not left to a dial or to good intentions:
+# a declared address that is not loopback is REFUSED BY NAME, and there is no
+# flag that turns that off. RULE 4 -- "if it needs someone else's server, it
+# does not go in" -- is the whole reason this skill can exist at all.
+#
+# A SERVER IS A DIAL, NOT A NEW FILE. `MANJUEL_MCP_<NAME>` in .env names one,
+# which is the mechanism every other wall in this estate already uses
+# (MANJUEL_GIT_REMOTE, MANJUEL_RACK_PULL). No new folder, no registry file, no
+# second place to forget -- RULE 8.
+#
+# AND THE ADDRESS IS NEVER SPOKEN. It comes out of .env, and .env is never
+# printed (RULE 7). Every line this skill returns names the SERVER, never the
+# URL behind it, including the refusals.
+#
+# WHAT THIS IS FOR. atlas serves 78 tools over MCP and the engine could not
+# reach one of them; the door pointed outward only. This turns any local MCP
+# server into a skill -- which means it inherits the law gate, the dedup, the
+# recompose, the clearances and the transcript, for free, because it IS a
+# skill. Nothing new had to be taught to the Router.
+
+_MCP_DIAL = "MANJUEL_MCP_"
+# Bounded, like everything else (ESTATE LAW 7). Short enough that a wedged
+# server is a refusal a seat can read rather than a turn that dies on the
+# skill timeout with nothing to say.
+_MCP_TIMEOUT = 60
+_MCP_LOOPBACK = {"127.0.0.1", "localhost", "::1", "[::1]"}
+
+
+def _mcp_servers() -> dict:
+    """{name: url} for every server this ground declares. Names only ever
+    leave this function paired with the url for the caller that must dial it;
+    nothing that returns to a seat carries the url."""
+    out = {}
+    for k, v in os.environ.items():
+        if k.startswith(_MCP_DIAL) and v.strip():
+            out[k[len(_MCP_DIAL):].strip().lower()] = v.strip()
+    return out
+
+
+def _mcp_rpc(url: str, method: str, params: dict) -> tuple[dict | None, str]:
+    """One JSON-RPC call. Returns (result, error-in-plain-words).
+
+    stdlib only: urllib, because a dependency for one POST is a dependency the
+    whole estate then carries (LAW 6, and the atlas law beside it).
+    """
+    import json as _json
+    import urllib.error
+    import urllib.request
+    body = _json.dumps({"jsonrpc": "2.0", "id": 1,
+                        "method": method, "params": params}).encode("utf-8")
+    req = urllib.request.Request(url, body, {"Content-Type": "application/json"})
+    try:
+        with urllib.request.urlopen(req, timeout=_MCP_TIMEOUT) as r:
+            row = _json.loads(r.read().decode("utf-8", "replace"))
+    except urllib.error.URLError as exc:
+        return None, f"it did not answer ({exc.reason})"
+    except TimeoutError:
+        return None, f"it did not answer inside {_MCP_TIMEOUT}s"
+    except ValueError:
+        return None, "it answered with something that is not JSON"
+    except Exception as exc:                     # the transport died
+        return None, f"{type(exc).__name__}: {exc}"
+    if isinstance(row, dict) and row.get("error"):
+        err = row["error"]
+        return None, f"it refused: {err.get('message') or err}"
+    return (row or {}).get("result") or {}, ""
+
+
+def _mcp_text(result: dict) -> str:
+    """An MCP result's own words. The content blocks are the answer; the
+    envelope is not."""
+    parts = []
+    for block in (result.get("content") or []):
+        if isinstance(block, dict) and block.get("text"):
+            parts.append(str(block["text"]))
+    return "\n".join(parts).strip()
+
+
+@skill("mcp_call")
+def _mcp_call(env: SkillExecutionEnv, args: dict) -> str:
+    """Call one tool on a local MCP server this ground declares.
+
+    Every way this can fail names what would answer it, because a seat that
+    gets "refused" and nothing else will invent the rest.
+    """
+    import json as _json
+    from urllib.parse import urlparse
+
+    servers = _mcp_servers()
+    name = (args.get("server") or "").strip().strip("'\"`").lower()
+
+    # NO SERVER NAMED: say which are declared. Names only -- never the address.
+    if not name:
+        if not servers:
+            return ("Refused: this ground declares no MCP server. Declare one "
+                    "as a dial in .env -- MANJUEL_MCP_<NAME>=<loopback url> -- "
+                    "and it becomes callable by <NAME>. The address must be "
+                    "loopback; the estate is local.")
+        return ("The MCP servers this ground declares: "
+                + ", ".join(sorted(servers)) + ".\nName one as <server>, and "
+                "leave <tool> blank to see what it carries.")
+
+    if name not in servers:
+        return (f"Refused: this ground declares no MCP server called "
+                f"{name!r}. It declares: "
+                + (", ".join(sorted(servers)) if servers else "none")
+                + f". A server is declared as {_MCP_DIAL}{name.upper()} in .env.")
+
+    url = servers[name]
+
+    # THE WALL. RULE 4, enforced here rather than trusted to whoever wrote the
+    # dial. A hostname that is not loopback does not get dialled, and the
+    # refusal does not repeat the address back (RULE 7).
+    try:
+        host = (urlparse(url).hostname or "").lower()
+    except ValueError:
+        host = ""
+    if host not in _MCP_LOOPBACK:
+        return (f"Refused: the address declared for {name!r} is not on this "
+                f"machine, and the estate is local (RULE 4). Only loopback is "
+                f"dialled: {', '.join(sorted(_MCP_LOOPBACK))}. Nothing was sent.")
+
+    tool = (args.get("tool") or "").strip().strip("'\"`")
+
+    # NO TOOL, OR A TOOL IT DOES NOT CARRY: answer with what it does carry.
+    # This is why there is one skill here and not two -- discovery is what a
+    # refusal already has to say to be worth reading.
+    if not tool:
+        result, err = _mcp_rpc(url, "tools/list", {})
+        if err:
+            return f"Refused: {name} could not be read -- {err}."
+        tools = result.get("tools") or []
+        if not tools:
+            return f"{name} carries no tools."
+        lines = [f"{name} carries {len(tools)} tools:"]
+        for t in tools:
+            desc = " ".join(str(t.get("description") or "").split())
+            lines.append(f"  - {t.get('name')}"
+                         + (f"  {desc[:100]}" if desc else ""))
+        return "\n".join(lines)
+
+    # THE ARGUMENTS. A tool's arguments are its own contract, so they arrive as
+    # the JSON object that contract describes rather than being guessed at here.
+    raw = (args.get("content") or "").strip()
+    payload: dict = {}
+    if raw:
+        try:
+            payload = _json.loads(raw)
+        except ValueError:
+            return (f"Refused: the arguments for {tool!r} must be a JSON "
+                    f"object, e.g. {{\"project\": \"research\"}}. Got: "
+                    f"{raw[:120]!r}")
+        if not isinstance(payload, dict):
+            return (f"Refused: the arguments for {tool!r} must be a JSON "
+                    f"OBJECT, not {type(payload).__name__}.")
+
+    # The handshake first, as the protocol asks. A server that does not need it
+    # is not harmed by it, and one that does would refuse everything without it.
+    from . import __version__ as _ver
+    _mcp_rpc(url, "initialize", {
+        "protocolVersion": "2025-06-18", "capabilities": {},
+        "clientInfo": {"name": "manjuel", "version": _ver}})
+
+    result, err = _mcp_rpc(url, "tools/call",
+                           {"name": tool, "arguments": payload})
+    if err:
+        # An unknown tool is the commonest miss, so it is answered with the
+        # roster rather than with the word "refused" and nothing else.
+        listing, lerr = _mcp_rpc(url, "tools/list", {})
+        if not lerr:
+            known = [str(t.get("name")) for t in (listing.get("tools") or [])]
+            if tool not in known:
+                return (f"Refused: {name} carries no tool called {tool!r}. "
+                        f"It carries: {', '.join(sorted(known))}.")
+        return f"Refused: {name} could not run {tool!r} -- {err}."
+
+    text = _mcp_text(result)
+    # THE TOOL'S OWN WORDS OUTRANK THE ENVELOPE. atlas learned this on
+    # 2026-09-11 (ADR-006 item 2): a tool that fails has usually said why, and
+    # replacing that with a transport-shaped message throws away the answer.
+    if result.get("isError"):
+        return (f"Refused: {name}'s {tool!r} refused -- "
+                + (text or "and said nothing about why."))
+    return text or f"{name}'s {tool!r} ran and returned nothing."
+
+
+# =====================================================================
 # Manifest
 # =====================================================================
 

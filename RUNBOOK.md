@@ -253,7 +253,7 @@ other.
 
 Two different things, and it is worth keeping them apart.
 
-**Skills** are what a SEAT can do -- 39 of them, declared as markdown in
+**Skills** are what a SEAT can do -- 40 of them, declared as markdown in
 `skills\`, hot-reloaded into a running session at the next turn. A seat asks
 for one by keyword and the engine runs it; the law gate can refuse it, and a
 refusal names the law. Read them on Records -> skills, or `commands.md` for
@@ -512,6 +512,9 @@ boot report says which took effect) or the shell. Nothing else is a dial.
     MANJUEL_LOG_HORIZON_DAYS 45    transcripts older than this leave retrieval; 0 = never (vectors.py)
     MANJUEL_NO_COLOR        off    1 turns the ink off (ink.py)
     MANJUEL_WHISPER_MODEL / _DIR / _CLI / _GGML   where speech-in looks (voice.py)
+    MANJUEL_MCP_<NAME>      --     a LOCAL MCP server, callable as <NAME> by the
+                                   `mcp_call` skill. Loopback only; anything else
+                                   is refused by name and nothing is sent (skills.py)
 
 `MANJUEL_OLLAMA_HOST` is named in dotenv.py's docstring and READ NOWHERE
 -- the runtime binds 127.0.0.1:11434 (runtime.py). Setting it does

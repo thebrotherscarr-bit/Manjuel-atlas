@@ -546,7 +546,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `open_wire` | 697-714 | The real stdout and stdin as the wire. stdout is swapped for the |
 | def | `main` | 717-827 |  |
 
-### manjuel/skills.py — 3128 lines
+### manjuel/skills.py — 3321 lines
 
 *Skills: markdown declares the interface, Python registers the implementation.*
 
@@ -625,20 +625,24 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `_search_transcripts` | 2571-2585 | What was SAID on a past run, as opposed to what the estate holds. |
 | def | `_search_scoped` | 2588-2688 |  |
 | def | `_deep_research` | 2692-2714 | Delegate to the Deep Researcher persona defined in agents.md. |
-| class | `SkillLibrary` | 2722-3013 |  |
-| def | `SkillLibrary.__init__` | 2723-2726 |  |
-| def | `SkillLibrary.load` | 2729-2772 |  |
-| def | `SkillLibrary.validate` | 2774-2798 | Return (errors, warnings) for the md <-> handler binding. |
-| def | `SkillLibrary.manifest` | 2800-2811 | Compact by default -- this is what the router reads to pick a tool. |
-| def | `SkillLibrary.shortlist` | 2813-2869 | The manifest, narrowed to what bears on THIS objective. |
-| def | `SkillLibrary.keywords` | 2871-2872 |  |
-| def | `SkillLibrary.spec` | 2874-2876 |  |
-| def | `SkillLibrary.models` | 2878-2880 | Model tags prompt skills depend on, for the startup check. |
-| def | `SkillLibrary.tool_schemas` | 2882-2961 | Ollama `tools=` schemas -- each skill offered ONLY what it declares. |
-| def | `SkillLibrary.execute` | 2963-3013 |  |
-| def | `_run_prompt_skill` | 3016-3068 | Send <content> to the skill's own model, with its markdown as the rules. |
-| def | `_json_call` | 3094-3112 |  |
-| def | `extract_tool_call` | 3115-3128 |  |
+| def | `_mcp_servers` | 2752-2760 | {name: url} for every server this ground declares. Names only ever |
+| def | `_mcp_rpc` | 2763-2789 | One JSON-RPC call. Returns (result, error-in-plain-words). |
+| def | `_mcp_text` | 2792-2799 | An MCP result's own words. The content blocks are the answer; the |
+| def | `_mcp_call` | 2803-2907 | Call one tool on a local MCP server this ground declares. |
+| class | `SkillLibrary` | 2915-3206 |  |
+| def | `SkillLibrary.__init__` | 2916-2919 |  |
+| def | `SkillLibrary.load` | 2922-2965 |  |
+| def | `SkillLibrary.validate` | 2967-2991 | Return (errors, warnings) for the md <-> handler binding. |
+| def | `SkillLibrary.manifest` | 2993-3004 | Compact by default -- this is what the router reads to pick a tool. |
+| def | `SkillLibrary.shortlist` | 3006-3062 | The manifest, narrowed to what bears on THIS objective. |
+| def | `SkillLibrary.keywords` | 3064-3065 |  |
+| def | `SkillLibrary.spec` | 3067-3069 |  |
+| def | `SkillLibrary.models` | 3071-3073 | Model tags prompt skills depend on, for the startup check. |
+| def | `SkillLibrary.tool_schemas` | 3075-3154 | Ollama `tools=` schemas -- each skill offered ONLY what it declares. |
+| def | `SkillLibrary.execute` | 3156-3206 |  |
+| def | `_run_prompt_skill` | 3209-3261 | Send <content> to the skill's own model, with its markdown as the rules. |
+| def | `_json_call` | 3287-3305 |  |
+| def | `extract_tool_call` | 3308-3321 |  |
 
 ### manjuel/spelling.py — 157 lines
 
@@ -776,7 +780,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `GroundWatch.start` | 109-134 |  |
 | def | `GroundWatch.stop` | 136-142 |  |
 
-manjuel/: 29 files, 17504 lines.
+manjuel/: 29 files, 17697 lines.
 
 ## GUARDS — by the failure that earned them
 
@@ -1127,10 +1131,11 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 | 2633 | `_rank` | RECENCY, added 2026-09-02. Age was DISPLAYED on every hit and |
 | 2657 | `_search_scoped` | Sitting 26: passages from an old run transcript were narrated as if |
 | 2700 | `_deep_research` | The standing ruling: the objective IS the payload. Sitting 39 |
-| 2756 | `load` | 2026-09-10 `doc_pass` claimed 35 phrases where 8 were declared, |
-| 3028 | `_run_prompt_skill` | sitting 39 waiting for a <content> nobody was going to type twice. |
-| 3034 | `_run_prompt_skill` | 2026-09-08). Sitting 95: "time align the logs" -- four words, no log |
-| 3084 | `(module)` | `<|python_tag|>`. Sitting 84 (2026-09-04): the closing Steward on llama3.2 |
+| 2902 | `_mcp_call` | 2026-09-11 (ADR-006 item 2): a tool that fails has usually said why, and |
+| 2949 | `load` | 2026-09-10 `doc_pass` claimed 35 phrases where 8 were declared, |
+| 3221 | `_run_prompt_skill` | sitting 39 waiting for a <content> nobody was going to type twice. |
+| 3227 | `_run_prompt_skill` | 2026-09-08). Sitting 95: "time align the logs" -- four words, no log |
+| 3277 | `(module)` | `<|python_tag|>`. Sitting 84 (2026-09-04): the closing Steward on llama3.2 |
 
 ### manjuel/transcript.py
 
@@ -1168,7 +1173,7 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 Every `test_*` function in tests/, the manjuel names it touches, and
 its line range. The suites are the memory (HANDOFF: test discipline).
 
-### tests/test_manjuel.py — 162 test functions
+### tests/test_manjuel.py — 163 test functions
 
 | test | lines | touches |
 |---|---|---|
@@ -1318,20 +1323,21 @@ its line range. The suites are the memory (HANDOFF: test discipline).
 | `test_fixtures_mirror_the_runtime` | 9803-9850 | `OllamaRuntime`, `OllamaRuntime.chat` |
 | `test_the_citation_check` | 9853-9921 | `RunContext`, `bogus_citations`, `intent`, `intent.search_result_pairs`, `run_pipeline` |
 | `test_sitting48_no_router_for_greetings` | 9924-9969 | `RunContext`, `run_pipeline` |
-| `test_a_skill_cannot_hang_the_repl` | 9972-10014 | `_sk`, `_sk.SKILL_TIMEOUT`, `_sk._HANDLERS`, `_sk._run_bounded`, `_sk.pop` |
-| `test_native_tool_calling` | 10017-10140 | `REVIEW_ONLY`, `calls_to_action_xml`, `declares`, `extract_tool_call` |
-| `test_the_router_is_told_how_not_just_what` | 10143-10210 | `RunContext`, `_router_prompt`, `_steward_prompt` |
-| `test_a_thinking_router_is_never_silent` | 10213-10272 | `OllamaRuntime`, `_salvage`, `thinking_of` |
-| `test_write_read_and_speak_about_it` | 10275-10365 | `REVIEW_ONLY_SKILLS`, `RunContext`, `intent`, `intent.names_a_tool`, `run_pipeline` |
-| `test_model_override` | 10368-10406 | `AgentRegistry`, `AgentRegistry.load`, `_cli`, `_cli.COMMANDS` |
-| `test_path_gate` | 10409-10520 | `RunContext`, `SkillSpec`, `gate_paths`, `parse_path_args`, `run_pipeline` |
-| `test_flags_are_not_speech` | 10523-10563 | `RunContext`, `build_prompt`, `read_flags`, `run_pipeline`, `strip_control` |
-| `test_ink` | 10566-10614 | `ink`, `ink.RESET`, `ink.Spinner`, `ink._STATE`, `ink.bad`, `ink.body`, `ink.dim`, `ink.enabled`, `ink.good`, `ink.seat`, `ink.seat_color`, `ink.warn` |
-| `test_math` | 10617-10640 | `M`, `M.MathError`, `M.cosine`, `M.linear_regression`, `M.matmul`, `M.parse_numbers`, `M.stdev`, `M.transpose`, `M.variance` |
-| `test_a_commit_is_not_a_tag` | 10643-10684 | `_HANDLERS` |
-| `test_says_is_a_phrase_list_not_a_paragraph` | 10687-10752 | `SkillLibrary`, `SkillLibrary.load`, `parse_says` |
-| `test_the_stamp_is_not_an_edit` | 10755-10863 | `_BOOT_STAMPS`, `_H`, `_sf`, `suite_tally` |
-| `test_doctrine` | 10866-11040 | `D`, `D.dead_paths`, `D.doc_pass_report`, `D.doctrine_report`, `D.living`, `D.open_tasks`, `D.sittings`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_SL` |
-| `test_the_core_sees_its_own_repository` | 11043-11161 | `gitstate`, `gitstate.GitRefused`, `gitstate._bad_branch_name`, `gitstate._host_of`, `gitstate._jailed`, `gitstate.branches`, `gitstate.close_branch`, `gitstate.commit`, `gitstate.diff`, `gitstate.read`, `gitstate.remotes`, `gitstate.switch` |
-| `test_record_and_git` | 11164-11268 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
+| `test_the_mcp_skill_never_leaves_this_machine` | 9972-10052 | `_FAILED_HEADS`, `_sk`, `_sk._HANDLERS` |
+| `test_a_skill_cannot_hang_the_repl` | 10055-10097 | `_sk`, `_sk.SKILL_TIMEOUT`, `_sk._HANDLERS`, `_sk._run_bounded`, `_sk.pop` |
+| `test_native_tool_calling` | 10100-10223 | `REVIEW_ONLY`, `calls_to_action_xml`, `declares`, `extract_tool_call` |
+| `test_the_router_is_told_how_not_just_what` | 10226-10293 | `RunContext`, `_router_prompt`, `_steward_prompt` |
+| `test_a_thinking_router_is_never_silent` | 10296-10355 | `OllamaRuntime`, `_salvage`, `thinking_of` |
+| `test_write_read_and_speak_about_it` | 10358-10448 | `REVIEW_ONLY_SKILLS`, `RunContext`, `intent`, `intent.names_a_tool`, `run_pipeline` |
+| `test_model_override` | 10451-10489 | `AgentRegistry`, `AgentRegistry.load`, `_cli`, `_cli.COMMANDS` |
+| `test_path_gate` | 10492-10603 | `RunContext`, `SkillSpec`, `gate_paths`, `parse_path_args`, `run_pipeline` |
+| `test_flags_are_not_speech` | 10606-10646 | `RunContext`, `build_prompt`, `read_flags`, `run_pipeline`, `strip_control` |
+| `test_ink` | 10649-10697 | `ink`, `ink.RESET`, `ink.Spinner`, `ink._STATE`, `ink.bad`, `ink.body`, `ink.dim`, `ink.enabled`, `ink.good`, `ink.seat`, `ink.seat_color`, `ink.warn` |
+| `test_math` | 10700-10723 | `M`, `M.MathError`, `M.cosine`, `M.linear_regression`, `M.matmul`, `M.parse_numbers`, `M.stdev`, `M.transpose`, `M.variance` |
+| `test_a_commit_is_not_a_tag` | 10726-10767 | `_HANDLERS` |
+| `test_says_is_a_phrase_list_not_a_paragraph` | 10770-10835 | `SkillLibrary`, `SkillLibrary.load`, `parse_says` |
+| `test_the_stamp_is_not_an_edit` | 10838-10946 | `_BOOT_STAMPS`, `_H`, `_sf`, `suite_tally` |
+| `test_doctrine` | 10949-11123 | `D`, `D.dead_paths`, `D.doc_pass_report`, `D.doctrine_report`, `D.living`, `D.open_tasks`, `D.sittings`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_SL` |
+| `test_the_core_sees_its_own_repository` | 11126-11244 | `gitstate`, `gitstate.GitRefused`, `gitstate._bad_branch_name`, `gitstate._host_of`, `gitstate._jailed`, `gitstate.branches`, `gitstate.close_branch`, `gitstate.commit`, `gitstate.diff`, `gitstate.read`, `gitstate.remotes`, `gitstate.switch` |
+| `test_record_and_git` | 11247-11351 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
 

@@ -34,6 +34,52 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### Every local MCP server is now a skill
+
+atlas serves 78 tools over MCP and the engine could not reach one of them: the
+door pointed OUTWARD only. `mcp_call` turns that around without a new protocol,
+a new page, or a new verb on the wire — it is a skill, so it inherits the law
+gate, the dedup, the recompose, the clearances and the transcript for free, and
+the Router had to be taught nothing.
+
+A server is a DIAL, not a new file: `MANJUEL_MCP_<NAME>` in `.env`, the same
+mechanism every other wall here already uses (`MANJUEL_GIT_REMOTE`,
+`MANJUEL_RACK_PULL`). No registry file, no folder, no second place to forget.
+
+**THE FIRST HANDLER IN THIS ENGINE THAT COULD OPEN A SOCKET.** Thirty-four
+stood before it and not one could; the only thing this ground talked to was
+Ollama on loopback. So RULE 4 is held in CODE, not in a dial and not in good
+intentions: a declared address that is not loopback is refused BY NAME, nothing
+is sent, and there is no flag that turns it off. Twenty strokes hold it,
+including the shape a substring check waves through — `127.0.0.1.somewhere.invalid`
+is not loopback, and `urlparse().hostname` against a set is why.
+
+**And the address is never spoken.** It comes out of `.env`, and `.env` is
+never printed (RULE 7). Every line this skill returns — every refusal included
+— names the SERVER and never the address behind it. A wall that refuses
+correctly while echoing the address back has still leaked it, so that is a
+stroke too.
+
+ONE SKILL, NOT TWO. Discovery is what a refusal already has to say to be worth
+reading: no tool named, or a tool the server does not carry, comes back with
+the roster. Proven live against the door — 78 tools listed, `muster` and
+`flow_list` answered, bad JSON and a non-object payload both refused before any
+dial. And when a tool fails, ITS OWN WORDS come back rather than a
+transport-shaped message; atlas learned that on 2026-09-11 (ADR-006 item 2) and
+this keeps it on the other side of the wire.
+
+Two reds the strokes found before a human did: `**Says:** mcp` was a bare word
+that would have claimed every sentence containing it, and the estate's own
+alias rule refused it; and the first draft of the failed-heads stroke asked a
+LISTING case to be a refusal. Both fixed before this landed.
+
+The skill count moves 39 -> 40 in README and RUNBOOK, the dial is named in
+`.env.example` and in RUNBOOK's dials table, and the build map is regenerated.
+
+**RESTART REQUIRED** — `manjuel/skills.py` moved, and code is not hot-reloaded.
+The declaration would be (`skills/*.md` reloads at the next turn), but the
+handler behind it will not exist until the REPL is restarted.
+
 ### Two runtime stores stop being commit fodder
 
 Firing a workflow from atlas's rebuilt builder writes into THIS ground: the

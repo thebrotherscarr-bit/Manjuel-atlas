@@ -9969,6 +9969,89 @@ def test_sitting48_no_router_for_greetings(reg, lib, book):
               for st in ctx3.steps), str([st.output[:40] for st in ctx3.steps]))
 
 
+def test_the_mcp_skill_never_leaves_this_machine(reg, lib, book):
+    """RULE 4 -- the estate is local -- held in code, on the one skill that
+    could break it.
+
+    `mcp_call` is the first handler in this engine that can open a socket to
+    anything but Ollama. Thirty-four stood before it and none could. So the
+    wall is a stroke, not a good intention: a declared address that is not
+    loopback is refused and NOTHING IS SENT, and there is no dial that turns
+    that off.
+
+    The second half is RULE 7. A server's address comes out of `.env`, and
+    `.env` is never printed -- so every line this skill returns, including
+    every refusal, names the SERVER and never the address behind it. A wall
+    that refuses correctly while echoing the address back has still leaked it.
+
+    Hermetic: no server is contacted. Each case is refused before any dial.
+    """
+    import os as _os
+    from manjuel import skills as _sk
+
+    call = lambda **kw: _sk._HANDLERS["mcp_call"](None, kw)
+    saved = {k: v for k, v in _os.environ.items() if k.startswith("MANJUEL_MCP_")}
+    for k in saved:
+        del _os.environ[k]
+    try:
+        out = call(server="")
+        check("with no server declared it refuses and names the dial to set",
+              out.startswith("Refused") and "MANJUEL_MCP_" in out, out[:90])
+
+        # `.invalid` can never resolve, so a BROKEN wall fails fast here
+        # rather than reaching anything real.
+        _os.environ["MANJUEL_MCP_FAR"] = "https://somewhere.invalid/rpc"
+        out = call(server="far", tool="muster")
+        check("a non-loopback address is refused by name", out.startswith("Refused"), out[:90])
+        check("and the refusal says nothing was sent", "Nothing was sent" in out, out[:160])
+        check("and cites the rule it is keeping", "RULE 4" in out, out[:160])
+        check("AND IT DOES NOT ECHO THE ADDRESS BACK (RULE 7)",
+              "somewhere.invalid" not in out and "https" not in out, out[:160])
+
+        # The attack shape a substring check would wave through: a hostname
+        # that BEGINS with the loopback address and is not it.
+        _os.environ["MANJUEL_MCP_SNEAK"] = "http://127.0.0.1.somewhere.invalid/rpc"
+        out = call(server="sneak", tool="muster")
+        check("a host that merely STARTS with 127.0.0.1 is not loopback",
+              out.startswith("Refused") and "RULE 4" in out, out[:120])
+
+        # A declared name that is not declared.
+        out = call(server="ghost", tool="muster")
+        check("an undeclared server refuses by name", out.startswith("Refused")
+              and "ghost" in out, out[:120])
+        check("and it does not fall through to another server",
+              "Nothing was sent" not in out or "ghost" in out, out[:120])
+
+        # Arguments are the tool's own contract, so they are judged before
+        # anything is dialled.
+        _os.environ["MANJUEL_MCP_LOOP"] = "http://127.0.0.1:9/rpc"
+        out = call(server="loop", tool="t", content="not json")
+        check("arguments that are not JSON refuse before any dial",
+              out.startswith("Refused") and "JSON" in out, out[:110])
+        out = call(server="loop", tool="t", content="[1,2]")
+        check("arguments that are JSON but not an object refuse too",
+              out.startswith("Refused") and "OBJECT" in out, out[:110])
+
+        # Every refusal must read as FAILED to the wire (serve.py's heads),
+        # or a watching client counts a refusal as a result.
+        from manjuel.serve import _FAILED_HEADS
+        for why, case in (("a walled address", call(server="far", tool="x")),
+                          ("a lookalike host", call(server="sneak", tool="x")),
+                          ("an undeclared server", call(server="ghost")),
+                          ("bad arguments", call(server="loop", tool="t", content="{"))):
+            check(f"the refusal for {why} reads as failed to the wire",
+                  case.lstrip().startswith(_FAILED_HEADS), case[:60])
+    finally:
+        for k in ("MANJUEL_MCP_FAR", "MANJUEL_MCP_SNEAK", "MANJUEL_MCP_LOOP"):
+            _os.environ.pop(k, None)
+        _os.environ.update(saved)
+
+    # The declaration and the handler are one thing or the skill is a lie.
+    check("the skill is declared in skills/ as well as handled",
+          any(s.keyword == "mcp_call" for s in lib.specs),
+          ", ".join(sorted(s.keyword for s in lib.specs))[:80])
+
+
 def test_a_skill_cannot_hang_the_repl(reg, lib, book):
     """LAW 7 -- bounded everything. voice.py bounds at 180s, gitstate.py at
     60; execute(), the one function every model-directed request passes
@@ -11448,6 +11531,7 @@ def main() -> int:
     test_the_citation_check(reg, lib, book)
     test_sitting48_no_router_for_greetings(reg, lib, book)
     test_path_gate(reg, lib, book)
+    test_the_mcp_skill_never_leaves_this_machine(reg, lib, book)
     test_a_skill_cannot_hang_the_repl(reg, lib, book)
     test_native_tool_calling(reg, lib, book)
     test_the_router_is_told_how_not_just_what(reg, lib, book)

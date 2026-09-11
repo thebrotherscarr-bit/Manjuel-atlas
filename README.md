@@ -145,7 +145,7 @@ the engine inside a world: that folder's own `agents/`, `skills/`,
 that world's, and this ground's record gains nothing. A path that is not a
 directory is refused, never created.
 
-The thirty-nine skills are `skills/*.md`; `/skills` lists them and
+The forty skills are `skills/*.md`; `/skills` lists them and
 `skill_report` (ask "what can you do") reads them off the disk. The ones
 no earlier doc named: `deep_research`, `ground_report`, `skill_report`,
 `skill_search`, `list_directory`, `write_file`, `linear_regression`,
