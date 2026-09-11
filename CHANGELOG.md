@@ -34,6 +34,30 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### The runbook stops promising a red that was really an absence
+
+"Starting the system" told a second machine that `atlas/tests/prove.py`
+"reports the door leg RED on any machine where it has not been built." One
+sentence, wrong twice: the door leg reports ABSENT, and has since the morning
+of 2026-09-11; and the leg that really did go red was a different one
+(`check_trade_parity`), which is now ABSENT as well. A page that teaches you to
+expect a red teaches you to ignore one. It now says what the battery actually
+does — every leg that needs the spine reports ABSENT, names `cargo build -p
+atlas` as the command that would answer, and exits 0 — and keeps the reason
+underneath it, because the instruction "build the spine first" is still right.
+
+- **The tool count.** README and RUNBOOK said the door serves 72 tools. It
+  serves 78, counted off the wire. RUNBOOK's "thirty-three of the seventy-two
+  have no page yet" is now thirty-two of the seventy-eight, measured rather
+  than adjusted: every name the door serves, grepped against the whole of
+  `atlas/webapp`. The kinds that sentence names — the record and law readers,
+  the rack commands, the mesh, keys and tenants — are still exactly the ones
+  with no button.
+
+Dated ledger lines carrying the old count were left as written. A number in a
+ledger is a true record of its day, which is the rule the doctrine check
+already follows.
+
 ### The build map catches up, and the gate that caught it was red for four runs
 
 `python tests/buildmap.py --check` FAILED ON A CLEAN CLONE. That command is a

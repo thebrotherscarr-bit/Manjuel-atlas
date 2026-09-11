@@ -63,8 +63,14 @@ Use `main`, not `--all`. `--all` carries every local branch, and a local
 branch can hold material that was deliberately kept off the remote.
 
 **Build the Rust spine first.** `verify_chain` shells a Rust binary, and the
-Go halves are useless without it — `atlas/tests/prove.py` reports the door leg
-RED on any machine where it has not been built.
+Go halves cannot prove themselves without it — `atlas/tests/prove.py` reports
+every leg that needs it ABSENT, naming `cargo build -p atlas` as the command
+that would answer. ABSENT is never a pass: those legs proved nothing.
+
+Until 2026-09-11 this page said those legs went RED, and one of them really
+did: `check_trade_parity` refused with a COMMAND rather than a missing path,
+which prove.py's absence check did not recognise, so a fresh clone's first
+battery reported a break on a tree where nothing was wrong. Both are fixed.
 
     cd atlas
     cargo build -p atlas        # -> atlas\target\debug\atlas.exe
@@ -85,7 +91,7 @@ Rebuild after any Go change. The webapp EMBEDS its own HTML, CSS and
 JavaScript (`go:embed`), so a change to a page is not live until you rebuild
 and restart it -- editing the file on disk does nothing to a running server.
 
-**Start the door.** `atlas-mcp` is the MCP door: it serves the 72 tools and it
+**Start the door.** `atlas-mcp` is the MCP door: it serves the 78 tools and it
 is the only thing that spawns a Manjuel engine. It holds `127.0.0.1:8090`.
 
     cd atlas\line
@@ -253,7 +259,7 @@ for one by keyword and the engine runs it; the law gate can refuse it, and a
 refusal names the law. Read them on Records -> skills, or `commands.md` for
 what can be asked for in words.
 
-**Tools** are what ATLAS serves over MCP -- 72 of them, listed at
+**Tools** are what ATLAS serves over MCP -- 78 of them, listed at
 `http://127.0.0.1:8090/tools` and reachable from the glass through
 `POST /api/tools/call`. They are read-only unless their declaration says
 `Writes: true`. The ones the dashboard itself leans on:
@@ -265,7 +271,7 @@ what can be asked for in words.
     muster    the declared worlds
     rack_list what the rack holds
 
-Thirty-three of the seventy-two have no page yet -- the record and law readers,
+Thirty-two of the seventy-eight have no page yet -- the record and law readers,
 the rack commands, the mesh, keys and tenants. They answer over MCP today; they
 have no button.
 
