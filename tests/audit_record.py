@@ -365,7 +365,7 @@ def main() -> int:
 
     page = render(findings, tally)
     try:
-        REPORT.write_text(page, encoding="utf-8", newline="\n")
+        REPORT.write_text(page, encoding="utf-8", newline="\r\n")
     except OSError:
         pass
 

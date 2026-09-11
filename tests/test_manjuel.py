@@ -127,7 +127,7 @@ def begin_run(root, suite: str) -> None:
         book[suite] = {"state": "running", "at": time.time(),
                        "passed": None, "total": None, "green": False}
         p.write_text(json.dumps(book, indent=2, sort_keys=True) + "\n",
-                     encoding="utf-8", newline="\n")
+                     encoding="utf-8", newline="\r\n")
     except Exception:
         pass
 
@@ -232,9 +232,9 @@ def record_run(root, suite: str, results) -> None:
             "failed": [n for n, ok, _, _ in rows if not ok][:12],
         })
         p.write_text(json.dumps(book, indent=2, sort_keys=True) + "\n",
-                     encoding="utf-8", newline="\n")
+                     encoding="utf-8", newline="\r\n")
         (Path(root) / REPORT_FILE).write_text(
-            _render_report(book), encoding="utf-8", newline="\n")
+            _render_report(book), encoding="utf-8", newline="\r\n")
     except Exception:
         pass
 

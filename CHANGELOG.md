@@ -34,6 +34,43 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### And the last three suite writers, so the whole record is one terminator
+
+The pass before this fixed the file that was MIXED and the writer making it so,
+and named three more that were breaking the ruling quietly: consistently LF,
+into tracked record files, which is wrong without ever being mixed.
+
+    tests/test_manjuel.py:130   last_run.json, the crash path
+    tests/test_manjuel.py:235   last_run.json, the finish path
+    tests/test_manjuel.py:237   last_run.md
+    tests/audit_record.py:368   last_audit.md
+
+All four now declare `\r\n`, which makes every writer in this estate — the
+engine's and the suites' — say the same thing. The four record files were
+normalised with them.
+
+PROVEN BY DELETION, not by reading the source. The three stamps were REMOVED
+from a mirror, then the strokes, the smoke suite and the record audit were run
+against it, and what they wrote from nothing came back:
+
+    tests/last_run.json        18 CRLF + 0 LF
+    tests/last_run.md           6 CRLF + 0 LF
+    tests/last_audit.md        39 CRLF + 0 LF
+    tests/run_history.jsonl   311 CRLF + 0 LF
+
+2126/2126 strokes, 60/60 smoke, audit exit 0. And as with every terminator fix
+in this pass, the record did not move: each normalised file hashed identical to
+HEAD, because git stores these blobs LF whichever way the working tree holds
+them.
+
+STILL NOT PINNED BY A STROKE, and named again so it is not lost:
+`test_the_chain_writes_declared_newlines` scans `manjuel/*.py` only. Every
+suite writer is now correct, so a guard over them would be green today — but
+the reason it was not simply widened still stands, because most of
+`test_manjuel.py`'s `newline="\n"` calls write FIXTURES into temp grounds where
+LF is right. A guard worth having has to name the record files rather than glob
+the folder.
+
 ### The last mixed files, and the writer that was making one of them
 
 CLAUDE.md: "never leave a file MIXED." Four files in this ground were, and a
