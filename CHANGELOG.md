@@ -34,6 +34,41 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### The build map catches up, and the gate that caught it was red for four runs
+
+`python tests/buildmap.py --check` FAILED ON A CLEAN CLONE. That command is a
+documented verification step, so the first thing a stranger installing this on
+their own machine would have seen was a red gate — on a tree where every stroke
+passes. Found during the packaging run on 2026-09-11, in a fresh clone of both
+repos in a scratch directory, not on the ground.
+
+**The map was two commits behind, and the drift was not cosmetic:**
+
+    3b54069  The REPL stops asking atlas about its own repository
+             manjuel/gitstate.py   335 -> 608 lines
+             manjuel/cli.py       1986 -> 2146 lines
+    0588ede  A skill is offered only the arguments it declares
+             manjuel/skills.py    3047 -> 3128 lines
+             manjuel/pipeline.py  2602 -> 2598 lines
+
+Eight functions the map had never heard of — `diff`, `branches`, `switch`,
+`close_branch`, `remotes`, `_host_of`, `_bad_branch_name`, `_jailed` — are the
+core's own git, and `gitstate.py` still described itself to a reader as "Git
+state, read-only" while carrying the commands that write. `declares` had moved
+from `pipeline.py` to `skills.py` and the map still pointed at the old seat.
+Regenerated with `python tests/buildmap.py`: 1337 lines, 286 changed.
+
+**AND THE CI HAD BEEN SAYING SO SINCE 0588ede.** Four runs red on one step,
+"The build map matches the code", while strokes, smoke and law were green in
+every one of them. TWO OF THOSE FOUR ARE PUSHES MADE TODAY BY A HAND THAT NEVER
+LOOKED — `ce586c6` and `24655cb`. The gate did its job on the first push and
+was not read on the next two. A gate nobody reads is not a gate, and the rule
+that follows is the operator's own shape for it: a hand that pushes watches the
+run it started.
+
+Proven after the fix: `--check` clean on the ground, clean on a mirror, and
+2106/2106 strokes on the mirror.
+
 ### THE ARCHIVE NEVER GOES ON GITHUB, written into RULE 1
 
 His word, 2026-09-11: *"the ARCHIVE never goes on github, EVER."* It is now in
