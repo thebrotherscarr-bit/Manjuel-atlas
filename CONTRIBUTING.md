@@ -48,6 +48,9 @@ standard:
 ## Adding a skill
 
 1. `skills/<name>.md` — Action Keyword, Description, Parameters Needed.
+   Parameters Needed may only name `content` and `filepath`: the Router
+   answers in three tags and there is no fourth, so an argument outside those
+   is offered to a model that has no way to send it. A stroke refuses it.
 2. A handler in `manjuel/skills.py`, registered with `@skill("<name>")`.
 3. **A record in `us/manjuel.us`** declaring what it may reach: `wall`,
    `writes`, `remote`. Write `wall` by reading your own handler; do not
@@ -56,6 +59,29 @@ standard:
 
 Startup refuses, by name, a skill file with no handler and a pipeline
 naming a seat no file declares. It will tell you which.
+
+## Adding a hook
+
+A hook is a skill that declares WHEN it fires. One more line in its own
+markdown, read by the same parser as `**Says:**` and `**Takes:**`:
+
+    - **Hooks:** before_tool | after_tool
+
+Those two points are the whole set. A point the engine does not fire is
+dropped rather than installed — startup names it, because a hook that looks
+installed and never runs is worse than one that is refused.
+
+The hook is handed the action it is firing around as `<content>`, and then:
+
+- **it cannot change the answer.** Its return value is discarded. A hook that
+  could rewrite a tool's result would be testimony becoming fact (LAW 5).
+- **it cannot fire a hook.** While one runs, calls take the plain path. An
+  unbounded tree is what LAW 7 exists to refuse.
+- **it cannot take the turn down.** A broken hook is named on the library, not
+  raised into the run.
+
+With nothing declaring `**Hooks:**`, the engine behaves exactly as it did
+before hooks existed — which is why landing them moved no stroke.
 
 ## Adding a seat
 

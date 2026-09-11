@@ -193,6 +193,58 @@ _TAKES_RULE_RE = re.compile(
 
 TAKES_ARGS = ("content", "filepath")
 
+# A HOOK IS A SKILL THAT DECLARES WHEN IT FIRES. Added 2026-09-11 on his word.
+#
+# The estate already had the SEAM and not the declaration: the headless door
+# replaces `skills.execute` with a wrapper to raise `tool` / `tool_result`
+# events for the Watchboard, and has since that door was built. The wrapper
+# proves the interception works -- but the door installs it, only for its own
+# wire, only to WATCH, and the typed REPL never had it at all.
+#
+# So a hook is not a new subsystem. It is one more line in a skill's own
+# markdown, read by the same parser that reads **Says:** and **Takes:**, and
+# fired by the library every skill call already goes through. No new folder
+# (RULE 8), no new file, no registry to keep in step with the disk.
+#
+# THE CLOSED SET, and it is closed for the reason TAKES_ARGS is: a point the
+# engine does not fire is a promise it cannot keep, and parse_hooks refuses
+# one by name rather than accepting it silently and never calling it.
+HOOK_POINTS = ("before_tool", "after_tool")
+
+_HOOKS_RE = re.compile(r"\*\*Hooks:\*\*\s*(?P<p>.*?)(?=\n[ \t]*[-*][ \t]*\*\*|\Z)",
+                       re.DOTALL)
+
+
+def parse_hooks(body: str) -> tuple:
+    """The lifecycle points a skill's OWN markdown says it fires at.
+
+    Unknown points are DROPPED, not accepted: `**Hooks:** whenever` would
+    otherwise read as a hook that never runs, which is worse than a refusal
+    because it looks installed. `validate()` reports it by name.
+    """
+    m = _HOOKS_RE.search(body)
+    if not m:
+        return ()
+    out: list = []
+    for w in m.group("p").replace(",", "|").split("|"):
+        w = " ".join(w.strip().strip("`'\"").split()).lower()
+        if w in HOOK_POINTS and w not in out:
+            out.append(w)
+    return tuple(out)
+
+
+def hook_faults(spec) -> list:
+    """Points a skill claims that the engine does not fire. Named, never run."""
+    m = _HOOKS_RE.search(getattr(spec, "body", "") or "")
+    if not m:
+        return []
+    bad = []
+    for w in m.group("p").replace(",", "|").split("|"):
+        w = " ".join(w.strip().strip("`'\"").split()).lower()
+        if w and w not in HOOK_POINTS and w not in bad:
+            bad.append(w)
+    return bad
+
 
 # A phrase this long, or ending in a full stop, is a SENTENCE that leaked out
 # of a paragraph -- not something an operator says at a door. It is reported at
@@ -291,6 +343,7 @@ class SkillSpec:
     path_args: tuple = ()    # ((arg, jail), ...) from **Path Args:**; see LAW 8
     says: tuple = ()         # alias phrases the skill claims, **Says:**
     takes: tuple = ()        # ((words...), arg) payload rules, **Takes:**
+    hooks: tuple = ()        # lifecycle points it fires at, **Hooks:**
 
     @property
     def is_prompt_skill(self) -> bool:
@@ -440,6 +493,11 @@ class SkillExecutionEnv:
     # pipeline.py would invert the containment rule. None outside a running
     # chain, and `subtask` says so plainly rather than pretending.
     sub_run: object = None
+    # True only while a HOOK is running. SkillLibrary.execute reads it and
+    # takes the plain path, so a hook cannot fire hooks (LAW 7, bounded
+    # everything). Declared here rather than set on the instance, because an
+    # attribute that only exists sometimes is one a reader cannot find.
+    in_hook: bool = False
 
     def __post_init__(self):
         if self.dialogue is None:
@@ -2988,6 +3046,11 @@ def _mcp_call(env: SkillExecutionEnv, args: dict) -> str:
 
 
 class SkillLibrary:
+    # The last hook that raised, as (keyword, message). A hook never takes a
+    # turn down, and a failure that is swallowed without a name is how a
+    # broken hook runs for weeks looking installed.
+    last_hook_fault: tuple | None = None
+
     def __init__(self, specs: list[SkillSpec], warnings: list[str], source: Path):
         self.specs = specs
         self.warnings = warnings
@@ -3035,7 +3098,7 @@ class SkillLibrary:
                         f"one.")
             specs.append(SkillSpec(m.group("kw").strip().lower(), path.name, body,
                                    model, parse_path_args(body),
-                                   says, parse_takes(body)))
+                                   says, parse_takes(body), parse_hooks(body)))
 
         return cls(specs, warnings, skills_dir)
 
@@ -3061,6 +3124,18 @@ class SkillLibrary:
             if kw not in declared:
                 warns.append(
                     f"Handler '{kw}' has no skills/*.md file, so no model can discover it."
+                )
+
+        # A HOOK POINT THE ENGINE DOES NOT FIRE. parse_hooks drops it, which
+        # is right -- an unknown point must not be treated as installed -- but
+        # dropping it silently leaves a skill that LOOKS hooked and never
+        # runs. Said out loud here, with the points that do exist.
+        for spec in self.specs:
+            for bad in hook_faults(spec):
+                warns.append(
+                    f"{spec.filename} claims hook point '{bad}', which the "
+                    f"engine does not fire. It will never run. The points "
+                    f"are: {', '.join(HOOK_POINTS)}."
                 )
 
         return errors, warns
@@ -3228,7 +3303,92 @@ class SkillLibrary:
             })
         return out
 
+    def hooks_for(self, point: str) -> list:
+        """Every skill declaring `point`, in NAME ORDER.
+
+        Deterministic on purpose: two hooks firing in a different order on
+        each boot make two transcripts of the same turn unreadable against
+        each other, which is the same fault the tenant registry's own order
+        was fixed for.
+        """
+        return [s for s in sorted(self.specs, key=lambda x: x.keyword)
+                if point in (getattr(s, "hooks", ()) or ())]
+
+    def _fire(self, specs: list, action: str, env) -> None:
+        """Run the hooks for one point. They watch and they act; they do not
+        decide.
+
+        THREE RULES, and each is a refusal of a power a hook might otherwise
+        take:
+
+          IT CANNOT CHANGE THE ANSWER. The return value is discarded here.
+          A hook that could rewrite a tool's result would be testimony
+          becoming fact, which is the one thing this estate refuses
+          everywhere else (LAW 5).
+
+          IT CANNOT FIRE A HOOK. `in_hook` is set for the duration, and
+          execute() takes the plain path while it is. A hook that could
+          trigger hooks is an unbounded tree; LAW 7 is bounded everything.
+
+          IT CANNOT TAKE THE TURN DOWN. A raising hook is caught and NAMED on
+          the library rather than swallowed -- a hook is an addition to a run,
+          and an addition that can kill the run is a liability, not a feature.
+        """
+        if env is None:
+            return
+        for s in specs:
+            if s.keyword == action:
+                continue                 # never on its own call
+            prev = getattr(env, "in_hook", False)
+            try:
+                setattr(env, "in_hook", True)
+                text = str(self._call(s.keyword, {"content": action}, env) or "")
+                # A BROKEN HOOK ARRIVES AS TEXT, NOT AS A RAISE. _call already
+                # converts a raising handler into "Skill 'x' raised ..." so
+                # that nothing a handler does can take a turn down -- the right
+                # discipline, and it means catching exceptions here would catch
+                # nothing. The first draft of this did exactly that and the
+                # stroke for it went red, which is what the stroke was for.
+                #
+                # These heads are the ones the headless wire reads a
+                # failure by. Written out rather than imported: that door
+                # imports the REPL, which imports this, and a cycle to share
+                # three strings is the worse trade. THE ENGINE DOES NOT NAME
+                # THE DOOR -- a stroke holds exactly that, and it went red on
+                # the first draft of this comment, which named it.
+                if (text.startswith(("Error", "Refused", "Cannot"))
+                        or text.startswith(f"Skill '{s.keyword}' raised")):
+                    self.last_hook_fault = (s.keyword, text[:200])
+            except Exception as exc:     # belt and braces; _call rarely lets one out
+                self.last_hook_fault = (s.keyword, f"{type(exc).__name__}: {exc}")
+            finally:
+                try:
+                    setattr(env, "in_hook", prev)
+                except Exception:
+                    pass
+
     def execute(self, action: str, args: dict, env: SkillExecutionEnv) -> str:
+        """Every skill call in this estate, with its declared hooks around it.
+
+        NOTHING DECLARED, NOTHING CHANGED: with no `**Hooks:**` anywhere on
+        disk this returns `_call` directly and the engine behaves exactly as
+        it did before hooks existed. The feature is inert until a skill asks
+        for it, which is why landing it could not move a single stroke.
+        """
+        if getattr(env, "in_hook", False):
+            return self._call(action, args, env)
+        before = self.hooks_for("before_tool")
+        after = self.hooks_for("after_tool")
+        if not (before or after):
+            return self._call(action, args, env)
+
+        key = (action or "").strip().lower()
+        self._fire(before, key, env)
+        out = self._call(action, args, env)
+        self._fire(after, key, env)
+        return out
+
+    def _call(self, action: str, args: dict, env: SkillExecutionEnv) -> str:
         key = action.strip().lower()
 
         # A prompt skill runs the model named in its own markdown, using its

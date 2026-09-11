@@ -34,6 +34,67 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### Hooks, and the interrupt that was always there and never pinned
+
+His word: make sure interrupt and hooks are part of the core harness. One of
+them already was.
+
+**THE INTERRUPT WAS NEVER MISSING — IT WAS NEVER HELD.** Ctrl-C mid-run kills
+the RUN and not the session: `cli.py`'s turn loop catches it, says "Run
+cancelled." and returns to the prompt. The headless door reaches the same path
+from its wire, and the failure prompt turns it into `Aborted`. Three levels,
+all working, and exactly ONE stroke touched cancel — the IDLE case, "a cancel
+with nothing running". The interrupt of a LIVE run, the one that matters, was
+held by nothing. It is now: the inbox is pumped by hand over a list of lines
+with the thread module swapped for a counter, so the stroke proves a cancel
+DURING a run signals the main thread and is not also queued, a cancel while
+idle signals nothing and IS queued, and a cancel while a question is pending
+is queued rather than signalled. No signal is ever raised in the suite's own
+process.
+
+**HOOKS: THE SEAM EXISTED, THE DECLARATION DID NOT.** The headless door has
+replaced `skills.execute` with a wrapper since it was built — that is how the
+Watchboard sees every tool call. But the door installs it, for its own wire,
+only to WATCH, and the typed REPL never had it at all.
+
+`**Hooks:** before_tool | after_tool` is that same interception, declared in a
+skill's own markdown, read by the parser that already reads `**Says:**` and
+`**Takes:**`, and fired by the library every call goes through. NO NEW FOLDER
+AND NO NEW FILE (RULE 8): a hook is a skill that says when it runs.
+
+THREE THINGS IT MAY NOT DO, and each is a refusal of a power it could
+otherwise take:
+
+    it cannot change the answer   the return value is discarded; a hook that
+                                  rewrote a tool's result would be testimony
+                                  becoming fact (LAW 5)
+    it cannot fire a hook         `in_hook` makes calls take the plain path;
+                                  an unbounded tree is what LAW 7 refuses
+    it cannot take the turn down  a broken hook is NAMED on the library
+
+A point the engine does not fire is DROPPED, not installed, and startup says
+so by name — the same discipline `parse_takes` applies to an argument nothing
+can carry. A hook that looks installed and never runs is worse than a refusal.
+
+INERT UNTIL ASKED FOR. Nothing on disk declares a hook, so `execute` takes the
+plain path and the engine behaves exactly as it did before. That is a stroke,
+not a hope: landing this moved no existing stroke.
+
+TWO REDS THE STROKES FOUND IN MY OWN WORK, both before a commit:
+
+  - The first draft caught EXCEPTIONS from a hook. `_call` never raises one —
+    it converts a raising handler into "Skill 'x' raised ..." so that nothing
+    a handler does can take a turn down. So the catch caught nothing and the
+    fault was never named. A broken hook arrives as TEXT; it is read that way
+    now.
+  - A comment in `skills.py` named the door by filename, and
+    `the engine is not edited for it` went red. The guard is right: the engine
+    does not name the door, because a comment naming it is how an import
+    follows. Rephrased; the rule is cited where the comment sits.
+
+2192 -> 2211 strokes. `CONTRIBUTING.md` carries how to add one, and the note
+that Parameters Needed may only name `content` and `filepath`.
+
 ### mcp_call declared two arguments the Router has no way to send
 
 The skill routed perfectly and then could not act. A live turn on 2026-09-11 —

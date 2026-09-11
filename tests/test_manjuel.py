@@ -10188,6 +10188,188 @@ def test_the_mcp_skill_never_leaves_this_machine(reg, lib, book):
           "substring matching would call a tool nobody named")
 
 
+def test_a_hook_watches_a_call_without_taking_it_over(reg, lib, book):
+    """A hook is a skill that declares WHEN it fires. Built 2026-09-11.
+
+    The estate had the SEAM and not the declaration: serve.py replaces
+    `skills.execute` to raise `tool` / `tool_result` for the Watchboard, and
+    has since the headless door was built -- installed by serve.py, only for
+    the headless wire, only to watch, and never present in the typed REPL at
+    all. `**Hooks:**` is that same interception, declared in the skill's own
+    markdown and fired by the library every call already goes through.
+
+    WHAT IT MAY NOT DO is the whole of the design, and each refusal is here:
+    a hook cannot change the answer, cannot fire a hook, and cannot take the
+    turn down. A hook that could rewrite a tool's result would be testimony
+    becoming fact (LAW 5); one that could trigger hooks is an unbounded tree
+    (LAW 7); one that can raise into the turn is a liability sold as a
+    feature.
+
+    Hermetic: the hook is registered on the library in this process and
+    removed again. Nothing on disk declares one, which is itself checked --
+    the feature must be INERT until something asks for it.
+    """
+    from manjuel import skills as _sk
+
+    # ---- inert until asked for -------------------------------------------
+    check("nothing on disk declares a hook, so the engine is unchanged",
+          not lib.hooks_for("before_tool") and not lib.hooks_for("after_tool"),
+          f"{[s.keyword for s in lib.hooks_for('before_tool')]} / "
+          f"{[s.keyword for s in lib.hooks_for('after_tool')]}")
+
+    # ---- the declaration --------------------------------------------------
+    check("a skill declares its points off its own markdown",
+          _sk.parse_hooks("- **Hooks:** before_tool | after_tool")
+          == ("before_tool", "after_tool"))
+    check("order and duplicates do not make two hooks out of one",
+          _sk.parse_hooks("- **Hooks:** after_tool, after_tool") == ("after_tool",))
+    check("a point the engine does not fire is DROPPED, not installed",
+          _sk.parse_hooks("- **Hooks:** whenever | before_tool") == ("before_tool",))
+    check("and it is named, so it cannot look installed and never run",
+          _sk.hook_faults(type("S", (), {"body": "- **Hooks:** whenever"})())
+          == ["whenever"])
+
+    # ---- the firing, behaviourally ---------------------------------------
+    g = Path(tempfile.mkdtemp())
+    env = env_for(g, reg, Stub())
+    seen: list = []
+
+    def watcher(e, a):
+        seen.append(a.get("content"))
+        return "the hook's own words"
+
+    def probe(e, a):
+        return "THE REAL ANSWER"
+
+    _sk._HANDLERS["_hooktest"] = watcher
+    _sk._HANDLERS["_probe"] = probe
+    spec = _sk.SkillSpec("_hooktest", "_hooktest.md",
+                         "- **Hooks:** before_tool | after_tool",
+                         "", (), (), (), ("before_tool", "after_tool"))
+    lib.specs.append(spec)
+    try:
+        out = lib.execute("_probe", {}, env)
+        check("the hook fired before AND after the call", seen == ["_probe", "_probe"],
+              str(seen))
+        check("AND THE ANSWER IS THE TOOL'S, NOT THE HOOK'S",
+              out == "THE REAL ANSWER", out,
+              )
+        # A hook does not fire on its own call, or it is its own trigger.
+        seen.clear()
+        lib.execute("_hooktest", {}, env)
+        # ONCE, as the call. Called directly it is handed no `content`, so the
+        # watcher records None -- what is under test is the COUNT, not the
+        # payload: twice would mean it triggered itself.
+        check("a hook does not fire on its own call", len(seen) == 1,
+              f"{seen} -- it should run once, as the call, not also as a hook")
+
+        # A hook cannot fire a hook: while one runs, execute takes the plain
+        # path. Proved by having the hook CALL a tool and counting.
+        seen.clear()
+        def caller(e, a):
+            seen.append("hook")
+            lib.execute("_probe", {}, e)      # a call from inside a hook
+            return ""
+        _sk._HANDLERS["_hooktest"] = caller
+        lib.execute("_probe", {}, env)
+        check("a hook's own call does not fire the hooks again",
+              seen == ["hook", "hook"],
+              f"{seen} -- more than two means the tree ran away")
+
+        # And a hook that breaks is named, not swallowed, and not fatal.
+        def breaker(e, a):
+            raise RuntimeError("the hook is broken")
+        _sk._HANDLERS["_hooktest"] = breaker
+        lib.last_hook_fault = None
+        out2 = lib.execute("_probe", {}, env)
+        check("a raising hook does not take the turn down",
+              out2 == "THE REAL ANSWER", out2)
+        check("and the broken hook is NAMED rather than swallowed",
+              lib.last_hook_fault and lib.last_hook_fault[0] == "_hooktest"
+              and "broken" in lib.last_hook_fault[1],
+              str(lib.last_hook_fault))
+    finally:
+        lib.specs.remove(spec)
+        _sk._HANDLERS.pop("_hooktest", None)
+        _sk._HANDLERS.pop("_probe", None)
+        lib.last_hook_fault = None
+
+
+def test_a_run_in_flight_can_be_interrupted(reg, lib, book):
+    """THE INTERRUPT, which the harness has always had and nothing pinned.
+
+    Ctrl-C mid-run kills the RUN, not the session: cli.py's turn loop catches
+    KeyboardInterrupt, says "Run cancelled." and returns to the prompt. The
+    headless door reaches that same path from the wire -- a `cancel` arriving
+    while a run is in flight calls `_thread.interrupt_main()` from the inbox
+    thread, which raises KeyboardInterrupt inside the model call the main
+    thread is sitting in.
+
+    Only ONE stroke touched cancel before this, and it covered the IDLE case
+    -- "a cancel with nothing running". The one that matters, the interrupt
+    of a live run, was never held by anything. Found 2026-09-11 during a
+    function check.
+
+    Hermetic: the inbox is pumped by hand over a list of lines, and
+    `_thread` is swapped for a counter, so no signal is ever raised in the
+    process running these strokes.
+    """
+    import io
+    import manjuel.serve as SV
+
+    class Counter:
+        def __init__(self): self.hits = 0
+        def interrupt_main(self): self.hits += 1
+
+    def pump(lines, state):
+        """One inbox, fed by hand, in the state under test."""
+        counter = Counter()
+        real, SV._thread = SV._thread, counter
+        try:
+            wire = SV.Wire(io.StringIO())
+            box = SV.Inbox(iter(lines), wire)
+            box.set_state(state)
+            box._pump()                       # the reader thread's own body
+            queued = []
+            while True:
+                row = box.take(timeout=0.01)
+                if row is None or row.get("cmd") == "_timeout":
+                    break
+                queued.append(row.get("cmd"))
+            return counter.hits, queued
+        finally:
+            SV._thread = real
+
+    CANCEL = '{"cmd": "cancel"}'
+
+    hits, queued = pump([CANCEL], SV.Inbox.RUNNING)
+    check("a cancel DURING a run interrupts the main thread", hits == 1, str(hits))
+    check("and is not also queued, or the turn would cancel twice",
+          "cancel" not in queued, str(queued))
+
+    hits, queued = pump([CANCEL], SV.Inbox.IDLE)
+    check("a cancel with nothing running interrupts NOTHING", hits == 0, str(hits))
+    check("and is queued instead, so the turn can say there was nothing to stop",
+          queued == ["cancel"], str(queued))
+
+    hits, queued = pump([CANCEL], SV.Inbox.ASKING)
+    check("a cancel while a QUESTION is pending is queued, not signalled",
+          hits == 0 and queued == ["cancel"], f"{hits} / {queued}")
+
+    # The wire's vocabulary is the contract a client writes against.
+    check("cancel is a verb the wire takes", "cancel" in SV.COMMANDS, str(SV.COMMANDS))
+    check("and `cancelled` is a TERMINAL event, so a client stops waiting",
+          "cancelled" in SV.TERMINAL, str(SV.TERMINAL))
+
+    # The typed REPL's own catch, at the turn loop rather than the process.
+    import inspect as _in
+    from manjuel import cli as _cli
+    loop = _in.getsource(_cli._loop)
+    check("the REPL's turn loop catches the interrupt and CONTINUES",
+          "except KeyboardInterrupt:" in loop and "Run cancelled" in loop,
+          "a turn loop that does not catch it loses the whole session")
+
+
 def test_a_skill_cannot_hang_the_repl(reg, lib, book):
     """LAW 7 -- bounded everything. voice.py bounds at 180s, gitstate.py at
     60; execute(), the one function every model-directed request passes
@@ -11668,6 +11850,8 @@ def main() -> int:
     test_the_citation_check(reg, lib, book)
     test_sitting48_no_router_for_greetings(reg, lib, book)
     test_path_gate(reg, lib, book)
+    test_a_hook_watches_a_call_without_taking_it_over(reg, lib, book)
+    test_a_run_in_flight_can_be_interrupted(reg, lib, book)
     test_the_mcp_skill_never_leaves_this_machine(reg, lib, book)
     test_a_skill_cannot_hang_the_repl(reg, lib, book)
     test_native_tool_calling(reg, lib, book)
