@@ -34,6 +34,23 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### Two runtime stores stop being commit fodder
+
+Firing a workflow from atlas's rebuilt builder writes into THIS ground: the
+engine's `flows/` (specs, folded history, `runs.jsonl`) and the door's `state/`
+(the rack ledger — one append-only file per tenant home). Both appeared here for
+the first time on 2026-09-11, from the first flow ever fired off that page.
+
+Neither belongs in the record, and the dashboard's Save is `git add -A` — so
+until they were named here, the next commit through the glass would have carried
+a test flow and a rack ledger into the repo without anyone choosing it. That is
+the same shape as the stale bundle and the stray store, and it is caught the
+same way: name it in `.gitignore` with the reason, before the commit rather
+than after it.
+
+atlas has ignored `state/` since 2026-09-11; the core never needed to, because
+nothing here had ever written one.
+
 ### A pass over the living docs, measured against the disk
 
 His order: make the documents true to the build. The system's own instrument,

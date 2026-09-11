@@ -106,3 +106,19 @@ data/
 # Never --all: that carries every local branch, and a local branch can hold
 # what was deliberately kept off the remote.
 *.bundle
+#
+# flows/ is the workflow engine's own store -- <home>/flows/<name>.json, the
+# folded version history beside it, and runs.jsonl (line/internal/flow/flow.go,
+# flowsDir). It is written the moment a flow is saved or fired, it is per-ground
+# runtime state exactly as atlas's state/ is, and NO PROVER READS IT: flow's own
+# strokes build their homes with t.TempDir(). Ignored 2026-09-11, the day the
+# builder page came back and the first flow was fired from it.
+flows/
+#
+# state/ is the door's own per-tenant record (the LINE's chat.go: "one
+# append-only file per tenant home") -- the rack ledger and its kin, written
+# when a tool reaches a model on this ground. atlas has ignored it since
+# 2026-09-11; the core never did, because nothing here had made one until the
+# workflow builder fired its first flow and the ask node left a rack_ledger
+# behind. Same class as flows/ above: runtime state, not the record.
+state/
