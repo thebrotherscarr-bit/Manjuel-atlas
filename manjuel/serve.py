@@ -123,6 +123,32 @@ _FAILED_HEADS = ("Error", "Refused", "Cannot")
 _RESULT_HEAD_CHARS = 400
 
 
+_BOOT_T0 = time.time()
+
+
+def _mark(stage: str) -> None:
+    """One line of boot progress, on the REAL stderr.
+
+    WHY THIS EXISTS (2026-09-10). A boot that hangs under THE LINE left no
+    evidence anywhere: stdout is swapped for the wire, so every print became
+    a `text` event the door discards while it waits for `opened`; stderr was
+    empty; and the door's own timeout message named the symptom and not the
+    place. Nine sittings died that way in one day and the only way to find
+    the stage was to guess at it from outside.
+
+    stderr is untouched by open_wire and THE LINE already keeps its tail
+    (engine.go's ringBuffer) and now prints it when a boot fails, so this
+    costs one line per stage and needs no file, no flag and no new plumbing.
+    It can never break a boot: every failure here is swallowed on purpose --
+    an instrument that can take the process down is worse than no instrument.
+    """
+    try:
+        print("boot: %7.1fs  %s" % (time.time() - _BOOT_T0, stage),
+              file=sys.__stderr__, flush=True)
+    except Exception:
+        pass
+
+
 # ---------------------------------------------------------------------
 # the wire
 # ---------------------------------------------------------------------
@@ -697,6 +723,7 @@ def main(argv: list[str] | None = None) -> int:
 
     wire, inbox = open_wire()
     inbox.start()
+    _mark("wire open")
 
     # THE GROUND, first (cli.main's shape): `--ground <path>` sits the door
     # inside a world; a bad path is refused on the wire, never created.
@@ -723,6 +750,7 @@ def main(argv: list[str] | None = None) -> int:
     for line in _dotenv_lines:
         print(line)
 
+    _mark("dotenv read")
     sess = _cli.Session()
     door = Door(sess, wire, inbox, ground=ROOT)
     if not sess.load():
@@ -730,6 +758,7 @@ def main(argv: list[str] | None = None) -> int:
         wire.emit("closed", why="declarations did not load", sitting=None,
                   runs=0, toll_paid=False)
         return 1
+    _mark("declarations loaded")
     if not sess.rack_check():
         print("\n  RACK UNREACHABLE — the ground is open, the models are not.")
         print("  Start `ollama serve` whenever; Manjuel reconnects on the "
@@ -740,8 +769,11 @@ def main(argv: list[str] | None = None) -> int:
                   toll_paid=False)
         return 1
 
+    _mark("rack checked")
     _log.record(ROOT, sess.sitting)
+    _mark("sitting line written")
     g0 = gitstate.read(ROOT)
+    _mark("git read")
     print(f"  sitting {sess.sitting.n} · session {sess.session} · {g0.stamp()}")
     print()
 
@@ -755,9 +787,11 @@ def main(argv: list[str] | None = None) -> int:
                           "themselves between turns"))
         else:
             sess.watcher = None
+    _mark("warm + watcher done")
 
     for line in boot.report(sess, ROOT, EMBED_MODEL, git=g0):
         print(line)
+    _mark("boot.report done")
     print()
     try:
         for line in boot.brief_facts(sess, ROOT, git=g0):
@@ -765,7 +799,9 @@ def main(argv: list[str] | None = None) -> int:
         print("  /brief has the door say it\n")
     except Exception as exc:
         print(ink.dim(f"  (the brief could not be read: {exc})\n"))
+    _mark("brief done")
     origin, prior = _cli.load_thread(ROOT)
+    _mark("thread read")
     if prior:
         print(f"  a thread from {origin} is on file "
               f"({len(prior) // 2} turns) — /resume picks it up")
@@ -776,6 +812,7 @@ def main(argv: list[str] | None = None) -> int:
               seats=[a.name for a in sess.registry.all()],
               commands=list(COMMANDS), events=list(EVENTS))
 
+    _mark("OPENED emitted")
     try:
         return door.serve()
     except Exception as exc:

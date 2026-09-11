@@ -45,6 +45,24 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
+# EVERY CHILD HERE CLOSES STDIN, AND IT IS LOAD-BEARING (2026-09-10).
+#
+# `subprocess.run()` with no `stdin` hands the child the PARENT's stdin. From a
+# shell that is a console and harmless. Inside the engine under `manjuel.py
+# --headless` it is the pipe `serve.Inbox` has a thread permanently blocked
+# reading -- two readers on one pipe, and git never returns. Worse than a slow
+# call: `run(timeout=N)` raises TimeoutExpired, then kills the child and calls
+# communicate() AGAIN with no timeout, which blocks for the life of the process.
+#
+# boot.py's `_gate()` loads this module and calls `spec(ROOT, None)` at EVERY
+# boot, and spec() with no tag calls last_tag() -> `git tag`. So this omission
+# froze the engine during boot: nine sittings on 2026-09-10 opened, hung, and
+# were closed by THE LINE's timeout with nothing run. gitstate.py was given
+# this same fix on 2026-09-09 and calls it load-bearing; this file was not.
+#
+# No command here ever reads stdin, so closing it costs nothing.
+DEVNULL = subprocess.DEVNULL
+
 CODE_DIRS = ("manjuel", "agents", "skills", "tests")
 # What the suites write into tests/ as they run. Counting these as edits
 # made the strokes STALE the moment smoke finished after them.
@@ -138,14 +156,16 @@ def standup(root: Path = ROOT, edited: float | None = None) -> Check:
 
 def buildmap(root: Path = ROOT) -> Check:
     r = subprocess.run([sys.executable, str(root / "tests" / "buildmap.py"), "--check"],
-                       capture_output=True, text=True, cwd=str(root), timeout=120)
+                       capture_output=True, text=True, cwd=str(root), timeout=120,
+                       stdin=DEVNULL)      # see DEVNULL, above -- load-bearing
     tail = (r.stdout or r.stderr).strip().splitlines()[-1:] or [""]
     return Check("buildmap", r.returncode == 0, tail[0])
 
 
 def law(root: Path = ROOT) -> Check:
     r = subprocess.run([sys.executable, str(root / "law" / "law.py"), "--prove"],
-                       capture_output=True, text=True, cwd=str(root), timeout=120)
+                       capture_output=True, text=True, cwd=str(root), timeout=120,
+                       stdin=DEVNULL)      # see DEVNULL, above -- load-bearing
     tail = (r.stdout or r.stderr).strip().splitlines()[-1:] or [""]
     return Check("law", r.returncode == 0, tail[0][:100])
 
@@ -194,7 +214,8 @@ def spec_statuses(text: str) -> dict[str, list[str]]:
 def last_tag(root: Path = ROOT) -> str:
     try:
         r = subprocess.run(["git", "tag", "--sort=-v:refname"], capture_output=True,
-                           text=True, cwd=str(root), timeout=30)
+                           text=True, cwd=str(root), timeout=30,
+                           stdin=DEVNULL)  # see DEVNULL, above -- load-bearing
         tags = [t for t in r.stdout.split() if t.startswith("v")]
         return tags[0] if tags else ""
     except Exception:
@@ -208,7 +229,8 @@ def tagged_file(root: Path, tag: str, rel: str) -> str | None:
         return None
     try:
         r = subprocess.run(["git", "show", f"{tag}:{rel}"], capture_output=True,
-                           text=True, cwd=str(root), timeout=30)
+                           text=True, cwd=str(root), timeout=30,
+                           stdin=DEVNULL)  # see DEVNULL, above -- load-bearing
     except Exception:
         return None
     return r.stdout if r.returncode == 0 else None

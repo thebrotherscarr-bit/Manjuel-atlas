@@ -88,7 +88,7 @@ widen a window, only cover more ground with each one.
     agents/        one seat per file: model, clearances, wake condition, prompt
     skills/        one tool per file: keyword, description, params
     pipelines.md   the running orders
-    manjuel/      the engine (26 modules — see BUILDPATH.md)
+    manjuel/      the engine (28 modules — see BUILDPATH.md)
     tests/         the strokes and the smoke suite — offline, seconds; both
                    print their own count, which is why none is written here.
                    They also write `tests/last_run.md`: the failures, with
@@ -137,7 +137,7 @@ the engine inside a world: that folder's own `agents/`, `skills/`,
 that world's, and this ground's record gains nothing. A path that is not a
 directory is refused, never created.
 
-The thirty-seven skills are `skills/*.md`; `/skills` lists them and
+The thirty-nine skills are `skills/*.md`; `/skills` lists them and
 `skill_report` (ask "what can you do") reads them off the disk. The ones
 no earlier doc named: `deep_research`, `ground_report`, `skill_report`,
 `skill_search`, `list_directory`, `write_file`, `linear_regression`,

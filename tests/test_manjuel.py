@@ -3692,8 +3692,49 @@ def test_sitting_88_paths_and_evidence(reg, lib, book):
     dctx.named_file_ok = False
     check("...and nothing for a file that was not found (the Router chooses)",
           decided_call(dctx) == "")
-    check("...and nothing for a tool named with no checked argument",
+    check("...and nothing for a tool named with no checked argument, when there "
+          "is no library to say what it declares",
           decided_call(RunContext(objective="git status", named_tool="git_status")) == "")
+
+    # SPEC 4.2'S LAST OPEN CLAUSE, CLOSED 2026-09-10. "OPEN for a tool named
+    # with no argument (`git status`): the Router still writes the call" --
+    # and there was never anything for it to write. git_status, rack_list,
+    # list_directory, proved, ground_report and skill_report declare no
+    # parameters, so the objective naming one determines the call in full.
+    #
+    # THE STROKE ABOVE IS NARROWED, NOT DELETED (TESTING: a superseded ruling
+    # rewrites its stroke and keeps the guard). What it still guards is real:
+    # with no library nothing can be decided by declaration, because nothing
+    # can say what is declared.
+    from manjuel.pipeline import declares
+    from manjuel.skills import WRITING_SKILLS as _WRITES
+    check("a tool that declares NO arguments is decided once the library can say so",
+          decided_call(RunContext(objective="git status", named_tool="git_status"), lib)
+          == "<action>git_status</action>",
+          decided_call(RunContext(objective="git status", named_tool="git_status"), lib))
+    check("...and a tool that DOES declare one is still the Router's to fill",
+          decided_call(RunContext(objective="search the ground for the covenant",
+                                  named_tool="semantic_search"), lib) == "",
+          str(declares(lib.spec("semantic_search"))))
+
+    # A WRITE IS NEVER DECIDED BY ARITHMETIC (the 2026-09-08 ruling). Four
+    # writers declare nothing either; they are excluded by WRITING_SKILLS,
+    # not by a list here. Asserted non-empty first, or the guard below is a
+    # stroke over an empty set and proves nothing.
+    silent_writes = sorted(w for w in _WRITES
+                           if lib.spec(w) is not None and not declares(lib.spec(w)))
+    check("there ARE writes that declare nothing, or the next stroke proves nothing",
+          len(silent_writes) >= 1, str(silent_writes))
+    check("...and not one of them is decided by arithmetic",
+          all(decided_call(RunContext(objective=w, named_tool=w), lib) == ""
+              for w in silent_writes), str(silent_writes))
+
+    # ...AND ONLY WHAT THE OBJECTIVE NAMED. A tool an engine BRANCH picked
+    # was a guess about intent, and a guess is what the Router is for.
+    check("a tool a branch chose, rather than the objective naming it, is left to the Router",
+          decided_call(RunContext(objective="what happened in this sitting",
+                                  named_tool="git_status",
+                                  named_by="asks_the_ground"), lib) == "")
 
     class RightRouter(GuessingRouter):
         def chat(self, agent, prompt, stream_to=None, tools=None, think_to=None,

@@ -1049,13 +1049,53 @@ def note_partial_read(action: str, result: str, ctx: RunContext, report=print) -
     return stamp
 
 
-def decided_call(ctx: RunContext) -> str:
+def declares(spec) -> set:
+    """Every argument name a skill's OWN markdown declares.
+
+    One expression, two readers: the dedup keys a call on it (an undeclared
+    argument cannot vary a signature, sitting 77) and `decided_call` asks it
+    whether there is anything left for the Router to choose. A second copy
+    would drift the first time a skill grows a parameter, which is the fault
+    `reopen_reads` has its own docstring about."""
+    if spec is None:
+        return set()
+    return ({a for a, _ in (spec.path_args or ())}
+            | {a for _, a in (spec.takes or ())}
+            | set(spec.declared_args or ()))
+
+
+def decided_call(ctx: RunContext, skills: SkillLibrary | None = None) -> str:
     """The Router's markup for a call the ENGINE has fully decided, or "".
 
-    Decided means: the tool is named AND its argument was checked on disk
-    -- a folder that exists (names_a_folder) or a file that exists
-    (named_file_ok). Nothing softer: a tool named with no argument, or an
-    argument the engine only guessed, still goes to the Router to choose."""
+    Decided means the tool is named AND there is nothing left to choose:
+    an argument checked on disk -- a folder that exists (names_a_folder),
+    a file that exists (named_file_ok), the operator's own words -- or NO
+    ARGUMENT AT ALL.
+
+    THE LAST CLAUSE CLOSES SPEC 4.2, open since 2026-09-04. A tool named
+    with no argument still went to the Router to write the call, and there
+    was never anything there to write: `git_status`, `rack_list`,
+    `list_directory`, `proved`, `ground_report` and `skill_report` declare
+    no parameters, so "git status" determines the call completely the
+    moment intent recognises it. The Router was being asked to choose
+    between one option, at the cost of a model call and the chance to
+    choose wrong -- which it did, four standups running, on the folder
+    case this same mechanism was built for.
+
+    TWO GUARDS, and both are the estate's existing rulings rather than new
+    ones. A WRITE is never decided by arithmetic (the 2026-09-08 review:
+    "a writer's argument is never decided by arithmetic over the words --
+    the Router chooses, and the gate is final") -- `git_init`, `git_pull`,
+    `git_push` and `rack_sync` also declare nothing and are excluded by
+    name from WRITING_SKILLS, not by a list here. And only a tool the
+    OBJECTIVE named outright (`named_by` empty) qualifies: a tool an
+    engine BRANCH picked was a guess about intent, and a guess is exactly
+    what the Router is for.
+
+    WITHOUT THE LIBRARY NOTHING IS DECIDED BY THIS RULE, because nothing
+    can say what a skill declares. That is why `skills` is optional rather
+    than required: a caller that has no library gets the behaviour that
+    stood before this clause."""
     tool = getattr(ctx, "named_tool", "")
     if not tool:
         return ""
@@ -1067,7 +1107,11 @@ def decided_call(ctx: RunContext) -> str:
           # the operator's own words carried the argument (Takes:, or the
           # words after the name) -- the review of 2026-09-08
           or (by == "the words" and str(args.get("content") or "").strip()
-              and tool != "ground_read"))
+              and tool != "ground_read")
+          # ...or the skill takes nothing, so the call is already whole.
+          or (skills is not None and not by and tool not in WRITING_SKILLS
+              and skills.spec(tool) is not None
+              and not declares(skills.spec(tool))))
     if not ok:
         return ""
     xml = f"<action>{tool}</action>"
@@ -1621,9 +1665,9 @@ def run_pipeline(
             # markup, and the loop below runs it exactly as if the Router
             # had emitted it -- the dedup, the gates and the record all see
             # the same shape. The Router then sits ONCE to read the result.
-            decided = bool(executes and decided_call(ctx))
+            decided = bool(executes and decided_call(ctx, skills))
             if decided:
-                output = decided_call(ctx)
+                output = decided_call(ctx, skills)
                 note = (f"the call was decided by arithmetic "
                         f"({ctx.named_by or 'the objective'}): `{ctx.named_tool}` "
                         f"runs first; the Router reads the result, it does not choose")
@@ -1789,11 +1833,10 @@ def run_pipeline(
                 if _spec is None:
                     keyed = dict(args or {})      # unknown skill: judge it whole
                 else:
-                    declared = ({a for a, _ in (_spec.path_args or ())}
-                                | {a for _, a in (_spec.takes or ())}
-                                | _spec.declared_args)
+                    # ONE expression for what a skill declares (`declares`),
+                    # shared with decided_call so the two cannot separate.
                     keyed = {k: v for k, v in (args or {}).items()
-                             if k in declared}
+                             if k in declares(_spec)}
                 sig = (action, repr(sorted(keyed.items())))
                 fresh = sig not in ran
                 if not fresh:

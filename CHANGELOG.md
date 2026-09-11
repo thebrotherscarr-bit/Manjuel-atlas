@@ -34,6 +34,40 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — THE ROUTER WAS BEING ASKED TO CHOOSE BETWEEN ONE OPTION (SPEC 4.2)
+- **THE LAST OPEN CLAUSE OF 4.2, AND IT HAD BEEN OPEN SINCE 2026-09-04.** `decided_call`
+  ran the call itself when the engine had the tool AND an argument checked on disk. A
+  tool named with **no** argument still went to the Router to write the call -- and
+  there was never anything for it to write. `git status` is the commonest objective in
+  the whole record.
+- **SIX SKILLS DECLARE NO PARAMETERS**, counted off the library rather than listed by
+  hand: `git_status`, `rack_list`, `list_directory`, `proved`, `ground_report`,
+  `skill_report`. For those the objective naming the tool determines the call in full,
+  so the Router was being paid a model call to pick from a set of one -- and picking
+  wrong is not hypothetical: sittings 86, 88, 90 and 91 told it `ground_list` and got
+  `skill_report`, which is why the decided call exists at all.
+- **TWO GUARDS, AND NEITHER IS A NEW RULING.** A WRITE is never decided by arithmetic
+  (the 2026-09-08 review: "the Router chooses, and the gate is final") -- `git_init`,
+  `git_pull`, `git_push` and `rack_sync` declare nothing either, and are excluded by
+  `WRITING_SKILLS` rather than by a second list. And only a tool the OBJECTIVE named
+  outright qualifies: a tool an engine BRANCH picked was a guess about intent, and a
+  guess is what the Router is for.
+- **ONE EXPRESSION FOR WHAT A SKILL DECLARES.** `declares(spec)` is now shared by the
+  dedup (which keys a call on it, sitting 77) and by `decided_call` (which asks whether
+  anything is left to choose). It was inline in one place; a second copy would drift the
+  first time a skill grows a parameter.
+- **WITHOUT THE LIBRARY NOTHING IS DECIDED BY THIS RULE**, so `skills` is optional and a
+  caller with none gets exactly the behaviour that stood before. That is what let the
+  superseded stroke be NARROWED rather than deleted (TESTING's rule): what it still
+  guards is real.
+- Six strokes, both ways: a no-argument tool IS decided; one that declares an argument
+  is not; the no-argument WRITES are asserted non-empty and then asserted undecided; and
+  a tool a branch chose is left to the Router.
+- Proven on a clean-clone mirror (173 tracked files, no .git, no logs, no index):
+  **2058/2058 strokes, 60/60 smoke**. BUILDMAP regenerated and `--check` clean.
+- **RESTART REQUIRED**: `manjuel/pipeline.py` moved, and a running REPL holds the old code.
+
+
 ### 2026-09-10 — DISCERN: SOURCES ARE WHAT IS, THE RECORD IS WHAT HAPPENED
 - **HIS RULING OF THIS MORNING WAS RIGHT AND STOPPED ONE FILE SHORT.**
   "semantic_search answers from SOURCES by default; the transcripts are a
