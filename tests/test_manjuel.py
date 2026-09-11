@@ -10146,6 +10146,47 @@ def test_the_mcp_skill_never_leaves_this_machine(reg, lib, book):
           any(s.keyword == "mcp_call" for s in lib.specs),
           ", ".join(sorted(s.keyword for s in lib.specs))[:80])
 
+    # ---- the fault this skill made on the day it was built ---------------
+    #
+    # NO SKILL MAY DECLARE AN ARGUMENT THE GRAMMAR CANNOT CARRY. The Router
+    # answers in three tags and there is no fourth: <action>, <filepath>,
+    # <content> (extract_tool_call; TAKES_ARGS names the two that carry a
+    # payload). `tool_schemas` offers the model EVERY argument a skill
+    # declares -- so a skill declaring <server> and <tool> has the Router
+    # trying to send what it has no tag for, and the call arrives as {}.
+    #
+    # mcp_call shipped exactly that on 2026-09-11 and it was found by running
+    # a live turn, not by a stroke: "call muster on the atlas mcp server"
+    # routed perfectly and then could not act. parse_takes already refuses
+    # this shape in **Takes:** rules -- "a rule pointing at a name nothing can
+    # carry would be a promise the engine cannot keep" -- and nothing applied
+    # the same rule to **Parameters Needed:**. Now something does.
+    #
+    # The guard is GENERAL; it is written here because this is where it was
+    # earned. A red names the skill and the argument.
+    from manjuel.skills import declares as _declares
+    carryable = set(_sk.TAKES_ARGS)
+    for spec in sorted(lib.specs, key=lambda x: x.keyword):
+        extra = sorted(set(_declares(spec)) - carryable)
+        check(f"{spec.keyword} declares only arguments the Router can send",
+              not extra,
+              f"declares {extra}, and the grammar carries "
+              f"{sorted(carryable)} -- the model would be offered an argument "
+              f"it has no tag for")
+
+    # And the resolver that replaced them: a name is only a name if it is
+    # really in the sentence. Pure, so no server is contacted.
+    from manjuel.skills import _mcp_named
+    check("a server named in the sentence is found",
+          _mcp_named("call muster on the atlas mcp server", {"atlas", "neiro"}) == "atlas")
+    check("a tool named in the sentence is found",
+          _mcp_named("call muster on atlas", ["muster", "flow_list"]) == "muster")
+    check("a name that is NOT in the sentence is not invented",
+          _mcp_named("call something on atlas", ["muster", "flow_list"]) == "")
+    check("a name embedded in a longer word does not count",
+          _mcp_named("mustering the troops", ["muster"]) == "",
+          "substring matching would call a tool nobody named")
+
 
 def test_a_skill_cannot_hang_the_repl(reg, lib, book):
     """LAW 7 -- bounded everything. voice.py bounds at 180s, gitstate.py at

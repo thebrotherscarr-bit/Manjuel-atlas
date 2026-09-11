@@ -2799,6 +2799,21 @@ def _mcp_text(result: dict) -> str:
     return "\n".join(parts).strip()
 
 
+def _mcp_named(text: str, candidates) -> str:
+    """The first candidate NAMED IN `text` as a whole word, or "".
+
+    Resolved against what actually exists -- the declared servers, or the
+    server's own roster read off the wire -- never guessed at. A name that is
+    not really there is not a name.
+    """
+    words = {w.strip(".,;:!?'\"`()[]{}").lower()
+             for w in (text or "").split()}
+    for c in sorted(candidates, key=len, reverse=True):
+        if str(c).lower() in words:
+            return str(c)
+    return ""
+
+
 @skill("mcp_call")
 def _mcp_call(env: SkillExecutionEnv, args: dict) -> str:
     """Call one tool on a local MCP server this ground declares.
@@ -2810,7 +2825,39 @@ def _mcp_call(env: SkillExecutionEnv, args: dict) -> str:
     from urllib.parse import urlparse
 
     servers = _mcp_servers()
+
+    # WHERE THE ARGUMENTS COME FROM, and why this is not simply `server=`.
+    #
+    # The Router's markup grammar has THREE TAGS AND NO FOURTH -- <action>,
+    # <filepath>, <content> (extract_tool_call, and TAKES_ARGS beside it). A
+    # skill that declares an argument the grammar cannot carry is making a
+    # promise the engine cannot keep, which is the exact fault parse_takes was
+    # written after. THIS SKILL MADE THAT FAULT ON THE DAY IT WAS BUILT: it
+    # declared <server> and <tool>, the schema duly offered them to the Router,
+    # the Router had no tag to answer with, and "call muster on the atlas mcp
+    # server" arrived here as {} -- routed perfectly, then unable to act.
+    #
+    # So <content> carries "<server> <tool> [json]", and when even that is
+    # absent THE OBJECTIVE IS THE PAYLOAD -- the fallback every handler in this
+    # file already relies on. `server=` and `tool=` still work for a caller
+    # that HAS them (a flow node, a direct call, a stroke); they are simply no
+    # longer advertised to a model that cannot send them.
+    said = (args.get("content") or "").strip().strip("`")
+    explicit = bool((args.get("server") or "").strip()
+                    and (args.get("tool") or "").strip())
+    if not said and not explicit:
+        said = (getattr(env, "objective", "") or "").strip()
+
     name = (args.get("server") or "").strip().strip("'\"`").lower()
+    if not name:
+        name = _mcp_named(said, servers)
+        # One declared server and none named is not ambiguity, it is the only
+        # answer there is -- but ONLY when something was actually asked. With
+        # nothing said at all the question is "which servers are there", and
+        # dialling the only one to recite its 78 tools answers a question
+        # nobody put.
+        if not name and said and len(servers) == 1:
+            name = next(iter(servers))
 
     # NO SERVER NAMED: say which are declared. Names only -- never the address.
     if not name:
@@ -2820,8 +2867,10 @@ def _mcp_call(env: SkillExecutionEnv, args: dict) -> str:
                     "and it becomes callable by <NAME>. The address must be "
                     "loopback; the estate is local.")
         return ("The MCP servers this ground declares: "
-                + ", ".join(sorted(servers)) + ".\nName one as <server>, and "
-                "leave <tool> blank to see what it carries.")
+                + ", ".join(sorted(servers)) + ".\nAsk for one by name to see "
+                "what it carries, or name a tool with it -- "
+                + f"`{sorted(servers)[0]} <tool>`, and any arguments after "
+                "that as a JSON object.")
 
     if name not in servers:
         return (f"Refused: this ground declares no MCP server called "
@@ -2845,6 +2894,15 @@ def _mcp_call(env: SkillExecutionEnv, args: dict) -> str:
 
     tool = (args.get("tool") or "").strip().strip("'\"`")
 
+    # THE TOOL, OFF THE SERVER'S OWN ROSTER. Asking the server what it carries
+    # and matching against THAT is the only way to name a tool without
+    # guessing -- and it costs one call to a server already on this machine.
+    if not tool and said:
+        listing, lerr = _mcp_rpc(url, "tools/list", {})
+        if not lerr:
+            tool = _mcp_named(
+                said, [str(t.get("name")) for t in (listing.get("tools") or [])])
+
     # NO TOOL, OR A TOOL IT DOES NOT CARRY: answer with what it does carry.
     # This is why there is one skill here and not two -- discovery is what a
     # refusal already has to say to be worth reading.
@@ -2864,18 +2922,35 @@ def _mcp_call(env: SkillExecutionEnv, args: dict) -> str:
 
     # THE ARGUMENTS. A tool's arguments are its own contract, so they arrive as
     # the JSON object that contract describes rather than being guessed at here.
-    raw = (args.get("content") or "").strip()
+    #
+    # WHICH HALF OF `content` THIS IS depends on how the call arrived, and the
+    # rule is the grammar's, not a preference: a caller that named the server
+    # AND the tool has nowhere else to put the arguments, so `content` IS them
+    # and must parse whole. A caller that named neither is speaking a sentence,
+    # so the arguments are the {...} inside it, if there is one.
     payload: dict = {}
-    if raw:
-        try:
-            payload = _json.loads(raw)
-        except ValueError:
-            return (f"Refused: the arguments for {tool!r} must be a JSON "
-                    f"object, e.g. {{\"project\": \"research\"}}. Got: "
-                    f"{raw[:120]!r}")
-        if not isinstance(payload, dict):
-            return (f"Refused: the arguments for {tool!r} must be a JSON "
-                    f"OBJECT, not {type(payload).__name__}.")
+    if explicit:
+        raw = (args.get("content") or "").strip()
+        if raw:
+            try:
+                payload = _json.loads(raw)
+            except ValueError:
+                return (f"Refused: the arguments for {tool!r} must be a JSON "
+                        f"object, e.g. {{\"project\": \"research\"}}. Got: "
+                        f"{raw[:120]!r}")
+            if not isinstance(payload, dict):
+                return (f"Refused: the arguments for {tool!r} must be a JSON "
+                        f"OBJECT, not {type(payload).__name__}.")
+    else:
+        i, j = said.find("{"), said.rfind("}")
+        if i != -1 and j > i:
+            try:
+                payload = _json.loads(said[i:j + 1])
+            except ValueError:
+                return (f"Refused: {said[i:j + 1][:80]!r} sits in that request "
+                        f"where {tool!r}'s arguments would, and it is not JSON.")
+            if not isinstance(payload, dict):
+                payload = {}
 
     # The handshake first, as the protocol asks. A server that does not need it
     # is not harmed by it, and one that does would refuse everything without it.

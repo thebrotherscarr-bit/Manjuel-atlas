@@ -34,6 +34,50 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### mcp_call declared two arguments the Router has no way to send
+
+The skill routed perfectly and then could not act. A live turn on 2026-09-11 —
+"call muster on the atlas mcp server" — reached `mcp_call` and arrived as `{}`,
+and the Steward correctly asked which tool was meant.
+
+THE ROUTER ANSWERS IN THREE TAGS AND THERE IS NO FOURTH: `<action>`,
+`<filepath>`, `<content>` (`extract_tool_call`; `TAKES_ARGS` names the two
+that carry a payload). `mcp_call` declared `<server>` and `<tool>`.
+`tool_schemas` offers a model EVERY argument a skill declares, so the Router
+was handed two it had no tag for, tried, and sent nothing.
+
+`parse_takes` has refused exactly this shape in **Takes:** rules since it was
+written — *"a rule pointing at a name nothing can carry would be a promise the
+engine cannot keep"* — and nothing applied the same rule to **Parameters
+Needed:**. This skill, built the same day, walked into it.
+
+WHAT REPLACED THEM. `<content>` carries `"<server> <tool> [json]"`, and when
+it is blank THE OBJECTIVE IS THE PAYLOAD — the fallback every handler in
+skills.py already leans on. The server and tool are then resolved AGAINST WHAT
+EXISTS: the declared dials, and the server's own roster read off the wire. A
+name that is not really in the sentence is not a name, and a name inside a
+longer word is not one either. `server=` and `tool=` still work for a caller
+that has them — a flow node, a stroke, a direct call — they are simply no
+longer advertised to a model that cannot send them.
+
+AND **Takes:** WAS THE WRONG CURE, which is worth writing down because it was
+the first answer that came to mind. `args_from_words` sets the argument to the
+MATCHED TRIGGER WORD; a rule like `atlas -> content` would overwrite the whole
+payload with the word "atlas". Takes is for a flag, not for a sentence.
+
+One behaviour deliberately narrowed: with a single declared server and NOTHING
+said, the skill does not dial it. "Which MCP servers do we have" is a question
+about servers, and reciting the only one's 78 tools answers a question nobody
+put.
+
+Proven live against the door: the sentence that failed now returns the carried
+projects; `atlas flow_list {"project":"atlas"}` inside a sentence resolves the
+server, the tool AND the arguments; the explicit path still refuses non-JSON.
+
+THE GUARD IS GENERAL AND IT IS NOW PINNED: every skill is checked against the
+grammar, all 40 pass today, and putting `<server>`/`<tool>` back turns the
+suite red naming the skill and the arguments. 2148 -> 2192 strokes.
+
 ### The build map catches up with the stroke that was just added
 
 `850e2ce` added a stroke to `tests/test_manjuel.py` and did not regenerate the
