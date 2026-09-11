@@ -498,45 +498,46 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `render_toll` | 307-365 |  |
 | def | `pay` | 368-375 | Append the toll. Never rewrites what stands above it. |
 
-### manjuel/serve.py — 797 lines
+### manjuel/serve.py — 834 lines
 
 *The headless door: the REPL's turn over stdin/stdout as JSON lines.*
 
 | kind | name | lines | says |
 |---|---|---|---|
-| class | `Wire` | 131-158 | JSON lines out, one per event, under a lock: the watcher, the |
-| def | `Wire.__init__` | 135-144 |  |
-| def | `Wire.emit` | 146-158 |  |
-| class | `TextChannel` | 161-188 | Stands where sys.stdout stood. Every write is a `text` event; there |
-| def | `TextChannel.__init__` | 168-169 |  |
-| def | `TextChannel.write` | 171-175 |  |
-| def | `TextChannel.flush` | 177-178 |  |
-| def | `TextChannel.isatty` | 180-181 |  |
-| def | `TextChannel.fileno` | 183-184 |  |
-| def | `TextChannel.writelines` | 186-188 |  |
-| class | `Inbox` | 191-259 | The client's lines, read on a thread so a `cancel` can reach a run |
-| def | `Inbox.__init__` | 198-206 |  |
-| def | `Inbox.start` | 208-209 |  |
-| def | `Inbox.set_state` | 211-213 |  |
-| def | `Inbox._pump` | 215-249 |  |
-| def | `Inbox.take` | 251-256 | The next command, or None at EOF. |
-| def | `Inbox.put_back` | 258-259 |  |
-| class | `_Runtime` | 267-309 | The runtime as it is, plus a `seat` event when a seat sits and |
-| def | `_Runtime.__init__` | 272-274 |  |
-| def | `_Runtime.__getattr__` | 276-277 |  |
-| def | `_Runtime.chat` | 279-286 |  |
-| def | `_Runtime._token_sink` | 288-309 |  |
-| def | `_watch_skills` | 312-333 | Wrap execute() on THIS library instance for THIS wire. /reload |
-| class | `Door` | 341-663 | One sitting, over one wire. `sess` is cli.Session or anything that |
-| def | `Door.__init__` | 345-359 |  |
-| def | `Door.ask` | 363-391 | Stands where input() stood. One question, one answer, over the |
-| def | `Door._listen` | 393-428 | One spoken turn, captured and transcribed, and NOT run. |
-| def | `Door._next` | 430-433 |  |
-| def | `Door.serve` | 437-489 | cli._loop's shape: take a turn, run it, until close or EOF. |
-| def | `Door._close` | 491-499 |  |
-| def | `Door.turn` | 503-663 | One typed turn, cli._loop's body line for line (the REPL read of |
-| def | `open_wire` | 671-688 | The real stdout and stdin as the wire. stdout is swapped for the |
-| def | `main` | 691-790 |  |
+| def | `_mark` | 129-149 | One line of boot progress, on the REAL stderr. |
+| class | `Wire` | 157-184 | JSON lines out, one per event, under a lock: the watcher, the |
+| def | `Wire.__init__` | 161-170 |  |
+| def | `Wire.emit` | 172-184 |  |
+| class | `TextChannel` | 187-214 | Stands where sys.stdout stood. Every write is a `text` event; there |
+| def | `TextChannel.__init__` | 194-195 |  |
+| def | `TextChannel.write` | 197-201 |  |
+| def | `TextChannel.flush` | 203-204 |  |
+| def | `TextChannel.isatty` | 206-207 |  |
+| def | `TextChannel.fileno` | 209-210 |  |
+| def | `TextChannel.writelines` | 212-214 |  |
+| class | `Inbox` | 217-285 | The client's lines, read on a thread so a `cancel` can reach a run |
+| def | `Inbox.__init__` | 224-232 |  |
+| def | `Inbox.start` | 234-235 |  |
+| def | `Inbox.set_state` | 237-239 |  |
+| def | `Inbox._pump` | 241-275 |  |
+| def | `Inbox.take` | 277-282 | The next command, or None at EOF. |
+| def | `Inbox.put_back` | 284-285 |  |
+| class | `_Runtime` | 293-335 | The runtime as it is, plus a `seat` event when a seat sits and |
+| def | `_Runtime.__init__` | 298-300 |  |
+| def | `_Runtime.__getattr__` | 302-303 |  |
+| def | `_Runtime.chat` | 305-312 |  |
+| def | `_Runtime._token_sink` | 314-335 |  |
+| def | `_watch_skills` | 338-359 | Wrap execute() on THIS library instance for THIS wire. /reload |
+| class | `Door` | 367-689 | One sitting, over one wire. `sess` is cli.Session or anything that |
+| def | `Door.__init__` | 371-385 |  |
+| def | `Door.ask` | 389-417 | Stands where input() stood. One question, one answer, over the |
+| def | `Door._listen` | 419-454 | One spoken turn, captured and transcribed, and NOT run. |
+| def | `Door._next` | 456-459 |  |
+| def | `Door.serve` | 463-515 | cli._loop's shape: take a turn, run it, until close or EOF. |
+| def | `Door._close` | 517-525 |  |
+| def | `Door.turn` | 529-689 | One typed turn, cli._loop's body line for line (the REPL read of |
+| def | `open_wire` | 697-714 | The real stdout and stdin as the wire. stdout is swapped for the |
+| def | `main` | 717-827 |  |
 
 ### manjuel/skills.py — 3047 lines
 
@@ -766,7 +767,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `GroundWatch.start` | 109-134 |  |
 | def | `GroundWatch.stop` | 136-142 |  |
 
-manjuel/: 29 files, 16957 lines.
+manjuel/: 29 files, 16994 lines.
 
 ## GUARDS — by the failure that earned them
 
@@ -1057,7 +1058,7 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 | line | in | marker |
 |---|---|---|
 | 113 | `(module)` | is exactly what every `/command` did until 2026-09-09. `error` is NOT here: |
-| 289 | `_token_sink` | SITTING 70's rule, kept: control markup is the seat's channel to |
+| 315 | `_token_sink` | SITTING 70's rule, kept: control markup is the seat's channel to |
 
 ### manjuel/skills.py
 
