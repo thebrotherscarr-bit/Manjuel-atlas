@@ -34,6 +34,17 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### The build map catches up with the stroke that was just added
+
+`850e2ce` added a stroke to `tests/test_manjuel.py` and did not regenerate the
+map, so all four legs went red on "The build map matches the code" — the same
+gate, in the same file, that was red for four runs this morning and fixed in
+`2e57462` twelve hours earlier. The map covers `tests/` as well as `manjuel/`;
+adding a function to either moves it.
+
+Regenerated. The gate is the estate working: it caught this in CI on the push
+that caused it, which is the shortest distance between a fault and its author.
+
 ### The guard for the suites' own writers, pinned
 
 Named in the last two entries and left standing twice; pinned now.
