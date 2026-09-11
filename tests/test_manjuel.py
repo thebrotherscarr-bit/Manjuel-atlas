@@ -142,7 +142,7 @@ def _append_history(root, row: dict) -> None:
     try:
         p = Path(root) / HISTORY_FILE
         p.parent.mkdir(parents=True, exist_ok=True)
-        with p.open("a", encoding="utf-8", newline="\n") as fh:
+        with p.open("a", encoding="utf-8", newline="\r\n") as fh:
             fh.write(json.dumps(row, ensure_ascii=False) + "\n")
     except Exception:
         pass

@@ -34,6 +34,52 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### The last mixed files, and the writer that was making one of them
+
+CLAUDE.md: "never leave a file MIXED." Four files in this ground were, and a
+sweep over every tracked file now finds none.
+
+`pyproject.toml` (18 CRLF + 67 LF), `BUILDPATH.md` (2 + 378) and `pipelines.md`
+(2 + 290) were hand-edit residue — a couple of lines saved from a Windows
+editor into an otherwise-LF file. Normalised to CRLF, which is what
+`.gitattributes` declares on checkout (`* text=auto eol=crlf`).
+
+NONE OF THAT MOVED THE RECORD, and that is checkable rather than claimed: git
+stores these text blobs LF whichever way the working tree holds them, so after
+the conversion every blob hashed identical to HEAD. The mixed state existed
+only on this disk; a fresh clone was already getting clean CRLF. Content
+equality was asserted with terminators stripped from both sides before any
+write, so the only bytes that moved were carriage returns.
+
+**`tests/run_history.jsonl` WAS A DIFFERENT FAULT WEARING THE SAME CLOTHES.**
+36 CRLF and 273 LF is not residue, it is TWO WRITERS APPENDING TO ONE FILE AND
+DISAGREEING:
+
+    tests/standup.py:449        newline="\r\n"      36 lines
+    tests/test_manjuel.py:145   newline="\n"       273 lines
+
+Normalising the file alone would have left it to re-mix on the next run, so the
+appender moved to `\r\n` and the file with it. Proven rather than asserted: on
+a mirror, after a full strokes run and a full smoke run, the file reads 311
+CRLF and 0 LF.
+
+**WHY THE GUARD DID NOT CATCH IT.** `test_the_chain_writes_declared_newlines`
+exists for exactly this and has since 2026-09-03. Its scan is
+`(ROOT / "manjuel").glob("*.py")` — the ENGINE's writers. The SUITES write the
+record too (`last_run.md`, `last_run.json`, `run_history.jsonl`,
+`last_audit.md` are all tracked), and no stroke has ever looked at how they
+declare a terminator.
+
+It was not simply widened to `tests/` in the same pass, and the reason is worth
+writing down: most of `test_manjuel.py`'s `newline="\n"` calls write FIXTURES
+into temp grounds, where LF is correct and deliberate. A glob that cannot tell
+a record-writer from a fixture-writer would go red on good code, and a guard
+that cries wolf gets widened again by deleting it. Three suite writers still
+declare `\n` into tracked record files — `test_manjuel.py:130` and `:235/:237`,
+and `audit_record.py:368`. They are CONSISTENTLY LF rather than mixed, so they
+break the ruling without breaking the rule this pass was called for. Named
+here, left standing, his to rule on.
+
 ### 0.1.10, and a flow that checks a bump rather than making one
 
 His word: manjuel is 0.1.10. Two files hold the number and both moved —
