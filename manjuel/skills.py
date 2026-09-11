@@ -54,6 +54,9 @@ _DESC_RE = re.compile(r"\*\*Description:\*\*\s*(?P<d>.*?)(?=\n[ \t]*[-*][ \t]*\*
                       re.DOTALL)
 _PARAMS_RE = re.compile(r"\*\*Parameters Needed:\*\*\s*(?P<p>.*?)(?=\n[ \t]*[-*][ \t]*\*\*|\Z)",
                         re.DOTALL)
+# `<content>The note to propose</content>` -- the NAME and the author's own
+# description of it. The backreference keeps `<a>x</b>` from matching.
+_PARAM_PAIR_RE = re.compile(r"<(?P<n>\w+)>(?P<d>.*?)</(?P=n)>", re.DOTALL)
 # LAW 8: one write-path per chain. A skill that resolves a CALLER-SUPPLIED path
 # declares which argument carries it and which jail it belongs to, so the gate
 # at dispatch can check the RESOLVED path before any handler runs. Declared,
@@ -315,6 +318,22 @@ class SkillSpec:
         return frozenset(re.findall(r"<(\w+)>", pm.group("p")))
 
     @property
+    def param_notes(self) -> dict:
+        """{argument: the skill's OWN words for it}, off **Parameters Needed:**.
+
+        `declared_args` reads the NAMES out of `<content>...</content>`; this
+        reads what is written BETWEEN the tags, which is the author describing
+        the argument to whoever has to supply it. The tool schema hands those
+        words to the Router rather than a sentence invented in Python, so the
+        description a model reads is the one the skill's author wrote.
+        """
+        pm = _PARAMS_RE.search(self.body)
+        if not pm:
+            return {}
+        return {m.group("n"): " ".join(m.group("d").split())
+                for m in _PARAM_PAIR_RE.finditer(pm.group("p"))}
+
+    @property
     def summary(self) -> str:
         """The ROUTING view: keyword, what it does, what it takes.
 
@@ -335,6 +354,28 @@ class SkillSpec:
         if len(params) > 80:
             params = params[:80] + "..."
         return f"- {self.keyword}  takes: {params}\n    {desc}"
+
+
+def declares(spec) -> set:
+    """Every argument name a skill's OWN markdown declares.
+
+    One expression, THREE readers now: the dedup keys a call on it (an
+    undeclared argument cannot vary a signature, sitting 77), `decided_call`
+    asks it whether anything is left for the Router to choose, and
+    `tool_schemas` builds each skill's parameters from it. A second copy
+    would drift the first time a skill grows a parameter.
+
+    MOVED HERE FROM pipeline.py, 2026-09-10. It reads nothing but SkillSpec
+    fields, and `tool_schemas` -- a SkillLibrary method -- needed it; pipeline
+    imports skills, so skills cannot import pipeline back. It belongs beside
+    the thing it describes. pipeline.py re-exports the name, so every existing
+    caller is untouched.
+    """
+    if spec is None:
+        return set()
+    return ({a for a, _ in (spec.path_args or ())}
+            | {a for _, a in (spec.takes or ())}
+            | set(spec.declared_args or ()))
 
 
 # What counsel may call: eyes, never hands. The operator's ruling,
@@ -2839,18 +2880,55 @@ class SkillLibrary:
         return {s.model for s in self.specs if s.model}
 
     def tool_schemas(self, allowed: set[str]) -> list[dict]:
-        """Ollama `tools=` schemas for the skills a seat may call.
+        """Ollama `tools=` schemas -- each skill offered ONLY what it declares.
 
-        The estate's calling convention is already two optional string
-        arguments -- every handler reads args['content'] and/or
-        args['filepath'] and falls back to the objective when they are absent
-        (s6/s26: a missing arg got narrated over by seats inventing results).
-        So the schema states that convention rather than trying to parse the
-        prose in **Parameters Needed:**, which is written for a person.
+        EVERY SKILL USED TO BE HANDED THE SAME TWO ARGUMENTS. `content` and
+        `filepath`, on all thirty-nine, whatever their markdown said. The old
+        docstring called that "the estate's calling convention" and it was
+        really the absence of one: the schema was a constant, so a skill that
+        takes nothing was still asked for two strings, and a skill that takes
+        only a query was still offered a file.
 
-        The USAGE rules live in the skill's markdown body and reach the model
-        by injection when it picks one -- a JSON schema cannot carry "reads
-        only", "refuses secrets", or "the objective IS the payload".
+        MEASURED 2026-09-10, off the library rather than by eye:
+
+            10 skills declare NOTHING          git_status, git_init, git_pull,
+                                               git_push, rack_list, rack_sync,
+                                               proved, ground_report,
+                                               skill_report, list_directory
+            24 more declare only `content`     and were offered `filepath` too
+             5 genuinely take a file           embed_text, ground_read, inspect,
+                                               read_file, write_file
+
+        WHAT IT COST, in the record. The standup sat at 8/9 on `a question
+        about the ground` because the Router spent 62 seconds and 3,233
+        characters deliberating whether `filepath` was required for
+        `semantic_search` -- which does not take one -- and then gave up. The
+        same thing on a live commit the same evening: "git_commit needs a
+        filepath (which file changed) and content (what changed). I don't know
+        what file changed", 5,357 characters of it. Neither model was
+        confused; both were answering the schema they were given, and the
+        schema was wrong.
+
+        SO IT IS GENERATED FROM `declares(spec)` -- the one expression the
+        dedup and `decided_call` already use. A skill's own file is the record
+        of what it takes; nothing else is.
+
+        THE DESCRIPTIONS ARE THE AUTHOR'S OWN WORDS, read from between the
+        tags on the `**Parameters Needed:**` line (`param_notes`), falling
+        back to the declared jail for a path argument. A sentence written in
+        Python here would be a second place to describe an argument, and it
+        would be the one that drifts.
+
+        `required` STAYS EMPTY, deliberately. Every handler falls back to the
+        objective when its argument is absent (s6/s26: a missing arg got
+        narrated over by seats inventing results), so a required argument
+        would refuse calls the estate currently completes. What was wrong was
+        offering arguments that do not exist, not failing to demand the ones
+        that do.
+
+        The USAGE rules still live in the skill's markdown body and reach the
+        model by injection when it picks one -- a JSON schema cannot carry
+        "reads only", "refuses secrets", or "the objective IS the payload".
         """
         out = []
         for s in sorted(self.specs, key=lambda x: x.keyword):
@@ -2858,6 +2936,16 @@ class SkillLibrary:
                 continue
             d = _DESC_RE.search(s.body)
             desc = " ".join(d.group("d").split()) if d else s.keyword
+            notes = s.param_notes
+            jails = dict(s.path_args or ())
+            props: dict = {}
+            for arg in sorted(declares(s)):
+                said = notes.get(arg, "")
+                if not said:
+                    said = (f"the path this skill acts on, relative to the "
+                            f"{jails[arg]}" if arg in jails else
+                            f"the {arg} this skill acts on")
+                props[arg] = {"type": "string", "description": said[:200]}
             out.append({
                 "type": "function",
                 "function": {
@@ -2865,14 +2953,7 @@ class SkillLibrary:
                     "description": desc[:400],
                     "parameters": {
                         "type": "object",
-                        "properties": {
-                            "content": {"type": "string",
-                                        "description": "the payload, query or "
-                                                       "subject this skill acts on"},
-                            "filepath": {"type": "string",
-                                         "description": "the file this skill "
-                                                        "acts on, when it takes one"},
-                        },
+                        "properties": props,
                         "required": [],
                     },
                 },

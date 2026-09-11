@@ -298,3 +298,12 @@
 {"suite": "smoke", "at": 1789094451.3764255, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
 {"suite": "strokes", "at": 1789094467.3555498, "state": "finished", "passed": 2100, "total": 2100, "green": true, "failed": []}
 {"suite": "smoke", "at": 1789094511.1836317, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789095134.848736, "state": "finished", "passed": 2099, "total": 2100, "green": false, "failed": ["every schema is a well-formed function with its two string args"]}
+{"suite": "smoke", "at": 1789095138.5104566, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789095212.2810645, "state": "finished", "passed": 2106, "total": 2106, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789095216.1789782, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789095375.6219456, "state": "finished", "passed": 2106, "total": 2106, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789095379.3610165, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "standup", "at": 1789095560.3663225, "state": "finished", "passed": 9, "total": 9, "green": true, "failed": [], "report": "logs/standup_2026-09-10_195920.md"}
+{"suite": "strokes", "at": 1789095940.582394, "state": "finished", "passed": 2106, "total": 2106, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789095944.4990442, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}

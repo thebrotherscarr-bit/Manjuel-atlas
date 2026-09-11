@@ -10073,10 +10073,56 @@ def test_native_tool_calling(reg, lib, book):
     names = {t["function"]["name"] for t in lib.tool_schemas(s_allowed)}
     check("the schemas offered mirror the clearance exactly", names == s_allowed,
           str(sorted(names ^ s_allowed)))
-    check("every schema is a well-formed function with its two string args",
+    # THIS STROKE USED TO PIN THE DEFECT. It read `== {"content", "filepath"}`
+    # for EVERY schema, which is exactly what was wrong: all thirty-nine skills
+    # were handed the same two arguments whatever their markdown declared. The
+    # Router then spent 62 seconds deciding whether `filepath` was required for
+    # `semantic_search` (it takes none) and the standup sat at 8/9 for it.
+    # A stroke that holds a constant cannot notice the constant is a lie.
+    # Imported from pipeline the way the other strokes do -- which also
+    # proves the re-export holds after the function moved to skills.py.
+    from manjuel.pipeline import declares
+    schemas = {t["function"]["name"]: t for t in lib.tool_schemas(every)}
+    check("every schema is a well-formed function of string arguments",
           all(t["type"] == "function"
-              and set(t["function"]["parameters"]["properties"]) == {"content", "filepath"}
-              for t in lib.tool_schemas(every)))
+              and t["function"]["parameters"]["type"] == "object"
+              and all(p.get("type") == "string" and p.get("description")
+                      for p in t["function"]["parameters"]["properties"].values())
+              for t in schemas.values()))
+
+    # THE CONTRACT, stated as the thing it actually is: a skill is offered
+    # what its own file says it takes, and nothing else.
+    wrong = sorted(k for k, t in schemas.items()
+                   if set(t["function"]["parameters"]["properties"])
+                   != declares(lib.spec(k)))
+    check("a skill is offered exactly the arguments it declares, and no others",
+          not wrong, f"schema disagrees with the markdown: {wrong}")
+
+    bare = sorted(k for k, t in schemas.items()
+                  if not t["function"]["parameters"]["properties"])
+    check("a skill that declares nothing is asked to fill nothing",
+          bare and all(not declares(lib.spec(k)) for k in bare),
+          f"{len(bare)} with no parameters: {bare}")
+    check("git_status is one of them -- it was the commonest objective in the record",
+          "git_status" in bare, str(bare))
+    check("no skill is offered a filepath it never declared",
+          not [k for k, t in schemas.items()
+               if "filepath" in t["function"]["parameters"]["properties"]
+               and "filepath" not in declares(lib.spec(k))])
+
+    # Nothing is REQUIRED: every handler falls back to the objective when its
+    # argument is absent (s6/s26), so demanding one would refuse calls the
+    # estate completes today. The fault was phantom arguments, not lax ones.
+    check("no argument is marked required, because the objective is the fallback",
+          all(t["function"]["parameters"]["required"] == []
+              for t in schemas.values()))
+
+    # The description a model reads is the SKILL AUTHOR'S, off the
+    # `**Parameters Needed:**` line -- not a sentence invented in Python.
+    gs = schemas["ground_read"]["function"]["parameters"]["properties"]
+    check("an argument is described in its own skill's words",
+          "relative to the ground" in gs["content"]["description"],
+          gs["content"]["description"][:80])
 
     # --- and the engine refuses what was never offered ----------------
     g = Path(tempfile.mkdtemp())

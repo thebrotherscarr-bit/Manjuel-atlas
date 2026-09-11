@@ -34,6 +34,48 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 2026-09-10 — EVERY SKILL WAS HANDED THE SAME TWO ARGUMENTS
+- **`tool_schemas` WAS A CONSTANT.** All thirty-nine skills were offered
+  `content` and `filepath`, whatever their markdown declared. The docstring
+  called that "the estate's calling convention"; it was the absence of one.
+- **MEASURED OFF THE LIBRARY, not by eye:** **10 skills declare NOTHING** and were
+  still asked for two strings (`git_status`, `git_init`, `git_pull`, `git_push`,
+  `rack_list`, `rack_sync`, `proved`, `ground_report`, `skill_report`,
+  `list_directory`); **24 more declare only `content`** and were offered a
+  `filepath` besides; only **5** genuinely take a file.
+- **WHAT IT COST, from the record.** The standup sat at 8/9 on *a question about
+  the ground* because the Router spent **62 seconds and 3,233 characters**
+  deciding whether `filepath` was required for `semantic_search` — which takes
+  none — and then gave up. The same evening, on a live commit through the
+  council: *"git_commit needs a filepath (which file changed) and content (what
+  changed). I don't know what file changed"*, **5,357 characters** of it.
+  Neither model was confused. Both were answering the schema they were given.
+- **NOW GENERATED FROM `declares(spec)`** — the one expression the dedup and
+  `decided_call` already share. `git_status`'s schema is now `{}`.
+- **`declares` MOVED to `skills.py`**, beside the `SkillSpec` it reads; pipeline
+  imports skills, so skills could not import pipeline back. `pipeline.py`
+  re-exports the name, so every caller and both existing strokes are untouched.
+- **THE ARGUMENT DESCRIPTIONS ARE THE AUTHOR'S OWN WORDS**, read from between the
+  tags on the `**Parameters Needed:**` line (`SkillSpec.param_notes`). A
+  sentence written in Python would be a second place to describe an argument,
+  and it would be the one that drifts.
+- **`required` STAYS EMPTY**, deliberately: every handler falls back to the
+  objective when an argument is absent (s6/s26), so demanding one would refuse
+  calls the estate completes today. The fault was phantom arguments, not lax ones.
+- **A STROKE WAS PINNING THE DEFECT.** *"every schema is a well-formed function
+  with its two string args"* asserted `== {"content", "filepath"}` for all of
+  them — a stroke that holds a constant cannot notice the constant is a lie. It
+  is replaced by seven that pin the real contract, including *"no skill is
+  offered a filepath it never declared."*
+- **STILL OPEN:** `skills/remember.md`'s Description says *"Optionally pass a
+  short title as filepath"* while its `**Parameters Needed:**` line declares only
+  `<content>` — so its handler's title argument is now unreachable from the
+  schema. The markdown is the record of what a skill takes; that line needs the
+  tag. Held: `skills/` HOT-RELOADS into a live engine and a sitting was open.
+- **Proven:** `2106/2106` strokes and `60/60` smoke. **RESTART REQUIRED** —
+  `manjuel/*.py` is not hot-reloaded, so an engine open before this is running
+  the old schema.
+
 ### 2026-09-10 — THE CORE STOPPED ASKING ATLAS ABOUT ITS OWN REPOSITORY
 - **`/git` WAS A PRINT STATEMENT THAT HANDED YOU A SHELL COMMAND.** It reported a
   state line and then said *"To version this sitting, run this YOURSELF"* followed by

@@ -1049,19 +1049,15 @@ def note_partial_read(action: str, result: str, ctx: RunContext, report=print) -
     return stamp
 
 
-def declares(spec) -> set:
-    """Every argument name a skill's OWN markdown declares.
-
-    One expression, two readers: the dedup keys a call on it (an undeclared
-    argument cannot vary a signature, sitting 77) and `decided_call` asks it
-    whether there is anything left for the Router to choose. A second copy
-    would drift the first time a skill grows a parameter, which is the fault
-    `reopen_reads` has its own docstring about."""
-    if spec is None:
-        return set()
-    return ({a for a, _ in (spec.path_args or ())}
-            | {a for _, a in (spec.takes or ())}
-            | set(spec.declared_args or ()))
+# `declares` MOVED TO skills.py on 2026-09-10 and is re-exported here.
+#
+# It reads nothing but SkillSpec fields, and `SkillLibrary.tool_schemas` needed
+# it to stop handing every skill the same two arguments. pipeline imports
+# skills, so skills cannot import pipeline back -- the function had to live
+# beside the thing it describes. The name stays here because the dedup below,
+# `decided_call`, and two strokes all import it from this module, and a move
+# that renames a caller's import is a move that breaks something for nothing.
+from .skills import declares                                    # noqa: F401
 
 
 def decided_call(ctx: RunContext, skills: SkillLibrary | None = None) -> str:
