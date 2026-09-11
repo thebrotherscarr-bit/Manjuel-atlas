@@ -34,6 +34,45 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 0.1.10, and a flow that checks a bump rather than making one
+
+His word: manjuel is 0.1.10. Two files hold the number and both moved —
+`manjuel/__init__.py` and `pyproject.toml` — which is what the doctrine check
+means by "said the same by every file that holds it", and it says so now.
+`RUNBOOK.md`'s pre-tag line moved with them, because `release.py --check 0.1.9`
+names the tag you are about to cut.
+
+EVERYTHING ELSE SAYING 0.1.9 WAS LEFT, and the difference is the point.
+`BUILDPATH.md` describes what the 0.1.9 tag WAS, `pyproject.toml`'s own
+comments record a bug where the package said 0.1.7 while the code said 0.1.9,
+and a stroke's fixture writes 0.1.9 into a temp ground of its own. None of
+those is a claim about now. A sweep that moved them would have rewritten
+history to make a number match.
+
+The CHANGELOG heading still reads "since 0.1.9" on purpose: it names the last
+TAG, and a tag is his to cut (RULE 6).
+
+**`version-bump`, the flow.** Built in the new workflows page and folded to v1:
+a `run` that reads the pin and reports it, a `gate`, and a `run` that reads it
+again. Three nodes, `always` into the gate and `pass` out of it.
+
+TWO THINGS IT TAUGHT ON ITS FIRST FIRE, both worth more than the flow:
+
+    no engine is open on this world -- env_open first, then fire the flow.
+    A `run` node will not start one behind your back.
+
+That is the estate's own rule holding inside the flow engine: a workflow does
+not open a sitting for you. It refused in one millisecond and named the cure.
+
+And the second, which is a REAL CONSTRAINT ON EVERY WORKFLOW THIS ESTATE WILL
+EVER WRITE: a gate cannot wait for the operator to change the ground. RULE 9
+says no file here is edited while a sitting is open, and a `run` node needs a
+sitting — so the pause between "survey" and "verify" is a pause in which
+nothing on disk may move. The flow is therefore a CHECK, not a bump: it reads,
+it gates, it reads again. The hand does the editing with no sitting open.
+Written down here because the next person to design a flow will reach for that
+gate for the same reason and hit the same wall.
+
 ### Every local MCP server is now a skill
 
 atlas serves 78 tools over MCP and the engine could not reach one of them: the

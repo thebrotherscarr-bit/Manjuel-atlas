@@ -21,7 +21,7 @@ name = "manjuel"
 # Found 2026-09-10 by a `pip install --dry-run` printing "manjuel-0.1.7"
 # while `manjuel.py --version` printed 0.1.9. LAW 6: what the system
 # states and what it performs may not disagree.
-version = "0.1.9"
+version = "0.1.10"
 description = "A local multi-agent harness that refuses to land anything."
 readme = "README.md"
 requires-python = ">=3.10"
