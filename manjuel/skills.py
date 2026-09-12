@@ -11,6 +11,7 @@ from __future__ import annotations
 import os
 import ast
 import re
+import sys
 import threading
 from dataclasses import dataclass
 from pathlib import Path
@@ -463,6 +464,12 @@ WRITING_SKILLS = {
     # write-claim check refused a TRUE claim on a turn where only one of
     # them ran. Both change the repo; both belong here.
     "git_pull", "git_push",
+    # 2026-09-11: edit_file replaces a passage in a file that already exists.
+    # `run_python` is NOT here and that is deliberate -- its handler writes
+    # nothing; the CHILD it starts may write inside the jail, and that reach
+    # is declared in prose on its `wall` where a reader will meet it. This
+    # roster answers "does the handler write", which is what the checker asks.
+    "edit_file",
 }
 
 
@@ -3038,6 +3045,215 @@ def _mcp_call(env: SkillExecutionEnv, args: dict) -> str:
         return (f"Refused: {name}'s {tool!r} refused -- "
                 + (text or "and said nothing about why."))
     return text or f"{name}'s {tool!r} ran and returned nothing."
+
+
+# =====================================================================
+# The coding loop: an edit that is not a whole file, and a run that is
+# not a shell
+# =====================================================================
+#
+# WHY THESE TWO AND WHY TOGETHER. The coder's loop was ONE PASS: the Expert
+# Coder emits a whole file, `land_code` parses it and writes it into the
+# workspace, the Quality Evaluator reads it. The only machine verdict in that
+# circuit is "does it parse", and a loop cannot steer on `compiles`.
+#
+# `edit_file` is the half that makes coding on a REAL file possible: at 8192
+# context a seat cannot hold a three-thousand-line file to rewrite it, so it
+# emits a fragment and the anchor decides where it goes. `run_python` is the
+# half that gives an eval node something true to read.
+#
+# NEITHER WIDENS THE JAIL. Both are `-> workspace`, the same wall write_file
+# has always had. Code reaches the estate the way it always has: through the
+# operator's hand (RULE 6).
+
+_EDIT_OLD = "@@ OLD"
+_EDIT_NEW = "@@ NEW"
+
+
+def _one_terminator(raw: bytes) -> bytes:
+    """CRLF if the file is CRLF, LF if it is LF. Refuses to guess for MIXED."""
+    crlf = raw.count(b"\r\n")
+    lf = raw.count(b"\n") - crlf
+    if crlf and lf:
+        return b""
+    return b"\r\n" if crlf else b"\n"
+
+
+@skill("edit_file")
+def _edit_file(env: SkillExecutionEnv, args: dict) -> str:
+    """Replace one exact passage in a workspace file.
+
+    THE ANCHOR MUST BE UNIQUE. Not "the first match", not "the closest" --
+    exactly one, or the edit is refused with the count. Every other rule here
+    follows from that one: an edit that guesses which of three matches was
+    meant is a write nobody authorised, and a write gate that guesses is the
+    thing this estate has spent its whole life refusing to be.
+    """
+    import ast as _ast
+
+    rel = (args.get("filepath") or "").strip()
+    if not rel:
+        return ("Refused: edit_file needs the file to edit as <filepath>, and "
+                "the passage as <content> in the two-marker shape: a line "
+                f"`{_EDIT_OLD}`, the exact text to replace, a line "
+                f"`{_EDIT_NEW}`, then what replaces it.")
+    try:
+        path = env.safe_path(rel)
+    except Exception as exc:
+        return f"Refused: {rel!r} is not a path this skill may touch ({exc})."
+    if not path.exists():
+        return (f"Refused: there is no {path.name!r} in the workspace to edit. "
+                f"write_file makes a new file; edit_file changes one that is "
+                f"already there.")
+
+    body = args.get("content") or ""
+    lines = body.replace("\r\n", "\n").split("\n")
+    heads = [i for i, l in enumerate(lines) if l.strip() == _EDIT_OLD]
+    news = [i for i, l in enumerate(lines) if l.strip() == _EDIT_NEW]
+    if len(heads) != 1 or len(news) != 1 or news[0] < heads[0]:
+        return (f"Refused: the edit needs exactly one `{_EDIT_OLD}` line and "
+                f"one `{_EDIT_NEW}` line after it. Found {len(heads)} and "
+                f"{len(news)}. The shape is:\n"
+                f"{_EDIT_OLD}\n<the exact text already in the file>\n"
+                f"{_EDIT_NEW}\n<what replaces it>")
+    old = "\n".join(lines[heads[0] + 1:news[0]])
+    new = "\n".join(lines[news[0] + 1:])
+    # A trailing blank from the fence or the wire is not part of the passage.
+    while old.endswith("\n"):
+        old = old[:-1]
+    while new.endswith("\n"):
+        new = new[:-1]
+    if not old.strip():
+        return f"Refused: the text after `{_EDIT_OLD}` is empty; nothing to find."
+    if old == new:
+        return "Refused: the old and new text are identical. Nothing to do."
+
+    raw = path.read_bytes()
+    eol = _one_terminator(raw)
+    if not eol:
+        return (f"Refused: {path.name} has MIXED line endings, so an edit "
+                f"cannot preserve what it already has. That is a file to fix "
+                f"before it is edited, not through an edit.")
+    text = raw.decode("utf-8", "replace")
+    flat = text.replace("\r\n", "\n")
+
+    hits = flat.count(old)
+    if hits == 0:
+        return (f"Refused: that passage is not in {path.name}. Nothing was "
+                f"written. Read the file and quote it exactly -- whitespace "
+                f"and all.")
+    if hits > 1:
+        return (f"Refused: that passage appears {hits} times in {path.name}, "
+                f"and an anchor that matches more than once does not say "
+                f"which. Quote more around it until it is unique.")
+
+    out = flat.replace(old, new, 1)
+
+    # REFUSE BY PROOF, the way land_code does. A .py that would not parse
+    # after the edit is not written -- and this is a PARSE check only, not
+    # the full structural gate the coder's own landing runs.
+    if path.suffix.lower() == ".py":
+        try:
+            _ast.parse(out)
+        except SyntaxError as exc:
+            return (f"Refused: that edit would leave {path.name} unparseable "
+                    f"-- {exc.msg} at line {exc.lineno}. Nothing was written.")
+
+    kept = "CRLF" if eol == b"\r\n" else "LF"
+    before = len(flat.split("\n"))
+    path.write_bytes(out.replace("\n", eol.decode()).encode("utf-8"))
+    after = len(out.split("\n"))
+    where = flat[:flat.index(old)].count("\n") + 1
+    return (f"Edited {path.name} at line {where}: "
+            f"{len(old.splitlines())} line(s) replaced by "
+            f"{len(new.splitlines())}, file now {after} lines (was {before}). "
+            f"Terminator kept: {kept}.")
+
+
+# The bound on a child, its own dial because a run is not a skill call: the
+# skill timeout (300s) is the WAIT on a handler, and a script that loops
+# forever should be refused long before that.
+RUN_TIMEOUT = float(os.environ.get("MANJUEL_RUN_TIMEOUT", "60") or 60)
+
+# WHAT THE CHILD IS ALLOWED TO SEE. An allowlist, not a scrub: `.env` is
+# loaded into this process's environment (dotenv.load), and a child that
+# inherited it could be made to print the operator's keys by the very model
+# that wrote it. RULE 7 says keys are never passed where something else can
+# read them; a subprocess is something else. So the child gets what it needs
+# to be a Python interpreter and nothing whatever besides.
+_RUN_ENV_KEEP = ("PATH", "SYSTEMROOT", "WINDIR", "COMSPEC", "TEMP", "TMP",
+                 "HOME", "USERPROFILE", "LANG", "LC_ALL", "PYTHONIOENCODING")
+
+
+@skill("run_python")
+def _run_python(env: SkillExecutionEnv, args: dict) -> str:
+    """Run one Python file from the workspace and report what it said.
+
+    THIS IS NOT A SHELL, and the difference is the whole safety case. One
+    interpreter, one argument, and that argument is a path already reduced to
+    the workspace by the jail. No command from a model, no shell=True, no cwd
+    outside the wall -- `inspect_code` refuses `shell=True` in code the coder
+    LANDS, and a skill that offered a shell would be the engine doing what it
+    forbids its own seats.
+
+    HONEST LIMITS, named here rather than found later:
+
+      THE JAIL IS THE FILESYSTEM, NOT THE NETWORK. A child can open a socket;
+      nothing here stops it. RULE 4 keeps the ESTATE local by refusing remote
+      dependencies, and it is not a sandbox.
+
+      PYTHON CANNOT KILL A THREAD BUT IT CAN KILL A CHILD. Unlike a hung
+      handler, this bound is real: the process is terminated at the deadline
+      and the partial output is reported as partial.
+    """
+    import subprocess as _sp
+
+    rel = (args.get("filepath") or args.get("content") or "").strip()
+    if not rel:
+        return ("Refused: run_python needs the file to run as <filepath> -- a "
+                "bare name inside the workspace, e.g. probe.py.")
+    try:
+        path = env.safe_path(rel)
+    except Exception as exc:
+        return f"Refused: {rel!r} is not a path this skill may run ({exc})."
+    if path.suffix.lower() != ".py":
+        return (f"Refused: run_python runs Python, and {path.name!r} is not a "
+                f".py file. There is no general runner here on purpose.")
+    if not path.exists():
+        return (f"Refused: there is no {path.name!r} in the workspace to run. "
+                f"Write it first.")
+
+    child_env = {k: v for k, v in os.environ.items()
+                 if k.upper() in _RUN_ENV_KEEP}
+    child_env["PYTHONIOENCODING"] = "utf-8"
+    try:
+        p = _sp.run([sys.executable, str(path)],
+                    cwd=str(path.parent),
+                    stdin=_sp.DEVNULL,
+                    stdout=_sp.PIPE, stderr=_sp.PIPE,
+                    timeout=RUN_TIMEOUT, env=child_env)
+    except _sp.TimeoutExpired as exc:
+        out = (exc.stdout or b"").decode("utf-8", "replace")
+        err = (exc.stderr or b"").decode("utf-8", "replace")
+        return (f"Refused: {path.name} did not finish inside {RUN_TIMEOUT:.0f}s "
+                f"and was stopped (LAW 7: bounded everything). Raise it with "
+                f"MANJUEL_RUN_TIMEOUT if the work is genuinely long.\n"
+                f"--- what it had said ---\n{(out + err)[:1200]}")
+    except Exception as exc:
+        return f"Refused: {path.name} could not be started -- {type(exc).__name__}: {exc}"
+
+    out = p.stdout.decode("utf-8", "replace")
+    err = p.stderr.decode("utf-8", "replace")
+    verdict = "RAN" if p.returncode == 0 else f"FAILED (exit {p.returncode})"
+    parts = [f"{verdict}: {path.name}"]
+    if out.strip():
+        parts.append("--- stdout ---\n" + out[:4000].rstrip())
+    if err.strip():
+        parts.append("--- stderr ---\n" + err[:4000].rstrip())
+    if not out.strip() and not err.strip():
+        parts.append("It said nothing on either stream.")
+    return "\n".join(parts)
+
 
 
 # =====================================================================

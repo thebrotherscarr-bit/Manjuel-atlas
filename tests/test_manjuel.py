@@ -10188,6 +10188,195 @@ def test_the_mcp_skill_never_leaves_this_machine(reg, lib, book):
           "substring matching would call a tool nobody named")
 
 
+def test_an_edit_refuses_an_anchor_that_does_not_say_which(reg, lib, book):
+    """`edit_file`, built 2026-09-11 so the coder can change a file it cannot
+    hold.
+
+    The coder emitted WHOLE FILES and `write_file` wrote whole files, which at
+    8192 context means a three-thousand-line file is untouchable. An edit
+    takes a fragment instead -- and then the anchor has to carry the whole
+    weight, because a fragment says WHAT but not WHERE.
+
+    SO THE ANCHOR MUST BE UNIQUE. Not the first match, not the nearest: one,
+    or the edit is refused WITH THE COUNT. An edit that picks among three
+    matches is a write nobody authorised, and every other rule here follows
+    from that one -- including that a refusal writes NOTHING, which is checked
+    by reading the file back after each one.
+    """
+    g = Path(tempfile.mkdtemp())
+    env = env_for(g, reg, Stub())
+    # env_for jails the workspace at <ground>/agent_workspace, the way the CLI
+    # does; these strokes read the file back from where the skill really put it.
+    ws = g / "agent_workspace"
+
+    def edit(name, old, new):
+        return lib.execute("edit_file",
+                           {"filepath": name,
+                            "content": f"@@ OLD\n{old}\n@@ NEW\n{new}"}, env)
+
+    lib.execute("write_file", {"filepath": "e.py",
+                               "content": "a = 1\nb = 2\na = 1\n"}, env)
+    kept = (ws / "e.py").read_text(encoding="utf-8")
+
+    out = edit("e.py", "a = 1", "a = 9")
+    check("an anchor matching twice is refused", out.startswith("Refused"), out[:70])
+    check("and the refusal says HOW MANY, so the cure is obvious",
+          "2 times" in out, out[:120])
+    check("and the double anchor wrote nothing",
+          (ws / "e.py").read_text(encoding="utf-8") == kept)
+
+    out = edit("e.py", "nowhere at all", "x")
+    check("an anchor that is not there is refused", out.startswith("Refused"), out[:70])
+    check("and the absent anchor wrote nothing",
+          (ws / "e.py").read_text(encoding="utf-8") == kept)
+
+    out = lib.execute("edit_file", {"filepath": "e.py", "content": "just prose"}, env)
+    check("content without the two markers is refused, and the shape is shown",
+          out.startswith("Refused") and "@@ OLD" in out and "@@ NEW" in out, out[:90])
+
+    out = edit("e.py", "b = 2", "b = 2")
+    check("an edit that changes nothing is refused", out.startswith("Refused"), out[:70])
+
+    # REFUSE BY PROOF, the way land_code does.
+    out = edit("e.py", "b = 2", "b = (")
+    check("an edit that would leave the file unparseable is refused",
+          out.startswith("Refused") and "unparseable" in out, out[:100])
+    check("and it names the line", "line 2" in out, out[:120])
+    check("and NOTHING was written -- the file still parses",
+          (ws / "e.py").read_text(encoding="utf-8") == kept)
+
+    # The one that works, and what it reports.
+    out = edit("e.py", "b = 2", "b = 20")
+    check("a unique anchor is replaced", not out.startswith("Refused"), out[:80])
+    check("and the reply says which line moved", "line 2" in out, out[:90])
+    check("and the change is on disk",
+          "b = 20" in (ws / "e.py").read_text(encoding="utf-8"))
+
+    # THE TERMINATOR IS KEPT. CLAUDE.md: preserve what the file has, and never
+    # leave it MIXED. An editor that normalises silently is how a whole file
+    # turns into a diff nobody asked for.
+    for eol, label in ((b"\r\n", "CRLF"), (b"\n", "LF")):
+        p = ws / f"t_{label}.py"
+        p.write_bytes(b"x = 1" + eol + b"y = 2" + eol)
+        lib.execute("edit_file", {"filepath": p.name,
+                                  "content": "@@ OLD\ny = 2\n@@ NEW\ny = 3"}, env)
+        raw = p.read_bytes()
+        crlf = raw.count(b"\r\n"); lf = raw.count(b"\n") - crlf
+        check(f"a {label} file is still {label} after an edit",
+              (crlf and not lf) if eol == b"\r\n" else (lf and not crlf),
+              f"{crlf} CRLF + {lf} LF")
+
+    mixed = ws / "mixed.py"
+    mixed.write_bytes(b"x = 1\r\ny = 2\nz = 3\n")
+    out = lib.execute("edit_file", {"filepath": "mixed.py",
+                                    "content": "@@ OLD\ny = 2\n@@ NEW\ny = 9"}, env)
+    check("a MIXED file is refused rather than silently normalised",
+          out.startswith("Refused") and "MIXED" in out, out[:110])
+
+    out = lib.execute("edit_file", {"filepath": "ghost.py",
+                                    "content": "@@ OLD\na\n@@ NEW\nb"}, env)
+    check("a file that is not there is refused, and write_file is named",
+          out.startswith("Refused") and "write_file" in out, out[:110])
+
+
+def test_a_run_is_bounded_jailed_and_blind_to_the_keys(reg, lib, book):
+    """`run_python`, built 2026-09-11: the verdict an agentic loop can steer on.
+
+    The only machine verdict in the coding circuit was "does it parse". A loop
+    cannot steer on `compiles`, so something had to be able to say *it ran* or
+    *it failed, and here is what it said*.
+
+    IT IS NOT A SHELL, and that is the whole safety case: one interpreter, one
+    argument, and that argument is a path the jail has already reduced to the
+    workspace. `inspect_code` refuses `shell=True` in code the coder LANDS --
+    a skill that offered a shell would be the engine doing what it forbids its
+    own seats.
+
+    AND IT IS BLIND TO `.env`. This is the stroke that matters most. `.env` is
+    loaded into the PROCESS environment, so a child that inherited it could be
+    made to print the operator's keys by the very model that wrote the script.
+    RULE 7 says keys are never passed where something else can read them, and
+    a subprocess is something else. The child is built from an allowlist, and
+    this proves it by planting secrets and asking the child to find them.
+    """
+    import os as _os
+    g = Path(tempfile.mkdtemp())
+    env = env_for(g, reg, Stub())
+
+    def write(name, src):
+        lib.execute("write_file", {"filepath": name, "content": src}, env)
+
+    def run(name):
+        return lib.execute("run_python", {"filepath": name}, env)
+
+    # ---- RULE 7, first, because it is the one worth breaking the build for
+    planted = {"MANJUEL_SECRET_PROBE": "never-reaches-a-child",
+               "SOME_API_KEY": "sk-not-visible", "MY_TOKEN": "t-not-visible"}
+    saved = {k: _os.environ.get(k) for k in planted}
+    _os.environ.update(planted)
+    try:
+        write("peek.py",
+              "import os\n"
+              "names = sorted(os.environ)\n"
+              "bad = [k for k in names if 'SECRET' in k or 'API_KEY' in k "
+              "or 'TOKEN' in k]\n"
+              "print('LEAKED', bad)\n")
+        out = run("peek.py")
+        check("a run reports that it RAN", out.startswith("RAN"), out[:60])
+        check("AND THE CHILD CANNOT SEE THE OPERATOR'S KEYS (RULE 7)",
+              "LEAKED []" in out, out[:200])
+        for k in planted:
+            check(f"{k} never reached the child", k not in out, out[:160])
+    finally:
+        for k, v in saved.items():
+            if v is None:
+                _os.environ.pop(k, None)
+            else:
+                _os.environ[k] = v
+
+    # ---- the verdict a loop reads
+    write("ok.py", "print('it worked')\n")
+    out = run("ok.py")
+    check("stdout comes back", "it worked" in out, out[:80])
+
+    write("bad.py", "import sys\nsys.stderr.write('the reason\\n')\nsys.exit(3)\n")
+    out = run("bad.py")
+    check("a non-zero exit is reported as FAILED", out.startswith("FAILED"), out[:60])
+    check("with the exit code, so an eval can steer on it", "exit 3" in out, out[:80])
+    check("and stderr is kept, which is the half that says why",
+          "the reason" in out, out[:120])
+
+    write("quiet.py", "x = 1\n")
+    check("a script that says nothing is reported as saying nothing",
+          "said nothing" in run("quiet.py"), run("quiet.py")[:90])
+
+    # ---- what it refuses
+    write("notpy.txt", "hello")
+    out = run("notpy.txt")
+    check("a file that is not .py is refused, and says there is no general runner",
+          out.startswith("Refused") and "general runner" in out, out[:110])
+    check("a file that is not there is refused",
+          run("ghost.py").startswith("Refused"))
+
+    # ---- and it is bounded, for real: a child CAN be killed
+    from manjuel import skills as _sk
+    write("spin.py", "import time\nprint('starting', flush=True)\n"
+                     "while True: time.sleep(0.05)\n")
+    real, _sk.RUN_TIMEOUT = _sk.RUN_TIMEOUT, 2.0
+    t0 = time.time()
+    try:
+        out = run("spin.py")
+    finally:
+        _sk.RUN_TIMEOUT = real
+    took = time.time() - t0
+    check("a runaway script is stopped at the bound", out.startswith("Refused"), out[:70])
+    check("and it really stopped, rather than being waited out",
+          took < 12, f"{took:.1f}s")
+    check("the refusal cites the law and names the dial",
+          "LAW 7" in out and "MANJUEL_RUN_TIMEOUT" in out, out[:150])
+    check("and what it HAD said is still reported", "starting" in out, out[:160])
+
+
 def test_a_hook_watches_a_call_without_taking_it_over(reg, lib, book):
     """A hook is a skill that declares WHEN it fires. Built 2026-09-11.
 
@@ -10916,9 +11105,15 @@ def test_path_gate(reg, lib, book):
     declared = [s.keyword for s in lib.specs if s.path_args]
     # SIX since 2026-09-07: `inspect` declares its path into the ground
     # jail (the workspace is inside it) so a reach is refused at dispatch.
-    check("and the declarations are exactly the six that jail",
-          sorted(declared) == ["embed_text", "ground_list", "ground_read",
-                               "inspect", "read_file", "write_file"], str(sorted(declared)))
+    # EIGHT since 2026-09-11: the coding loop's two, `edit_file` and
+    # `run_python`, both jail into the workspace exactly as write_file does.
+    # This roster is written out rather than counted on purpose -- a skill
+    # that starts taking a path is a skill that must be seen doing it, and a
+    # bare count would have let the eighth arrive unnoticed.
+    check("and the declarations are exactly the eight that jail",
+          sorted(declared) == ["edit_file", "embed_text", "ground_list",
+                               "ground_read", "inspect", "read_file",
+                               "run_python", "write_file"], str(sorted(declared)))
 
 
 def test_flags_are_not_speech(reg, lib, book):
@@ -11850,6 +12045,8 @@ def main() -> int:
     test_the_citation_check(reg, lib, book)
     test_sitting48_no_router_for_greetings(reg, lib, book)
     test_path_gate(reg, lib, book)
+    test_an_edit_refuses_an_anchor_that_does_not_say_which(reg, lib, book)
+    test_a_run_is_bounded_jailed_and_blind_to_the_keys(reg, lib, book)
     test_a_hook_watches_a_call_without_taking_it_over(reg, lib, book)
     test_a_run_in_flight_can_be_interrupted(reg, lib, book)
     test_the_mcp_skill_never_leaves_this_machine(reg, lib, book)

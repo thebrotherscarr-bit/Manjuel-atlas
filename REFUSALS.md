@@ -625,3 +625,40 @@ Stated plainly, because a security page that only lists wins is marketing.
 - **The operator.** Nothing here binds him, and it is not trying to. He is the
   one who lands, and the estate's honesty exists so that what he lands is
   informed.
+
+---
+
+## 19. An edit names one passage, and a run is not a shell
+
+**Trigger.** `edit_file` is given an anchor that appears twice, or none, or an
+edit that would leave a `.py` unparseable, or a file whose line endings are
+already MIXED. `run_python` is given something that is not a `.py`, or a file
+that is not there, or a script that will not finish.
+
+**Action.** Refused, and NOTHING IS WRITTEN — each refusal is checked by
+reading the file back. The anchor refusal says HOW MANY times it matched, which
+is the whole cure. A runaway child is killed at `MANJUEL_RUN_TIMEOUT` (60s) and
+what it had already said is still reported.
+
+**Why.** The coder emitted whole files, so at 8192 context a large file could
+not be touched at all. An edit takes a fragment instead, and then the anchor
+carries the weight the file used to: a fragment says WHAT but not WHERE. An
+edit that picks among three matches is a write nobody authorised.
+
+`run_python` exists because the only machine verdict in the coding circuit was
+"does it parse", and a loop cannot steer on *compiles*. It is one interpreter
+and one jailed path — **never a command from a model.** `inspect_code` already
+refuses `shell=True` in code the coder lands (§15); a skill that offered a
+shell would be the engine doing what it forbids its own seats.
+
+And the child is handed an ALLOWLISTED environment, because `.env` is loaded
+into this process and a child that inherited it could be made to print the
+operator's keys by the very model that wrote the script. RULE 9 / §6 says keys
+are never passed where something else can read them, and a subprocess is
+something else. A stroke plants secrets and asks the child to find them; it
+comes back `LEAKED []`.
+
+**The honest limit:** the jail is the FILESYSTEM, not the network. A child can
+open a socket and nothing here stops it. RULE 4 keeps the estate local by
+refusing remote dependencies — it is not a sandbox, and this says so rather
+than letting someone assume otherwise.

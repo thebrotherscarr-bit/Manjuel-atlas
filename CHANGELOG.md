@@ -34,6 +34,84 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### The coding loop gets an edit that is not a whole file, and a verdict it can steer on
+
+His order: pieces 1 and 2 of the coding design together, 3 after. The loop was
+ONE PASS — the Expert Coder emits a whole file, `land_code` parses it and
+writes it to the workspace, the Quality Evaluator reads it — and the only
+machine verdict in that circuit was "does it parse". A loop cannot steer on
+`compiles`.
+
+**`edit_file`: THE ANCHOR CARRIES THE WEIGHT.** At 8192 context a seat cannot
+hold a three-thousand-line file to rewrite it, so it emits a fragment — and a
+fragment says WHAT but not WHERE. So the anchor must be unique: not the first
+match, not the nearest, exactly one, or the edit is refused WITH THE COUNT.
+Every other rule follows from that one, and each refusal writes NOTHING, which
+the strokes check by reading the file back afterwards:
+
+    the passage appears twice   refused, and says "appears 2 times"
+    the passage is not there    refused, nothing written
+    the two markers are absent  refused, and the shape is printed
+    old and new are identical   refused
+    a .py that would not parse  refused, and names the line -- by PROOF, the
+      after the edit              way land_code does
+    the file is already MIXED    refused rather than silently normalised
+
+The terminator is KEPT — CRLF stays CRLF, LF stays LF — because CLAUDE.md says
+preserve what the file has, and an editor that normalises quietly is how one
+line becomes a whole-file diff.
+
+**`run_python`: NOT A SHELL, AND THAT IS THE WHOLE SAFETY CASE.** One
+interpreter, one argument, and that argument is a path the jail has already
+reduced to the workspace. No command from a model, no `shell=True`, no cwd
+outside the wall. `inspect_code` refuses `shell=True` in code the coder LANDS
+(REFUSALS §15); a skill that offered a shell would be the engine doing what it
+forbids its own seats.
+
+AND IT IS BLIND TO `.env`, which is the part worth breaking a build over.
+`.env` is loaded into the process environment, so a child that inherited it
+could be made to print the operator's keys by the very model that wrote the
+script. RULE 7 says keys are never passed where something else can read them,
+and a subprocess IS something else. The child is built from an allowlist —
+PATH, the OS's own few, PYTHONIOENCODING — and a stroke plants
+`MANJUEL_SECRET_PROBE`, `SOME_API_KEY` and `MY_TOKEN` in the parent, then asks
+the child to find them. It comes back `LEAKED []`, with nine variables visible.
+
+The bound is a REAL kill, unlike a hung handler: the child is terminated at
+`MANJUEL_RUN_TIMEOUT` (60s) and what it had already printed is still reported.
+Proven with the dial at 2s against a `while True`.
+
+NEITHER WIDENS THE JAIL. Both are `-> workspace`, the wall `write_file` has
+always had. Code still reaches the estate through the operator's hand (RULE 6).
+
+**THREE REDS THE ESTATE FOUND IN THIS WORK, and one was a debt from the
+morning.**
+
+  - `python -m manjuel.us` reported `GAP skills/mcp_call` and
+    `DRIFT us/seat_router may_call 39/40`. I added a skill at 11:49 and skipped
+    CONTRIBUTING step 3 — the capability record — and the Router's roster
+    drifted with it. Paid here: three records written, the Router's `may_call`
+    at 42, and the manifest agrees with the disk again.
+  - My first records declared what the capabilities PERMIT — `writes` and
+    `remote` true for `run_python`, because a child can write and can open a
+    socket. The checker disagreed, and CONTRIBUTING is explicit: *"Write `wall`
+    by reading your own handler; do not infer it."* The machine-checkable
+    fields describe the HANDLER; the blast radius belongs in the prose `wall`,
+    where a reader meets it. `edit_file` joined `WRITING_SKILLS` because it
+    genuinely writes; `run_python` deliberately did not.
+  - `and the declarations are exactly the six that jail` went red. That stroke
+    writes its roster OUT rather than counting it, so the eighth path-taking
+    skill could not arrive unnoticed — which is exactly what happened, and
+    exactly what it is for. Now eight, named, with the reason.
+
+Docs with it: `skills/edit_file.md`, `skills/run_python.md`, three records in
+`us/manjuel.us`, `us/seat_router.us`, REFUSALS §19, the skill count 40 -> 42 in
+README and RUNBOOK, `MANJUEL_RUN_TIMEOUT` in RUNBOOK's dials table and
+`.env.example`, and the build map. 2211 -> 2254 strokes.
+
+Piece 3 — the `coder` pipeline block and the flow spec — is next and is
+declaration, not code.
+
 ### Hooks, and the interrupt that was always there and never pinned
 
 His word: make sure interrupt and hooks are part of the core harness. One of

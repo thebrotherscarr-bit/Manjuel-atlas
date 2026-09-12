@@ -253,7 +253,7 @@ other.
 
 Two different things, and it is worth keeping them apart.
 
-**Skills** are what a SEAT can do -- 40 of them, declared as markdown in
+**Skills** are what a SEAT can do -- 42 of them, declared as markdown in
 `skills\`, hot-reloaded into a running session at the next turn. A seat asks
 for one by keyword and the engine runs it; the law gate can refuse it, and a
 refusal names the law. Read them on Records -> skills, or `commands.md` for
@@ -504,6 +504,8 @@ boot report says which took effect) or the shell. Nothing else is a dial.
     MANJUEL_SEAT_TIMEOUT    700    the most one seat call may take (runtime.py)
     MANJUEL_TURN_DEADLINE   600    the most one turn may take (pipeline.py)
     MANJUEL_SKILL_TIMEOUT   300    the most one skill call is waited for (skills.py)
+    MANJUEL_RUN_TIMEOUT     60     the most a `run_python` child may take before it
+                                   is KILLED -- a real kill, not a wait (skills.py)
     MANJUEL_GIT_REMOTE      off    1 allows pull/push/rack_pull (gitstate.py)
     MANJUEL_RACK_PULL       off    1 allows `ollama pull` from a seat (skills.py)
     MANJUEL_KEEP_ALIVE      30m    how long Ollama holds a model after a call (runtime.py)

@@ -145,11 +145,13 @@ the engine inside a world: that folder's own `agents/`, `skills/`,
 that world's, and this ground's record gains nothing. A path that is not a
 directory is refused, never created.
 
-The forty skills are `skills/*.md`; `/skills` lists them and
+The forty-two skills are `skills/*.md`; `/skills` lists them and
 `skill_report` (ask "what can you do") reads them off the disk. The ones
 no earlier doc named: `deep_research`, `ground_report`, `skill_report`,
 `skill_search`, `list_directory`, `write_file`, `linear_regression`,
-`subtask` (a scoped sub-run: depth 1, three per turn, the Router alone).
+`subtask` (a scoped sub-run: depth 1, three per turn, the Router alone),
+`edit_file` (one uniquely-anchored passage, not a whole file) and
+`run_python` (one jailed script, bounded, blind to `.env`).
 
 ## Documents
 

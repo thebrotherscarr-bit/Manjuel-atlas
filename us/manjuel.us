@@ -759,3 +759,48 @@ other (LAW 5); now a record that lies is a finding.
   "writes": true
 }
 ```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "mcp_call",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/mcp_call.md",
+  "us": 1,
+  "wall": "a LOCAL MCP server declared as MANJUEL_MCP_<NAME> in .env; loopback only, and any other host is refused by name (RULE 4). The address is never printed (RULE 7).",
+  "writes": false
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "edit_file",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/edit_file.md",
+  "us": 1,
+  "wall": "agent_workspace/ -- replaces ONE uniquely-anchored passage; an anchor matching twice or none refuses and writes nothing, and a .py that would not parse after the edit is refused.",
+  "writes": true
+}
+```
+
+```json
+{
+  "can_approve": false,
+  "covenant": "1512741580b7239b",
+  "id": "run_python",
+  "kind": "skill",
+  "office": "MANJUEL",
+  "reports_to": "manjuel",
+  "source": "skills/run_python.md",
+  "us": 1,
+  "wall": "agent_workspace/ -- and it EXECUTES what is there. One interpreter, one jailed path, no shell. The child is bounded (MANJUEL_RUN_TIMEOUT) and handed an allowlisted environment, so nothing in .env reaches it; but the jail is the FILESYSTEM, not the network.",
+  "writes": false
+}
+```
