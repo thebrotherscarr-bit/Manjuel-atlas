@@ -628,7 +628,7 @@ Stated plainly, because a security page that only lists wins is marketing.
 
 ---
 
-## 19. An edit names one passage, and a run is not a shell
+## 23. An edit names one passage, and a run is not a shell
 
 **Trigger.** `edit_file` is given an anchor that appears twice, or none, or an
 edit that would leave a `.py` unparseable, or a file whose line endings are
@@ -662,3 +662,132 @@ comes back `LEAKED []`.
 open a socket and nothing here stops it. RULE 4 keeps the estate local by
 refusing remote dependencies — it is not a sandbox, and this says so rather
 than letting someone assume otherwise.
+
+---
+
+## 24. The write door checks before it writes
+
+**Trigger.** `write_file` is given `.py` content that will not parse.
+
+**Action.** Refused, and NOTHING IS WRITTEN. The refusal names the line and the
+syntax error, and says outright that a stray closing tag or a flag block from
+the model's own answer counts as source here, because that is the usual cause.
+
+**Why.** 2026-09-12, the coder flow's third live run. The seat's own markup
+leaked into the payload and `calculate_sum.py` was written as sound code
+followed by `</parameter>` and a `<flags>technical</flags>` block. It was
+written happily; `run_python` then died of a SyntaxError, and the flow spent a
+repair and a recheck on a fault that was already on disk before anything ran.
+
+`edit_file` had refused exactly those bytes since the day it landed (§23) --
+**two doors onto the same workspace and only one of them looked.** Only `.py`,
+and only PARSING, which is the same bound `edit_file` draws: this is not the
+structural gate the coder's own landing runs (§15), and prose files are
+nobody's syntax to judge.
+
+Stroked: `test_a_write_refuses_python_that_will_not_parse`, with the exact
+bytes that leaked, and both ways -- a real `.py`, a `.md` carrying the same
+markup, and an empty `.py` all still land.
+
+---
+
+## 25. A mention is not a naming
+
+**Trigger.** A one-word skill keyword appears in the objective as ordinary
+English rather than as a request for that skill.
+
+**Action.** No dispatch. The keyword must be NAMED, and what counts as naming
+depends on what kind of word it is:
+
+    a FUNCTION word     `when` -- it opens the objective, or it wears quotes.
+                        Everywhere else it is grammar.
+    a NUMBERED argument `sitting` -- a number sits beside it. The skill's own
+                        markdown says so ("The sitting number alone, e.g. 63"),
+                        so the rule is read off the declaration rather than a
+                        list in Python.
+
+**Why.** 2026-09-12. A coder-flow objective carried a brief reading "...when
+executed, it should print 55", and intent dispatched the `when` skill -- a
+transcript-window reader, woken to answer a question about a Python file, on
+the strength of a subordinate clause. The match was not loose: `when` really is
+a keyword.
+
+`sitting` was the next one and needed a DIFFERENT question, because it is a
+content word this estate says constantly -- CLAUDE.md and `law/` carry the bare
+word 58 times ("while the operator's sitting is open", "the sitting laws").
+Every one of those would have woken a transcript reader.
+
+The numeric rule deliberately does NOT borrow the function-word rule's
+"opens the objective" clause: `ALIASES` carries "the sitting", so "the sitting
+laws bind any hand" opened with the form and read as a naming until a stroke
+caught it. A WH-word at the front of a sentence IS the question; a content word
+at the front is just a sentence.
+
+Content-word keywords that declare no number are untouched -- `inspect`,
+`remember`, `statistics` still dispatch from mid-sentence, and a stroke holds
+that, because a rule against accidents must not make the deliberate case
+harder.
+
+Stroked: `test_a_keyword_that_is_grammar_must_be_named` and
+`test_a_keyword_whose_argument_is_a_number_wants_one`, each both ways.
+
+---
+
+## 26. A turn that wanted hands and used none says so
+
+**Trigger.** Intent read the objective as an ORDER TO ACT on something, the
+Router was woken to choose the tool, and it chose none.
+
+**Action.** The delivery carries `NO TOOL RAN`, machine-emitted: *nothing was
+read, run or written this turn -- so any result in them came from a seat, not
+from the estate.*
+
+**Why.** The existing guard (§14's family: THE NAMED TOOL DID NOT RUN) compares
+what intent NAMED against what was CALLED. When intent reads an objective as
+action-shaped it names no tool -- "Router decides the tool" -- so if the Router
+then decides on none, **both sides of that comparison are empty and no guard
+fires at all.** 2026-09-12: such a turn delivered "The result is: 5050" for a
+script nothing had run.
+
+KEYED ON WHAT INTENT READ, NOT ON THE `needs_tool` FLAG. The first draft used
+the flag and was too broad -- the flag is also raised by a write-shaped
+objective and by a seat emitting `<flags>needs_tool</flags>`, and in those a
+Router that decides no tool is needed may be perfectly right. It accused a
+draft-review stroke whose fixture raises the flag by hand and needs no tool at
+all. Narrow and certainly right beats broad and crying wolf.
+
+NEVER ON A REFUSAL, for the reason every list here keeps that rule: when a gate
+refuses, no tool runs and the refusal IS the answer.
+
+Stroked: `test_a_turn_that_wanted_hands_and_used_none_says_so` -- fires on
+action-shaped-with-no-call; silent on a turn that called something, on a
+conversation, and on a refusal.
+
+---
+
+## What this does NOT protect against
+
+Stated plainly, because a security page that only lists wins is marketing.
+
+- **Invention that cites nothing.** A seat can still state something false in
+  ordinary prose with no file named and no result cited. Sitting 60 produced a
+  confident paragraph about a real client's work, sourced from nowhere. The
+  answer to that class is *dispatch* — a question about the ground now reaches
+  a reader, so the void that invention fills is smaller — but the class is not
+  closed and may not be closeable by arithmetic alone.
+- **A model's judgement, where judgement is the job.** The Guardian, the
+  Evaluator and the Router make calls a gate cannot make for them.
+- **A PARTIAL read spoken as a whole one.** `windowed()` hands a big file
+  over as "part 1 of 7 — THIS IS NOT THE WHOLE FILE" in capitals, with a map
+  of the headings it did not show. The claim-check then asks only whether A
+  READ RAN this turn — part 1 ran, so it passes, and a seat that saw 9% can
+  speak about 100%. Named 2026-09-03 after an agent did exactly this to
+  `parity.py` and was wrong twice in one turn. BUILT 2026-09-07 as the
+  partial-read stamp (§20): the delivery now SAYS the read was partial.
+  What is still not caught is the harder half -- a claim about what a read
+  SAID with nothing tying it to the read (TASKS, Layer 7).
+- **The operator.** Nothing here binds him, and it is not trying to. He is the
+  one who lands, and the estate's honesty exists so that what he lands is
+  informed.
+
+---

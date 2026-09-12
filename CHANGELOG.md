@@ -42,6 +42,59 @@ files that hold the number both moved — `manjuel/__init__.py` and
 same by every file that holds it", and `RUNBOOK.md`'s pre-tag line moved
 with them because `release.py --check 0.1.11` names the tag being cut.
 
+### The record caught up with the day, and REFUSALS had two sections numbered 19
+
+A pass over the record itself, on his order. What was stale, and what was
+wrong:
+
+    DAYBOOK.md      NOTHING FOR TODAY. Its last entry was Session 7,
+                    2026-09-09, and DAYBOOK is the one file CLAUDE.md calls
+                    "the only file that carries intent" -- the next hand
+                    begins with total amnesia and reads it first. Session 8
+                    written: the standing, what landed in order, the trap
+                    worth more than the fixes, the three things I broke and
+                    undid, and **At close**.
+    HANDOFF.md      written at 10:12 and describing the morning only, while
+                    the afternoon held the correctness arc, item 0 and the
+                    review's five items. The opener now carries the CLOSE
+                    numbers and says outright that the rest of the block is
+                    the morning; the afternoon is appended under its own
+                    heading.
+    REFUSALS.md     TWO SECTIONS NUMBERED 19 -- the law gate at 391, and
+                    `edit_file`/`run_python` appended at the very end, AFTER
+                    "What this does NOT protect against". A closing section
+                    that is not last stops being a closing section.
+                    Renumbered 23 and moved where it belongs; 1..26 with no
+                    duplicates and the closing block last again.
+    CONTRIBUTING    "Twenty-one numbered refusals" -- it is twenty-six.
+                    Counted, not estimated.
+
+**Three refusals earned today, written down.** The house standard is that every
+guard is named after the failure that earned it, and three of today's had
+landed in code and CHANGELOG without reaching the page a stranger is told to
+read:
+
+    24  the write door checks before it writes -- `write_file` refuses `.py`
+        that will not parse, which `edit_file` had done since it landed. Two
+        doors onto the same workspace and only one of them looked.
+    25  a mention is not a naming -- a function word must OPEN the objective
+        or wear quotes; a keyword whose declared argument is a NUMBER wants
+        one beside it. Read off the skill's own markdown.
+    26  a turn that wanted hands and used none says so -- the case the
+        named-tool comparison cannot see, because when intent reads an
+        objective as action-shaped it names nothing and both sides of that
+        comparison are empty.
+
+**TASKS.md WAS NOT TOUCHED, deliberately.** Two of his open lines are affected
+-- "the release gate in prove.yml" (still genuinely absent from CI; `release.yml`
+is a different gate, and I checked rather than assumed) and "CRLF or LF (his
+call)", which today ENACTED his 2026-09-03 ruling rather than making a new one.
+Neither is ticked. That list is his, and the 2026-09-08 order was about exactly
+this: "you are picking shit to add to your task list from an arbitrary source."
+
+The release gate reads 9 of 9 after the pass, with the standup re-run live so
+it post-dates the newest edit.
+
 ### `sitting` was the next collision, and the root docs now match their own ruling
 
 Two of the review's open items, closed.

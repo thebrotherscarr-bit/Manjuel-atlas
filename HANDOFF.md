@@ -672,12 +672,18 @@ dropped by operator ruling 2026-09-01 — see the fix log.
 
 ## HANDOFF FOR 2026-09-12 — read this before anything below it
 
-**Where the ground stands.** `main` at `d53a160`, version **0.1.11**; atlas
-`main` at `467e94c`, version **0.1.4**. Both pushed, both CI green — core 4/4
-legs (Windows and Ubuntu, 3.10 and 3.13), atlas 2/2. Strokes **2316/2316**,
-smoke **60/60**, law chain whole at 4 links, manifest agrees with the disk,
-BUILDMAP idempotent. The atlas battery: 22 held · 15 absent · 0 broke, every
-absent one naming the private oracle ground.
+**Where the ground stands AT CLOSE.** core `main@e4cf663`, version
+**0.1.11 THE CODING UPDATE**; atlas `main@572186d`, version **0.1.5 THE FLOW
+CONFIRMATION** — both names his. Both trees clean, both in step with GitHub,
+no sitting open. Strokes **2333/2333**, smoke **60/60**, live standup 9/9, law
+chain whole at 4 links, manifest agrees with the disk, BUILDMAP matching,
+release gate 9 of 9. atlas: 22 held · 15 absent · 0 broke, both Go modules
+green and gofmt-clean, **ten version pins in sync**, five binaries and the
+glass all asked and all answering 0.1.5. THE TAGS ARE NOT CUT (RULE 6).
+
+*The rest of this block was written at 10:12 and describes the morning. The
+afternoon is under THEN THE AFTERNOON below it; the numbers above are the
+close.*
 
 **THE DAY WAS THE CODING LOOP MEETING THE LIVE RACK.** Piece 3 landed green
 the night before on strokes alone. Firing it found four faults in a row, each
@@ -754,6 +760,78 @@ all five binaries now answer from disk, measured.
 `smoke` are green on a MIRROR and the ground's `tests/last_run.json` is the
 one his terminal writes; `standup` wants a live run after the newest edit.
 Those three are a terminal away. Everything else in the gate passes.
+
+**THEN THE AFTERNOON: THE CORRECTNESS ARC, AND WHY THE VERSION IS NAMED WHAT
+IT IS.** The morning's four faults were about a flow not doing the work. The
+afternoon's were about a flow SAYING it had. Each was found by firing it and
+then refusing to believe the green:
+
+    liveness as correctness  `check` asked whether `run_python` said `RAN:` and
+                             called that correct. It went GREEN over code that
+                             did the opposite of the objective -- the coder
+                             stripped a build tag the objective said to REFUSE,
+                             and its own delivery wrote both halves of the
+                             contradiction in one sentence.
+    the marker travelled     `verify` was given `{{out_attempt}}` so it would
+                             know which file was written. It PASSED a run where
+                             verify called `list_directory` and ran nothing,
+                             because attempt's verdict block rode into verify's
+                             objective.
+    the marker was written    requiring the block proved something RAN; it did
+                             not prove the marker came from what ran. A seat
+                             can simply write `RAN:`.
+    the marker was quoted     the sharpest one. The seat reported the failure
+                             PERFECTLY -- "printed FIB6: 0, which is not the
+                             expected output of FIB6: 8" -- and the check found
+                             its marker INSIDE the clause saying it did not
+                             match.
+    the branch nobody judged `recheck -> land always`: a run that failed, then
+                             repaired and rechecked, reached the gate with no
+                             judgement of the repaired work.
+
+**WHAT CLOSED THEM, AND IT IS ONE SENTENCE.** An eval scores the machine's
+EVIDENCE and prose is not scored at all, because prose quotes requirements and
+prose negates them. `expected` is rendered so the HAND states what correct
+output is at fire time; `--- WHAT THE TOOLS SAID ---` carries the verdict lines
+AND each tool's output; the marker is unforgeable because `appendVerdicts`
+strips any seat-written one before writing its own; a `run` node with no block
+cannot be judged OR passed; and `proof` holds the repaired work to the same
+expectation with NO FAIL EDGE, so the verdict finally means something --
+**PAUSED is "it passed, your hand decides", FAIL is "it did not", and no gate
+is offered for work that failed.**
+
+Five wirings, three wrong, each corrected by a run. The two lessons worth more
+than the code: **an eval is a GATE, never a passive recorder** (`run.go`: an
+eval that fails with no fail edge stops the run, so a "recording" eval killed
+the run before the judging one could fire), and **liveness cannot gate
+correctness** because a task whose correct behaviour is a non-zero exit fails a
+`RAN:` check. A correct refusal exits 1.
+
+**ITEM 0 WAS THREE FAULTS STACKED.** `release.ps1` could not be PARSED --
+BOM-less UTF-8 with seven em-dashes, and PowerShell 5.1 reads a BOM-less file
+as ANSI, so the dash broke the string on the `<ver>` line. Proven against
+HEAD's own bytes. `prove.ps1` had the same single dash, so **neither local
+script had ever run on this machine**, and the moniker fault everyone was
+looking at sat underneath a file that would not load. All five `.ps1` are pure
+ASCII now, so no BOM has to survive a future edit. `version.ps1` moves all TEN
+pins (it held six; the four it missed were the two commands that printed
+hardcoded literals, plus Cargo.toml and version.rs, which had been a WARNING
+pointing at a `version-cross` stroke that does not exist).
+
+**AND THE REVIEW'S FIVE OPEN ITEMS ARE CLOSED.** The glass went from ONE test
+function in ~2,800 lines to fifteen over three packages (`db` round-trip and
+atomic save, the tenant wall in all four cases, the session gate's open paths
+and its JSON 401). `release.yml` was WRITTEN rather than the claim deleted --
+it proves before it publishes and stops at a draft. `sitting` got the rule
+`when` needed a different version of, read off the skill's own declaration. The
+root docs are the CRLF he ruled on 2026-09-03, content verified byte-identical.
+SYSTEM_DESIGN got the convention that tells a planned path from another world's
+-- and the record says my own review was wrong about it: most of those "dead
+paths" are the business's own files, described as inputs.
+
+REFUSALS.md gained §24, §25 and §26, and a section that had been appended
+AFTER the closing block carrying a duplicate §19 was renumbered §23 and moved
+where it belongs.
 
 **Open, named, not fixed** — none of these is a claim about now, they are the
 next hand's list:

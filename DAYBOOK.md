@@ -1279,3 +1279,107 @@ door — and after them the citation check, the largest thing left in the spec.
 Still his: sealing SITTING LAW 5 onto the chain (it is written in
 law/SITTING_LAWS_2.md, but the chain seals four files and that is not one of
 them), the terminator ruling, and the client token's last two places.
+
+## Session 8 — 2026-09-12 (Friday), sittings 203–216, the flow confirmation
+
+**Standing** — follows session 7 (2026-09-09), which closed at `main@031b62e`
+with the glass and the gate. Two days of coding-loop work had landed green on
+strokes alone; today was the day it was FIRED, and firing it is the whole
+session. Manjuel moved 0.1.10 → **0.1.11 THE CODING UPDATE**; atlas 0.1.3 →
+0.1.4 THE DELIVERY PACKAGING → **0.1.5 THE FLOW CONFIRMATION**, both names his.
+
+**Version** — core `main@e4cf663`, `__version__` 0.1.11; atlas `main@572186d`,
+VERSION 0.1.5. THE TAGS ARE NOT CUT: the core's gate passes 9 of 9 and the
+cutting is his (RULE 6).
+
+**Every commit and push went through the panel**, on his order ("run every
+commit and push through the dashboard"). Nine saves across the two repositories,
+each one a button on Version control, each CI run watched to conclusion before
+the next piece started.
+
+**WHAT THE DAY WAS FOR, IN ONE LINE.** Every fault found today was a flow
+saying a thing had happened when it had not, and every fix was the same move:
+make the confirmation mean something. That is why he named the version.
+
+**What landed, in order.**
+
+    morning    the coder flow fired for the first time. It traversed all six
+               nodes in 646s and BUILT NOTHING -- `attempt` said "write the
+               code THE OBJECTIVE ASKS FOR" and no node carried an objective.
+               The seats were right to refuse. An `ask` head, and the builder
+               given a box for every {{var}} no step supplies, because
+               API.fireFlow had always sent '{}'.
+    midday     the archive rode in, for the SECOND day running. THE LINE was
+               relaunched with CurrentDirectory at the ground root, Detect
+               resolved `research`, and the SEE THE TOWN walk read the DESKTOP
+               and adopted every neighbour with an AGENTS.md. The dashboard
+               read Archive's git state: the owed badge said 83,302. On
+               2026-09-11 the same walk said 83,303 -- that day it was caught
+               and the boot line was made to NAME what it carries so the next
+               one would be visible. It was visible. Being visible is not
+               being refused. `ground.Barred` now refuses it at the walk AND
+               the registry, and `insideNamed` stops the walk leaving the
+               estate at all: carrying 2, badge 13.
+    afternoon  the correctness arc. Four faults, each hidden behind the last,
+               none findable by reading: a check that asked whether code RAN
+               and called that correct; a marker that TRAVELLED from one node's
+               objective into another's prose; a marker a seat could simply
+               WRITE; and a marker QUOTED OUT OF THE REQUIREMENT it was meant
+               to verify -- found inside the clause saying it did not match.
+               Then the branch nobody judged. Five wirings, three of them
+               wrong, each corrected by an actual run.
+    evening    item 0 of the approved plan, which turned out to be three
+               faults stacked: `release.ps1` could not be PARSED at all
+               (BOM-less UTF-8 with em-dashes, which PowerShell 5.1 reads as
+               ANSI), under that the stone moniker its only caller still
+               appended, and under that a closing line promising a CI release
+               that has never existed. `prove.ps1` had the same parse fault,
+               so NEITHER LOCAL SCRIPT HAD EVER RUN on this machine.
+    close      the review's five open items closed: the glass went from ONE
+               test function in 2,800 lines to fifteen, `release.yml` was
+               written rather than the claim deleted, `sitting` got the rule
+               `when` needed a different version of, the root docs were
+               normalised to the CRLF he ruled on 2026-09-03, and
+               SYSTEM_DESIGN got the convention that distinguishes a planned
+               path from another world's.
+
+**THE TRAP WORTH MORE THAN ANY OF THE FIXES.** Between v7 and v8 the flow was
+given `{{out_attempt}}` so `verify` would know which file was written. It
+PASSED a run where verify called `list_directory` and ran nothing, because
+attempt's verdict block travelled into verify's objective and `contains RAN:`
+found a marker that had been pasted rather than earned. It is now a property of
+the design, in `pipelines.md`: **a node's verdict block describes that node's
+run only, and that holds exactly as long as no objective carries a prior run
+node's output.** The general form landed with it -- an eval scores the machine's
+evidence and prose is not scored at all, because prose quotes requirements and
+prose negates them.
+
+**Three things I broke and undid, in the record because they happened.** A hand
+reached into Archive during the badge diagnosis -- a loop that ran `git` over
+whatever `muster` returned, before reading the list (RULE 3: checking is
+reaching). `sed -i` stripped every CRLF from HANDOFF.md and had to be restored.
+And `version.ps1`'s first pin-rewrite CORRUPTED `core/src/version.rs` with
+mojibake and a BOM, reverted from HEAD and rewritten with .NET file APIs -- the
+same encoding trap as `release.ps1`'s, one layer down.
+
+**At close** — core `main@e4cf663`, atlas `main@572186d`, both trees clean and
+in step with GitHub, no sitting open. Strokes 2333/2333 (from 2254), smoke
+60/60, live standup 9/9, law chain whole at 4 links, BUILDMAP matching,
+manifest agrees with the disk, release gate 9 of 9. atlas: 22 held · 15 absent
+· 0 broke, both Go modules green and gofmt-clean, ten version pins in sync,
+five binaries and the glass all asked and all answering 0.1.5. Sittings 203–216
+closed; 203 was closed by hand after its engine was KILLED rather than exited,
+and its line says `toll_paid: false` because none was.
+
+**Next session:** the auth gate cannot be turned on — `ConfigureAuth` has no
+caller anywhere in the webapp, so `authOn` is false for every process's life
+and `ATLAS_AUTH=1` is documented in two comments and read nowhere. The gate
+itself is correct and stroked both ways; only the wiring is missing, and the
+wiring is a decision (the env var, the session path, the service wire). After
+that, the citation check is still the largest thing left in the spec.
+
+**Still his:** the two tags (`v0.1.11`, `v0.1.5`); sealing SITTING LAW 5 onto
+the chain; and two lines on his own task list that today's work touches — "the
+release gate in prove.yml" (still absent from CI; `release.yml` is a different
+gate) and "CRLF or LF (his call)", which today enacted his 2026-09-03 ruling
+rather than making a new call. I did not tick them: that list is his.

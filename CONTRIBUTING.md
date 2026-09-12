@@ -30,7 +30,7 @@ declared wall, it is not a feature with a flag — it is a different project.
 
 ## Every guard is named after the failure that earned it
 
-Read `REFUSALS.md`. Twenty-one numbered refusals (plus 7b and 11b), each with the sitting number of the
+Read `REFUSALS.md`. Twenty-six numbered refusals (plus 7b and 11b), each with the sitting number of the
 run that produced it. That is the house style, and it is the contribution
 standard:
 
