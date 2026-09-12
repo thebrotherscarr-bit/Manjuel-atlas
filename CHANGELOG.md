@@ -34,6 +34,434 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### 0.1.11 — THE CODING UPDATE
+
+His word, 2026-09-12: *"manjuel 0.1.11 - the coding update."* The two
+files that hold the number both moved — `manjuel/__init__.py` and
+`pyproject.toml` — which is what the doctrine check means by "said the
+same by every file that holds it", and `RUNBOOK.md`'s pre-tag line moved
+with them because `release.py --check 0.1.11` names the tag being cut.
+
+WHAT THE NAME IS FOR. Everything under this heading is the coding loop
+becoming real: `edit_file` and `run_python` as declared skills, the
+`coder` flow around them, the verdict lines that let a check score a RUN
+instead of a seat's account of one, and the four faults that only showed
+up by firing it on the live rack. Nothing here was found by reading.
+
+EVERYTHING ELSE SAYING 0.1.10 IS LEFT, for the reason 0.1.10 left 0.1.9:
+`BUILDPATH.md` describes what a tag WAS, `pyproject.toml`'s comments
+record an old drift, and a stroke's fixture writes its own number into a
+temp ground. None of those is a claim about now.
+
+### A keyword that is English grammar must be named, not merely spoken
+
+**What was wrong, and it was not a loose regex.** `names_a_tool` matched the
+word "when" in the coder flow's `verify` objective and dispatched the `when`
+skill -- a transcript-window reader -- to answer a question about a Python
+file. The match was correct: `when` really is a keyword (`skills/when.md`,
+"what ran yesterday"). The brief it was reading said "...when executed, it
+should print 55", and a subordinate clause became a tool call.
+
+Eight of the forty-two keywords are one word. Seven are CONTENT words --
+`inspect`, `remember`, `statistics`, `sitting`, `speak`, `proved`, `subtask` --
+and someone who writes those usually does mean the thing. `when` is a FUNCTION
+word: it carries no subject of its own, so it is grammar unless the sentence is
+plainly about it.
+
+**Fixed — `_FUNCTION_WORDS`, and two structural ways to be NAMED.** A one-word
+keyword in that set matches only when it OPENS the objective ("when this week"
+is a question about time; "...when executed" is a clause), or when it wears
+quotes in the raw text ("call `when`") -- checked against the raw objective,
+because `_norm` strips exactly the marks that carry the distinction.
+
+A DECLARED PHRASE IS NEVER HELD TO THE RULE. A `**Says:**` phrase is already a
+naming, so the cure for a skill caught by this is its own markdown -- which is
+also the ruling that put phrases there in the first place (sitting 66: markdown
+declares, Python only runs it). Only `when` is a keyword in the set today; the
+rest of the WH-words and conjunctions are listed so a skill named `how` or
+`where` arrives with the fault already fixed.
+
+**And `skills/when.md` now declares its phrases.** Its Description had been
+listing them in prose for weeks -- "what ran yesterday", "what did we do this
+week", "what have we been doing lately" -- while the only thing that could
+actually reach the skill was the bare word. The phrases are now `**Says:**`,
+so it is reached by what a person would type rather than by a conjunction.
+
+**Measured — the arithmetic branch finally fires.** Objective "a script that
+prints the factorial of 6", `coder` v8, sitting 210:
+
+    intent: orders `factorial.py` RUN, and it is in the workspace
+            -- run_python, the file as the argument
+    intent: `run_python` chosen by wants_running -- Router woken directly
+
+The Router never got to decline. And verify's own verdict block carries the
+whole turn, honestly:
+
+    run_python: FAILED (exit 1): factorial.py
+    read_file:  inspected: 516 bytes; utf-8 text (extension .py); ...
+    edit_file:  Edited factorial.py at line 12: 7 line(s) replaced by 4 ...
+    run_python: RAN: factorial.py
+
+It ran the file, it failed, the Router read it, edited it and re-ran it, inside
+one turn -- and the re-run was possible only because `reopen_reads` drops the
+dedup after a write, which is the same mechanism `carry_unblocked` was built
+around this morning. `check` passed on a `RAN:` that verify earned. Four nodes,
+133s, `repair` and `recheck` never needed. The file prints `6! = 720`.
+
+Strokes 2299 -> 2316: `test_a_keyword_that_is_grammar_must_be_named` -- the
+clause mid-sentence and at the end must name nothing; the opening question,
+the bare word, the quoted word and the declared phrases must all still reach
+it; and a content word must still dispatch from mid-sentence, because this
+rule is not allowed to make the other seven harder to call.
+
+### The Router was deciding not to run files it had been told to run
+
+**What was wrong.** The coder flow's `verify` node declined twice, for two
+different reasons. Once it wrote the file and stopped without running it. Once
+it answered *"NO skill is needed -- the .py file named in the objective does
+not exist (no filename was provided, only the command text itself), and the
+result 5050 has already been provided via the steward record from this very
+session"* -- where the Steward's own words had been *"I will run the .py file
+and report exactly what it said. The result is: 5050"* over a script nothing
+had executed. A seat's claim stood where a run belonged (LAW 5), and the second
+time the Router was right about the filename: `{{out_brief}}` had come back as
+`print(sum(range(1, 101)))` -- the ask node returned CODE, not a name.
+
+**Added — `intent.wants_running`, and the branch that decides it.** An order to
+RUN a named `.py` that is on disk is arithmetic, not a judgement: the engine
+decides `run_python` with the file as the argument and wakes the Router to read
+the result, the same shape `ground_read` and `ground_list` already use. Placed
+BEFORE `names_a_file`, which would otherwise make "run probe.py" a READ -- and
+a seat handed source code and asked what it printed answers from the code,
+which is the invention LAW 5 exists to refuse. A `.py` that is not there yet
+falls to the Router rather than to a refusal: a turn that writes a file then
+runs it is the coder's own shape.
+
+**Added — `NO TOOL RAN`, the case `missed` cannot see.** `missed` needs a NAMED
+tool to compare against. When intent reads an objective as action-shaped it
+names none -- "Router decides the tool" -- so if the Router then decides on
+none, both sides of that comparison are empty and no guard fires. That turn
+delivered "The result is: 5050" for a script nothing had run.
+
+KEYED ON WHAT INTENT READ, not on the `needs_tool` flag. The first draft used
+the flag and was too broad: the flag is also raised by a write-shaped objective
+and by a seat emitting `<flags>needs_tool</flags>`, and in those a Router that
+decides no tool is needed may be right. It accused the draft-review stroke,
+whose fixture raises the flag by hand and needs no tool at all. `hands_wanted`
+is set only where the ENGINE read an order to act on something. Narrow and
+certainly right beats broad and crying wolf.
+
+**Fixed — `brief` names the file on its own line.** `FILE: <name>.py` first,
+nothing else, then the spec. That is what makes the filename reach `verify`
+deterministically.
+
+**Measured — the pass branch fires, for the right reason.** Objective "a script
+that prints the 10th triangular number", `coder` v8:
+
+    brief    FILE: triangular_numbers.py       (no verdict block: ask nodes
+                                                do not go through Turn)
+    attempt  wrote it
+    verify   run_python: RAN: triangular_numbers.py  -- exactly ONE `RAN:` in
+                                                the node's output, its own
+    check    pass
+    land     paused, waiting on a hand
+
+Four nodes, 124s. `repair` and `recheck` did not fire. The file prints 55.
+
+**A TRAP, WALKED INTO AND RECORDED.** Between v7 and v8 `verify` was given
+`{{out_attempt}}`, on the reasoning that attempt's verdict block names the file
+it actually wrote. It produced a PASS on a run where `verify` called
+`list_directory` and never ran anything -- because attempt's block travelled
+into verify's objective, and `contains RAN:` found a marker that had been
+pasted rather than earned. Reverted.
+
+The lesson is now a property of the design: **a node's verdict block describes
+that node's run only, and that holds exactly as long as no objective carries a
+prior node's output.** An `ask` node is safe to carry (it never gets a block);
+a `run` node's output is not. Anything that scores prose can be fooled by prose
+that moved. The durable answer is for an eval to score a node's verdicts as
+STRUCTURED data rather than searching its text -- a change to what a node's
+output IS, and named here rather than guessed at.
+
+Strokes 2284 -> 2299: `test_an_order_to_run_a_script_is_arithmetic` (the verb
+must mean execute, the file must be Python, and a read is still a read) and
+`test_a_turn_that_wanted_hands_and_used_none_says_so` (fires on action-shaped
+with no call; silent on a turn that called something, on a conversation, and on
+a refusal -- because when a gate refuses, the refusal IS the answer).
+
+**Still standing, named not fixed:** on the passing run the routing note read
+`intent: objective names 'when' -- Router woken directly`. `names_a_tool`
+matched the bare word "when" in the brief's prose. It did no harm -- the Router
+chose `run_python` anyway -- but a one-word match against ordinary English is
+the same shape of fault as the `ran`/`RAN` collision fixed earlier today.
+
+### The tools' own words reach the gate, and write_file looks before it writes
+
+**Fixed — a `run` node now carries what the tools SAID, not only what the seats
+said about it.** An eval checking a `run` node was scoring the closing seat's
+paraphrase: on 2026-09-12 a check for `RAN:` failed over a script that had
+worked, because the seat wrote "the run_python tool executed the file and
+reported that it produced 5050 to stdout". No matching mode reaches that --
+whatever marker a check hunts, the seat is free not to write it.
+
+The verdict lines had been collected since the 2026-09-08 review
+(`StepResult.tool_results`) and thrown away at the wire.
+
+    manjuel/context.py   tool_verdicts(steps) -- `<tool>: <its own first line>`,
+                         bounded. Every skill here leads with its verdict --
+                         RAN:, FAILED (exit 1):, Refused:, Saved to workspace:
+                         -- so the first line IS the answer and the body is
+                         evidence the delivery already carries.
+    manjuel/serve.py     the delivery envelope gains `verdicts`
+    atlas .../tools.go   appendVerdicts() puts them under the prose as
+                         `--- WHAT THE TOOLS SAID ---`, once, appended and
+                         never substituted: the prose is what a person reads
+                         at the gate, the facts are what a check reads, and
+                         both survive.
+
+LAW 5, exactly: the delivery is testimony; `RAN: calc.py` is the run.
+
+Measured live, same objective, on the nodes that called tools:
+
+    attempt   write_file: Saved to workspace: sum_calculator.py
+    repair    run_python: RAN: sum_calculator.py
+    recheck   run_python: RAN: run_sum.py
+
+**Fixed — `write_file` refuses Python that will not parse.** `edit_file` and
+`land_code` both refuse by proof and this door did not, so the coder flow's
+third live run wrote `calculate_sum.py` as sound code followed by
+`</parameter>` and a `<flags>technical</flags>` block -- the seat's own markup,
+leaked into the payload. It was written happily, `run_python` died of a
+SyntaxError, and the flow spent a repair and a recheck on a fault that was
+already on disk. Only `.py`, and only PARSING, which is the same bound
+`edit_file` draws; prose files are nobody's syntax to judge. The refusal names
+the line and says nothing was written.
+
+Strokes 2265 -> 2284: `test_the_tools_own_words_leave_the_turn` (the real
+paraphrase as the case that carries no verdict, the real verdict as the one
+that does, plus a call short of a result, an empty step, and the cap) and
+`test_a_write_refuses_python_that_will_not_parse` (the exact bytes that leaked,
+then a real .py, a .md, an empty .py, and edit_file still holding its own
+line). Go: `TestAppendVerdicts`, both ways including the once-only rule.
+
+**Still standing, named not fixed.** The coder flow's check is still not
+reliably green, and it is no longer the matching or the plumbing. On the run
+above `verify` called NO TOOL AT ALL -- the Router answered "NO skill is needed
+... the result 5050 has already been provided via the steward record from this
+very session" -- so there was no verdict to carry and the check failed, which
+is correct: a node that ran nothing must not pass a check for `RAN:`. What
+remains is a seat declining to re-run work it believes it has already seen.
+That is the Router's judgement, not the flow engine's, and it is named here for
+the operator rather than patched from the flow.
+
+### The eval node's pass branch, which had never once been reachable
+
+**What was wrong.** `play.Score` is exact match after trim and casefold. The
+flow builder's label for the same field read "what the answer should carry" --
+which is `contains`, in words. The coder flow believed the label: its check
+expected `RAN` from a `run` node, whose answer is the council's prose. On
+2026-09-12 `verify` came back `RAN: fizz_buzz.py` over correct FizzBuzz and the
+check failed anyway. It had failed every time since the flow was first folded;
+`repair` and `recheck` ran on every run, including the ones that worked.
+
+`Score` could not simply be loosened: it also scores prompt-eval datasets
+(`play.Eval`), and changing it there would have silently rescored saved runs.
+
+**Added — `match` on the eval node: `equals` (default) or `contains`.** Empty
+means `equals`, so every spec folded before this keeps the verdict it already
+had. `Validate` refuses an unknown mode by name and refuses `match` on a node
+with no answer to test. An empty `expected` never passes under either mode --
+every string contains "", and a check that goes green on a blank field is a
+green light nobody set.
+
+**And `contains` is CASE-SENSITIVE, which is the whole difference between the
+two modes.** This was not the first design. `contains` landed case-blind, and
+the very first live run after it exposed why that is wrong: the flow asked for
+`RAN`, `calculate_sum.py` had died of a SyntaxError, `run_python` reported
+`FAILED (exit 1)` correctly -- and the check passed, because the delivery said
+"the tools that actually **ran** this turn were...". Lowercase `ran` is an
+ordinary English word, so a case-blind hunt for it finds English instead of a
+verdict. A word-boundary test would not have helped: that match WAS a whole
+word.
+
+So `equals` compares a whole answer to a whole expected value, where case is
+noise, and stays case-blind. `contains` hunts a MARKER inside prose -- `RAN:`,
+`FAILED`, `PASS` -- and in machine output the case IS the marker. The builder's
+hint says so and offers `RAN:` as the example, because the old label is exactly
+what caused this.
+
+The flow's check is now `contains` / `RAN:` -- the verdict line `run_python`
+emits verbatim, colon included. `coder` is at v6; v1 through v5 are kept whole.
+
+**AND THE PASS BRANCH IS STILL NOT RELIABLY REACHABLE. Named, not fixed.**
+Three live runs after the match modes landed:
+
+    v3  PASSED -- on a lie. The script had died of a SyntaxError; the
+        delivery contained the English word "ran". This is what made
+        `contains` case-sensitive.
+    v4  FAILED honestly. `run_python` returned `RAN: calc_sum.py`, the script
+        worked -- and the CLOSING SEAT PARAPHRASED: "the run_python tool
+        executed the file and reported that it produced 5050 to stdout". The
+        marker never reached the delivery.
+    v5  FAILED earlier still. A tail added to the objective asking the seat to
+        copy the verdict line verbatim made the objective look like it NAMED A
+        SKILL, and the intent guard refused it -- "`calculate_sum` is not a
+        skill in this ground" -- before the tool ran at all. Reverted.
+
+The root is structural and no matching mode reaches it: **an eval node checking
+a `run` node is scoring a model's PARAGRAPH, not the machine's verdict.** The
+tool result is a fact; the delivery is a seat's account of it, and the estate's
+own doctrine is that those are not the same thing (LAW 5). Whatever marker the
+check hunts, the closing seat is free not to write it.
+
+The durable fix is for a `run` node to expose its tool verdicts to the eval
+alongside the prose, which is a change to what THE LINE returns across the
+manjuel boundary -- a design decision, not a patch. Named here for the operator
+rather than guessed at.
+
+Strokes: `TestEvalMatchModes` carries the real failed delivery as a case that
+must NOT pass, and the real successful one as a case that must. Both verdict
+tokens are tested in both directions. `TestValidateGuardsTheMatchMode` holds
+the refusals.
+
+**Still standing, named not fixed:** `write_file` does not parse-check a `.py`
+before writing it, and `edit_file` does. That is how `</parameter>` and
+`<flags>technical</flags>` ended up inside `calculate_sum.py` and made it a
+SyntaxError -- the model's own markup leaked into the content and nothing
+stopped it at the door.
+
+### The archive rode in a second time, and is now refused rather than named
+
+**What happened.** THE LINE was relaunched on 2026-09-12 with
+`CurrentDirectory` set to the ground root. `ground.Detect` resolved `research`,
+and the SEE THE TOWN walk then read `filepath.Dir(here.Home)` -- the desktop --
+and carried every neighbour holding an AGENTS.md. `Desktop\Archive` is one, so
+the door carried it as a tenant, `muster` listed it, and the dashboard's owed
+badge read **83,302**: 83,225 changed files and 70 untracked, all of them
+outside the estate. RULE 1 puts the archive outside the ground and RULE 3 says
+checking is reaching; reading its git state is reaching.
+
+**This is the same failure as 2026-09-11, one day later, at 83,303.** That day
+it was caught and the boot line was changed to NAME what it carries, so the
+next one would be visible. It was visible. Being visible is not being refused,
+and nothing stopped it happening again.
+
+**Fixed — `ground.Barred`, checked at the walk AND at the registry.**
+
+    ground.Detect     stops the moment the walk touches a barred directory,
+                      so a `.us` module sitting INSIDE the archive is not a
+                      ground either -- Detect walks UP, and would otherwise
+                      have found the module before the barred parent
+    ground.Siblings   skips a barred neighbour and skips a barred root, while
+                      still seeing the rest of the town: the refusal is one
+                      house, not the street
+    tenant.Add        refuses a barred home whatever name it is given, and a
+                      tenant named `archive` whatever path it is given -- so
+                      an explicit `--tenant archive=...` is refused too, and
+                      fatally, because an explicit order to carry it should
+                      stop the door rather than be quietly dropped
+
+BY NAME, EVERY SEGMENT, CASE-BLIND. A path test would bind the rule to one
+machine's layout and miss a copy, a mount or a move. `archive` is the estate's
+word for this place wherever it sits, and `archived`, `archive-notes` and
+`my_archive_tool` are not it.
+
+**Measured after the fix, from the cwd that caused it.** The door boots at the
+ground root and says: `carrying 4: atlas, research, manjuel, neiro_recovery`.
+`muster` agrees. The archive is not among them.
+
+Strokes: `TestSiblingsNeverCarriesTheArchive`, `TestDetectStopsAtTheArchive`,
+`TestBarredIsCaseBlindAndWholePath`, `TestTheArchiveIsNeverCarried` -- each
+both ways, with the real worlds still landing. The reproduction is not
+synthetic: it is the badge, twice, on two consecutive days.
+
+**Fixed — and the walk no longer leaves the estate at all** (the operator, on
+seeing the boot line: "remove those two as well"). With the archive refused by
+name, the same walk still carried `manjuel` and `neiro_recovery` -- two desktop
+folders holding an AGENTS.md, outside the ground by RULE 1 exactly as the
+archive is. Two more names on a list would have been a list waiting for a
+fourth folder, so the rule is a boundary instead: **a neighbour is carried only
+when it sits inside a tenant the command line actually named.** Detection still
+learns where it is standing -- the 2026-08-27 ruling stands -- but what it may
+ADOPT stops at the estate it was given.
+
+`insideNamed` compares cleaned absolute paths and demands a separator after the
+root, so `Research` does not swallow `Research_old`; an unresolvable root
+admits nothing. The boot line NAMES what it left outside, for the same reason
+it names what it took in.
+
+Measured, from the cwd that caused all of this:
+
+    ground: left outside the estate (2): manjuel, neiro_recovery
+    ground: research (C:\Users\novad\Desktop\Research via AGENTS.md); carrying 2: atlas, research
+
+`muster` answers 2. The dashboard's owed badge went **83,302 -> 13**, and the
+13 is this estate's own two repositories.
+
+`TestInsideNamedIsTheEstateBoundary` holds it both ways, including the shared-
+prefix case a bare HasPrefix gets wrong.
+
+
+### The coder flow's first live run, and the two faults it found
+
+`coder` v1 was fired on the live rack on 2026-09-12 and traversed all six
+nodes -- `attempt`, `verify`, `check` FAIL, `repair`, `recheck` -- in 646s of
+its 1800s budget, every node with a receipt, and PAUSED at the gate exactly as
+built. `run_python` proved itself on the way: `recheck` ran the file and
+reported real stdout, Python 3.14.7, cwd `agent_workspace`, exit 0, inside the
+bound. Nothing reached the estate.
+
+It also built nothing, and the two reasons are both fixed here.
+
+**Added — the `ask` head on the `coder` flow (`coder` v2, 7 nodes).**
+v1 began at `attempt`, whose objective read "write the code THE OBJECTIVE ASKS
+FOR" -- referring to an objective no node carried. The seats refused, and were
+right to: "there's no source material or specification about what code to
+write." A new `brief` node (kind `ask`, one voice, not the council) turns the
+hand's line into one concrete task -- the exact .py filename and what a run of
+it should print -- and the five `run` nodes now carry `{{out_brief}}` instead
+of referring to an objective that was never there. `brief` carries
+`{{objective}}`, supplied at fire time; `play.Render` refuses a var nothing
+supplies ("nothing is guessed"), so an empty fire now stops at the first node
+instead of spending the budget discovering it has nothing to build. v1 is kept
+whole. The shape is in `pipelines.md`, because `flows/` is gitignored runtime
+state and a flow worth keeping is one a reader can rebuild from the record.
+
+**Fixed — a refusal that the next call answered, and nothing said so.**
+In `verify` the Router asked `run_python` for `probe.py` and was refused --
+"there is no 'probe.py' in the workspace to run. Write it first." It then
+wrote the file with `write_file` and stopped, because nothing joined the two.
+Its own deliberation, in the transcript: "write_file succeeded but run_python
+failed ... This seems like a contradiction." 332 of the run's 646 seconds went
+into that contradiction, and probe.py was never run.
+
+`carry_unblocked` (`manjuel/pipeline.py`) now has the write carry the news:
+a call refused while the file it named was absent is remembered against that
+file, and the write that creates it says so in its own result. Read off the
+DISK, not off anything a seat said -- a refusal is testimony, whether the file
+is there now is fact (LAW 5). IT TELLS; IT DOES NOT RUN: re-firing the refused
+call from the engine would be the engine deciding by itself to execute code a
+model has just written, which is the one thing `run_python` is built not to
+be. `reopen_reads` had already cleared the dedup, so the second call was
+always allowed to land -- nothing told the seat it could.
+
+`declared_path` (`manjuel/skills.py`) answers which file a call is about,
+resolved the way `gate_paths` resolves it. A READER, NOT A GATE: every doubt
+returns None, so the worst a drift between the two can do is fall silent,
+which is how this ground behaved before it existed.
+
+**Added — the flow builder asks for what it cannot supply itself.**
+`API.fireFlow` had always sent `'{}'`, so any flow that templated anything was
+unfireable from the glass. The builder now scans the spec for `{{vars}}` no
+node fills from its own output -- only `question` and a prompt node's `vars`,
+the two fields the engine actually renders -- and offers a box for each.
+**Restart required** for the webapp: the page is `go:embed`ed.
+
+Strokes 2254 -> 2265: `test_the_refusal_a_later_write_answers`, both ways --
+the refusal-then-write that must fire, and three that must not (a write nobody
+waited on, a refusal for a file that IS there, and a write of a different
+file).
+
 ### Piece 3: the coder flow, and the pipeline block that turned out to be unnecessary
 
 The design said piece 3 was "a `coder` pipeline block and the flow spec.

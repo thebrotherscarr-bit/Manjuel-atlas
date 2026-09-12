@@ -539,7 +539,7 @@ operator's act, not a hand's.
 
 ## Before a tag: the release gate
 
-    python tests\release.py --check 0.1.10
+    python tests\release.py --check 0.1.11
 
 One command, run ON YOUR TERMINAL before every tag, that refuses by name:
 the suites green and stamped after the newest edit; buildmap clean; the

@@ -386,11 +386,57 @@ def claims_wrote_a_file(text: str) -> str:
     return ""
 
 
+# KEYWORDS THAT ARE ALSO GRAMMAR. A skill may be called `when`, and then the
+# word "when" appears in every third sentence anyone writes -- as a
+# conjunction, doing a job that has nothing to do with the skill. On
+# 2026-09-12 the coder flow's `verify` objective carried a brief that said
+# "...when executed, it should print 55", and intent dispatched the `when`
+# skill: a transcript-window reader, woken to answer a question about a
+# Python file, because of a subordinate clause.
+#
+# A CONTENT word is different. "inspect", "remember", "statistics" are also
+# keywords, and someone who writes them usually does mean the thing; they are
+# left alone. These are FUNCTION words: they carry no subject of their own, so
+# they are grammar unless the sentence is plainly ABOUT them.
+#
+# Only `when` is a keyword today. The rest are here because a skill named
+# `how` or `where` would arrive with the same fault already fixed.
+_FUNCTION_WORDS = frozenset({
+    "when", "where", "what", "who", "whom", "why", "how", "which",
+    "if", "then", "while", "until", "after", "before", "since", "unless",
+})
+
+# `when`, `'when'`, "when" -- a word wearing quotes is a word being NAMED
+# rather than used. Checked against the RAW objective, because _norm strips
+# exactly the marks that carry the distinction.
+_QUOTED = "`'\"*"
+
+
+def _named_not_used(form: str, hay: str, raw: str) -> bool:
+    """Is this function-word form being NAMED here, rather than spoken?
+
+    Two ways, both structural: it OPENS the objective ("when did we last
+    commit" is a question about time; "...when executed" is a clause), or it
+    wears quotes in the raw text ("call `when`").
+    """
+    if hay == form or hay.startswith(form + " "):
+        return True
+    for q in _QUOTED:
+        if f"{q}{form}{q}" in raw.lower():
+            return True
+    return False
+
+
 def names_a_tool(objective: str, keywords) -> str:
     """Return the keyword the objective names, or "" if none does.
 
     Matches the keyword itself (`git_commit`), its spaced form (`git commit`),
     and any declared alias. Longest match wins so `git_commit` beats `commit`.
+
+    A ONE-WORD KEYWORD THAT IS ENGLISH GRAMMAR must be named, not merely
+    spoken -- see `_FUNCTION_WORDS`. A declared `**Says:**` phrase is never
+    subject to that: a phrase is already a naming, which is why the cure for a
+    skill caught by this is to declare its phrases in its own markdown.
 
     A skill may declare its OWN phrases in its markdown (`**Says:**`), and
     those are read here alongside the table below. The table came first and
@@ -416,12 +462,21 @@ def names_a_tool(objective: str, keywords) -> str:
         if lib is not None:
             spec = lib.spec(kw)
             declared = tuple(getattr(spec, "says", ()) or ()) if spec else ()
-        forms = ([kw, kw.replace("_", " ")]
-                 + list(ALIASES.get(kw, ())) + list(declared))
-        for form in forms:
+        bare = [kw, kw.replace("_", " ")] + list(ALIASES.get(kw, ()))
+        # A DECLARED PHRASE IS ALREADY A NAMING, so it is never held to the
+        # function-word rule below -- `says` and `bare` are kept apart for
+        # exactly that reason.
+        for form, is_phrase in ([(f, False) for f in bare]
+                                + [(f, True) for f in declared]):
             f = _norm(form)
-            if f and re.search(rf"(?<![a-z0-9_]){re.escape(f)}(?![a-z0-9_])", hay):
-                hits.append((len(f), kw))
+            if not f:
+                continue
+            if not re.search(rf"(?<![a-z0-9_]){re.escape(f)}(?![a-z0-9_])", hay):
+                continue
+            if (not is_phrase and f in _FUNCTION_WORDS
+                    and not _named_not_used(f, hay, objective or "")):
+                continue
+            hits.append((len(f), kw))
     if not hits:
         return ""
     return max(hits)[1]
@@ -573,6 +628,35 @@ def wants_writing(objective: str) -> bool:
 def wants_action(objective: str) -> bool:
     """Action-verb + object: the turn wants hands, tool unspecified."""
     return bool(_ACTION_SHAPE.search(objective or ""))
+
+
+# AN ORDER TO RUN SOMETHING. Narrow on purpose: the verb has to mean
+# EXECUTE, not "run through it" or "run a check on the record".
+_RUN_VERBS = re.compile(r"(?i)\b(run|execute|rerun|re-run)\b")
+
+
+def wants_running(objective: str) -> str:
+    """The `.py` this objective orders RUN, or "".
+
+    EARNED 2026-09-12, from the coder flow. `verify`'s objective was "Run the
+    .py file this task names and report exactly what it said", the file was
+    named in the text, and the Router answered "NO skill is needed" -- twice,
+    for two different reasons, on two different runs. Once it wrote the file
+    and never ran it; once it decided the answer was already in the thread.
+    Both times a seat's judgement stood where arithmetic was available: the
+    objective says RUN, it names a `.py`, and whether that file exists is a
+    fact on disk. The estate's own pattern for that is to DECIDE the call and
+    wake the Router to read the result -- "it does not choose".
+
+    `.py` ONLY, because `run_python` runs Python and nothing else; a "run
+    notes.md" is not an order this can answer, and it falls through to the
+    reader exactly as it did before.
+    """
+    text = objective or ""
+    if not _RUN_VERBS.search(text):
+        return ""
+    got = names_a_file(text)
+    return got if got.lower().endswith(".py") else ""
 
 
 # A FOLLOW-UP POINTS AT THE CONVERSATION. Sitting 87 (2026-09-04, runs 8,

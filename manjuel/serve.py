@@ -669,10 +669,18 @@ class Door:
         print(where)
         print()
 
+        # WHAT THE TOOLS SAID, beside what the seats said about it. A client
+        # scoring a turn -- a flow's eval node is the one that found this --
+        # was left reading the delivery, which is a seat's paraphrase of the
+        # run. The verdict lines are the machine's own words and were being
+        # collected and thrown away at this boundary.
+        from .context import tool_verdicts as _verdicts
+
         self.wire.emit(
             "delivery", text=body, elapsed=round(ctx.elapsed, 1), transcript=logged,
             pipeline=name, flags=sorted(ctx.flags), notes=list(ctx.notes),
             failures=[list(f) for f in ctx.failures],
+            verdicts=_verdicts(ctx.steps),
             out_of_time=list(ctx.out_of_time),
             steps=[{"seat": s.agent, "model": s.model, "elapsed": round(s.elapsed, 1),
                     "tools": list(s.tool_calls or []), "error": s.error or "",

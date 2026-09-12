@@ -22,7 +22,8 @@ from .runtime import SEAT_TIMEOUT as _SEAT_TIMEOUT
 from .skills import (GATE_MARK, REVIEW_ONLY_SKILLS, WRITING_SKILLS,
                      SkillExecutionEnv, SkillLibrary, extract_tool_call,
                      args_from_words as skills_args_from_words,
-                     _inside_ground as skills_inside_ground, unjail)
+                     _inside_ground as skills_inside_ground, declared_path,
+                     unjail)
 from .drift import DriftChecker
 from . import ink
 from . import lawgate
@@ -1286,6 +1287,40 @@ def run_pipeline(
         named = "decompose_task"        # the `if named:` block below arms it
         ctx.notes.append("intent: several acts in one objective -- routed "
                          "first, then worked step by step (decompose_task)")
+    elif not named and intent.wants_running(ctx.objective):
+        # AN ORDER TO RUN A NAMED SCRIPT IS ARITHMETIC, NOT A JUDGEMENT
+        # (2026-09-12, from the coder flow). `verify` said "Run the .py file
+        # this task names and report exactly what it said", the file was in
+        # the text, and the Router answered "NO skill is needed" -- once
+        # because it had written the file and not run it, once because it
+        # decided the answer was already in the thread. The objective says
+        # RUN, it names a `.py`, and whether that file is there is a fact.
+        # So the engine decides and the Router reads the result.
+        #
+        # BEFORE names_a_file, which is below and would make this a READ:
+        # "run probe.py" was dispatched to ground_read, which reports the
+        # file's TEXT. A seat handed source code and asked what it printed
+        # answers from the code, and that is exactly the invention LAW 5
+        # exists to refuse.
+        _script = unjail(intent.wants_running(ctx.objective))
+        try:
+            _there = (env.workspace / _script).is_file()
+        except Exception:
+            _there = False
+        if _there:
+            named = "run_python"
+            ctx.named_by = "wants_running"
+            ctx.tool_args = {"filepath": _script}
+            ctx.notes.append(f"intent: orders `{_script}` RUN, and it is in the "
+                             f"workspace -- run_python, the file as the argument")
+        else:
+            # Fail to the Router rather than to a refusal: the file may be
+            # about to exist, and a turn that writes it then runs it is the
+            # coder's own shape.
+            ctx.flags.add("needs_tool")
+            ctx.hands_wanted = "run-not-there"
+            ctx.notes.append(f"intent: orders `{_script}` run, but it is not in "
+                             f"the workspace yet -- Router decides the tool")
     elif not named and intent.wants_writing(ctx.objective):
         # A write is a decision; the Router thinks, nothing is presumed.
         ctx.flags.add("needs_tool")
@@ -1328,6 +1363,11 @@ def run_pipeline(
                                      "up -- dispatched to the reader (asks_the_ground)")
     elif not named and intent.wants_action(ctx.objective):
         ctx.flags.add("needs_tool")
+        # The ENGINE read this as an order to act on something. A turn that
+        # then calls nothing is named for it by the recompose -- see
+        # `hands_wanted` there. A WRITE is deliberately not marked: declining
+        # to write is a decision the Router is allowed to make.
+        ctx.hands_wanted = "action-shaped"
         ctx.notes.append("intent: action-shaped -- Router decides the tool")
     elif not named and intent.decomposes_to_search(ctx.objective):
         # THE DECOMPOSER (sitting 62): verb class + object class beats
@@ -1764,6 +1804,11 @@ def run_pipeline(
             # thing the comment above says this exists to kill.
             ran: dict[tuple, str] = ctx.ran_calls
             repeats = 0
+            # Calls refused because the file they named was not there yet,
+            # keyed by that file. PER TURN, not per run: a write answers the
+            # refusal the same seat just made, and carrying this between
+            # seatings would nudge a seat about a call it never made.
+            blocked: dict[str, list[str]] = {}
             for hop in range(MAX_TOOL_STEPS):
                 action, args = extract_tool_call(output)
                 if not action:
@@ -1859,7 +1904,14 @@ def run_pipeline(
                     # (the operator's arguments were filled in above the
                     # signature, so the dedup sees the call as it is made)
                     report("      " + ink.dim(f"→ skill: {action}"))
+                    # WHICH file this call is about, and whether it is there
+                    # YET. Both read before the handler runs, because the
+                    # handler is about to change the second answer.
+                    _named = declared_path(_spec, args, env)
+                    _absent = bool(_named is not None and not _named.exists())
                     result = skills.execute(action, args, env)
+                    result = carry_unblocked(result, action, _named,
+                                             _absent, blocked)
                     tool_calls.append(action)
                     ran[sig] = result
                     # A WRITE REOPENS THE READS. The ground has moved, so a
@@ -2405,6 +2457,55 @@ def reopen_reads(ran: dict, action: str) -> int:
     return len(stale)
 
 
+def carry_unblocked(result: str, action: str, path, absent: bool,
+                    blocked: dict) -> str:
+    """Tell a turn that the file its earlier call was refused for now exists.
+
+    THE CODER FLOW'S FIRST LIVE RUN, 2026-09-12. The Router asked `run_python`
+    for `probe.py` and was refused -- "there is no 'probe.py' in the workspace
+    to run. Write it first." It then wrote it with `write_file`, and stopped.
+    Nothing connected the two, and its own deliberation says so: "write_file
+    succeeded but run_python failed ... This seems like a contradiction."
+    332 of that run's 646 seconds went into the contradiction, and the file was
+    never run.
+
+    So the WRITE carries the news, machine-emitted from the disk rather than
+    from anything a seat said (LAW 5): a refusal is testimony; whether the file
+    is there now is fact.
+
+    IT TELLS; IT DOES NOT RUN. Re-firing the refused call from here would be
+    the engine deciding by itself to execute code a model has just written,
+    which is the one thing `run_python` is built not to be. The seat is told
+    and the seat chooses -- and `reopen_reads` has already dropped the dedup
+    entry, so the second call is allowed to land.
+    """
+    if path is None:
+        return result
+    key = str(path).lower()
+    refused = str(result).lstrip().startswith(("Error", "Refused", "Cannot"))
+    if refused:
+        # Only a refusal for a file that is STILL not there is waiting on a
+        # write. Every other refusal -- a bad anchor, a jail, a timeout -- is
+        # its own problem and a later write does not answer it.
+        if absent and not path.exists():
+            waiting = blocked.setdefault(key, [])
+            if action not in waiting:
+                waiting.append(action)
+        return result
+    if not (absent and path.exists()):
+        return result
+    waiting = blocked.pop(key, [])
+    if not waiting:
+        return result
+    names = ", ".join(f"`{a}`" for a in waiting)
+    was = "was" if len(waiting) == 1 else "were"
+    return (f"{result}\n\n"
+            f"{names} {was} refused earlier this turn because {path.name} did "
+            f"not exist. IT EXISTS NOW. Call it again if the objective still "
+            f"needs it — that refusal has been answered. Machine-emitted by "
+            f"comparing the refusal with the disk.")
+
+
 def recompose(ctx: RunContext, report=print) -> bool:
     """Put what actually happened back into what is delivered.
 
@@ -2468,6 +2569,26 @@ def recompose(ctx: RunContext, report=print) -> bool:
                   for n in (getattr(ctx, "notes", ()) or ()))
     missed = named if (named and named not in called and not refused) else ""
 
+    # THE CASE `missed` CANNOT SEE (2026-09-12, the coder flow's `verify`).
+    # `missed` needs a NAMED tool to compare against. When intent reads an
+    # objective as action-shaped it names none -- "Router decides the tool" --
+    # and if the Router then decides on none, both sides of that comparison
+    # are empty and no guard fires at all. That turn delivered "The result is:
+    # 5050" for a script nothing had run, and the flow's own check could not
+    # tell the difference.
+    #
+    # KEYED ON WHAT INTENT READ, NOT ON THE `needs_tool` FLAG. The flag is
+    # raised by several hands -- a write-shaped objective, a SEAT emitting
+    # <flags>needs_tool</flags> -- and in those a Router that decides no tool
+    # is needed may be perfectly right. `hands_wanted` is set only where the
+    # ENGINE read the objective as an order to act on something: then a turn
+    # with no call is a turn that did not do what it was told. Narrow and
+    # certainly right beats broad and crying wolf (HANDOFF, 2026-09-01), and
+    # the first draft of this was the broad one -- it accused the draft-review
+    # stroke, whose fixture raises the flag by hand and needs no tool at all.
+    nothing_ran = bool(getattr(ctx, "hands_wanted", "")
+                       and not named and not called and not refused)
+
     made_up = []
     # FROM THE STEPS, which is where tool results live. This read `ctx`
     # directly and got nothing: `tool_results` is a StepResult field ("what
@@ -2491,7 +2612,7 @@ def recompose(ctx: RunContext, report=print) -> bool:
     # Manjuel and nothing about Jesster's 577s. Same arithmetic.
     cut = [(s.agent, s.error) for s in ctx.steps if s.error]
     if (not fails and not partial and not late and not cut and not made_up
-            and not missed):
+            and not missed and not nothing_ran):
         return False
     last = next((s for s in reversed(ctx.steps)
                  if s.ok and (s.output or "").strip()), None)
@@ -2513,6 +2634,14 @@ def recompose(ctx: RunContext, report=print) -> bool:
             f"{', '.join(sorted(called)) or 'nothing'}. Whatever the words "
             f"above say, `{missed}` did not happen. Machine-emitted by "
             f"comparing what was named with what was called.")
+    if nothing_ran:
+        blocks.append(
+            "NO TOOL RAN. This objective was read as an ACTION and the Router "
+            "was woken to choose the tool for it; it chose none. Whatever the "
+            "words above say, nothing was read, run or written this turn -- so "
+            "any result in them came from a seat, not from the estate. "
+            "Machine-emitted by comparing what the objective asked for with "
+            "what was called.")
     if made_up:
         blocks.append(
             "A NUMBER NO TOOL RETURNED. These appear in the words above and in "

@@ -681,6 +681,39 @@ def gate_paths(spec, args: dict, env) -> str:
     return ""
 
 
+def declared_path(spec, args: dict, env):
+    """The file a call NAMES, resolved the way gate_paths resolves it -- or None.
+
+    A READER, NOT A GATE. gate_paths above is the gate and stays the gate;
+    this answers one narrower question, for the turn's own bookkeeping: which
+    file on disk is this call about? Every doubt returns None, so the worst a
+    drift between the two can do is fall silent -- which is exactly how this
+    ground behaved before it existed.
+
+    THE FIRST DECLARED PATH, not all of them. Every skill in this estate
+    declares at most one; a second would need its own answer here rather than
+    a guess about which one mattered.
+    """
+    if spec is None or not spec.path_args:
+        return None
+    for name, jail in spec.path_args:
+        raw = (args.get(name) or "").strip().strip("'\"`")
+        if not raw or jail not in JAILS:
+            continue
+        if raw.startswith(("/", "\\")) or ":" in raw:
+            return None
+        root = env.workspace if jail == "workspace" else Path(env.ground)
+        try:
+            cand = (Path(root) / raw).resolve()
+            base = Path(root).resolve()
+        except (OSError, ValueError):
+            return None
+        if cand != base and base not in cand.parents:
+            return None
+        return cand
+    return None
+
+
 @skill("ground_list")
 def _ground_list(env: SkillExecutionEnv, args: dict) -> str:
     """The ground as it stands on disk. Live, read-only.
@@ -1567,12 +1600,50 @@ def _read_file(env: SkillExecutionEnv, args: dict) -> str:
 
 @skill("write_file")
 def _write_file(env: SkillExecutionEnv, args: dict) -> str:
+    """Write one file into the workspace.
+
+    REFUSE BY PROOF, which `edit_file` and `land_code` already do and this door
+    did not. A `.py` that will not parse is not written, and the reply names
+    the line -- so the fault is found where it happens rather than one node
+    later, by a run that dies of it.
+
+    EARNED 2026-09-12, on the coder flow's own third live run. The seat's
+    markup leaked into the payload and `calculate_sum.py` was written as:
+
+        sum_result = (100 * 101) // 2
+        print(sum_result)
+        </parameter>
+        <flags>technical</flags>
+
+    It was written happily, `run_python` died of a SyntaxError, and the flow
+    spent a repair and a recheck on a file whose fault was already on disk.
+    `edit_file` would have refused the same bytes; the two doors into the same
+    workspace now hold the same line.
+
+    ONLY `.py`, and only PARSING -- the same bound edit_file draws. This is not
+    the structural gate the coder's own landing runs, and prose files are
+    nobody's syntax to judge.
+    """
+    import ast as _ast
+
     filename = args.get("filepath", "").strip()
     if not filename:
         return "Error: missing <filepath> parameter."
     path = env.safe_path(filename)
+    body = args.get("content", "")
+    if path.suffix.lower() == ".py":
+        try:
+            _ast.parse(body)
+        except SyntaxError as exc:
+            line = (exc.text or "").strip()
+            shown = f" The line: {line!r}." if line else ""
+            return (f"Refused: that content is not parseable Python -- "
+                    f"{exc.msg} at line {exc.lineno}.{shown} NOTHING WAS "
+                    f"WRITTEN. Send the code alone: a stray closing tag or a "
+                    f"flag block from your own answer counts as source here, "
+                    f"and it is the usual cause.")
     try:
-        path.write_text(args.get("content", ""), encoding="utf-8", newline="\r\n")
+        path.write_text(body, encoding="utf-8", newline="\r\n")
     except Exception as exc:
         return f"Write error: {exc}"
     return f"Saved to workspace: {path.name}"

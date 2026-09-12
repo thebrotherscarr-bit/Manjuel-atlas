@@ -41,6 +41,43 @@ class StepResult:
         return self.error is None and not self.skipped
 
 
+def tool_verdicts(steps, cap: int = 200) -> list[str]:
+    """What each tool SAID, one line each: `<tool>: <its own first line>`.
+
+    THE FACT, NOT THE ACCOUNT OF IT (LAW 5). A seat's delivery is its words
+    ABOUT a run; `run_python` writing `RAN: calc_sum.py` IS the run. Measured
+    2026-09-12: a flow's eval checked a `run` node for `RAN:` over a script
+    that had worked perfectly, and failed -- because the closing seat wrote
+    "the run_python tool executed the file and reported that it produced 5050
+    to stdout" instead of the verdict. The check was scoring a paraphrase.
+    Every marker that check could have hunted was at the mercy of a seat's
+    choice of words; this is the machine's own line, carried out whole.
+
+    FIRST LINE ONLY, and bounded. Every skill in this ground leads with its
+    verdict -- `RAN:`, `FAILED (exit 1):`, `Refused:`, `Saved to workspace:`,
+    `Edited x.py at line 8:` -- so the first line IS the answer and the body is
+    evidence the delivery already carries. A call whose result says nothing is
+    named with nothing after it rather than dropped: that it ran is itself a
+    fact.
+
+    `tool_calls` and `tool_results` are appended together, once per executed
+    call, so they are index-aligned; a call short of a result is reported
+    without one rather than paired with somebody else's.
+    """
+    out: list[str] = []
+    for s in steps:
+        calls = list(getattr(s, "tool_calls", ()) or [])
+        results = list(getattr(s, "tool_results", ()) or [])
+        for i, name in enumerate(calls):
+            head = ""
+            if i < len(results):
+                head = str(results[i] or "").strip().split("\n", 1)[0].strip()
+            if len(head) > cap:
+                head = head[:cap].rstrip() + " ..."
+            out.append(f"{name}: {head}" if head else f"{name}:")
+    return out
+
+
 def _entry(e):
     """(who, what, ts) from either the old 2-shape or the new 3-shape."""
     who, what = e[0], e[1]

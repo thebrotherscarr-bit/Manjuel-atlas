@@ -1270,6 +1270,84 @@ def test_the_dedup_covers_the_run(reg, lib, book):
           hasattr(ctx, "ran_calls") and ctx.ran_calls == {})
 
 
+def test_the_refusal_a_later_write_answers(reg, lib, book):
+    """The coder flow's first live run, 2026-09-12.
+
+    The Router asked `run_python` for `probe.py` and was refused -- "there is
+    no 'probe.py' in the workspace to run. Write it first." It then wrote the
+    file with `write_file` and stopped, because nothing joined the two. Its own
+    deliberation: "write_file succeeded but run_python failed ... This seems
+    like a contradiction." 332 of that run's 646 seconds went into the
+    contradiction, and probe.py was never run.
+
+    The write now carries the news, read off the disk rather than off anything
+    a seat said. IT TELLS; IT DOES NOT RUN -- the engine firing code a model
+    has just written, on its own initiative, is precisely what run_python is
+    built not to be.
+    """
+    import tempfile
+    from pathlib import Path as _P
+    from manjuel.pipeline import carry_unblocked
+    from manjuel.skills import declared_path
+
+    with tempfile.TemporaryDirectory() as d:
+        probe, other = _P(d) / "probe.py", _P(d) / "notes.md"
+
+        # THE WAY IT MUST FIRE -- the run that was actually measured
+        blocked = {}
+        out = carry_unblocked(
+            "Refused: there is no 'probe.py' in the workspace to run. "
+            "Write it first.", "run_python", probe, True, blocked)
+        check("the refusal itself is passed through untouched",
+              out.startswith("Refused:") and "IT EXISTS NOW" not in out, out)
+        check("and the call is remembered against the file it waited on",
+              list(blocked.values()) == [["run_python"]], str(blocked))
+
+        probe.write_text("print('hi')\n")
+        out = carry_unblocked("Saved to workspace: probe.py", "write_file",
+                              probe, True, blocked)
+        check("the write that answers the refusal says so",
+              "`run_python`" in out and "IT EXISTS NOW" in out, out)
+        check("the write's own result is still the first thing in it",
+              out.startswith("Saved to workspace: probe.py"), out)
+        check("and it is said ONCE -- the waiting call is dropped",
+              blocked == {}, str(blocked))
+
+        # AND THE THREE WAYS IT MUST NOT
+        blocked = {}
+        other.write_text("x\n")
+        out = carry_unblocked("Saved to workspace: notes.md", "write_file",
+                              other, True, blocked)
+        check("a write nothing was waiting on says nothing extra",
+              out == "Saved to workspace: notes.md", out)
+
+        blocked = {}
+        carry_unblocked(
+            "Refused: that passage appears 3 times in notes.md, and an anchor "
+            "that matches more than once does not say which.",
+            "edit_file", other, False, blocked)
+        check("a refusal for a file that IS there waits on no write",
+              blocked == {}, str(blocked))
+
+        blocked, gone = {}, _P(d) / "absent.py"
+        carry_unblocked("Refused: there is no 'absent.py' in the workspace to "
+                        "run. Write it first.", "run_python", gone, True, blocked)
+        out = carry_unblocked("Saved to workspace: notes.md", "write_file",
+                              other, True, blocked)
+        check("a write of a DIFFERENT file answers nothing",
+              out == "Saved to workspace: notes.md", out)
+        check("and the call still waits on the file it actually named",
+              list(blocked.values()) == [["run_python"]], str(blocked))
+
+    # the reader that says WHICH file a call is about
+    check("run_python declares the workspace path it names",
+          bool(lib.spec("run_python") and lib.spec("run_python").path_args),
+          str(lib.spec("run_python")))
+    check("and a skill declaring no path names no file, so nothing is tracked",
+          declared_path(lib.spec("git_status"), {"filepath": "x.py"}, None)
+          is None)
+
+
 def test_a_named_tool_that_did_not_run(reg, lib, book):
     """A push that reports success without pushing (2026-09-10).
 
@@ -10188,6 +10266,273 @@ def test_the_mcp_skill_never_leaves_this_machine(reg, lib, book):
           "substring matching would call a tool nobody named")
 
 
+def test_a_keyword_that_is_grammar_must_be_named(reg, lib, book):
+    """A skill called `when`, and the word "when" in every third sentence.
+
+    EARNED 2026-09-12 on the coder flow. `verify`'s objective carried a brief
+    reading "...when executed, it should print 55", and intent dispatched the
+    `when` skill -- a transcript-window reader, woken to answer a question
+    about a Python file, on the strength of a subordinate clause. The match was
+    not loose: `when` really is a keyword. The fault is that a FUNCTION word
+    carries no subject of its own, so it is grammar unless the sentence is
+    plainly about it.
+
+    CONTENT words are left alone. `inspect`, `remember`, `statistics` are
+    keywords too, and someone who writes them usually does mean the thing.
+
+    And the cure for a skill caught by this is its own markdown: a declared
+    `**Says:**` phrase is already a naming, so `when.md` now declares the
+    phrases its Description had been listing in prose all along.
+    """
+    from manjuel import intent
+
+    def named(text):
+        return intent.names_a_tool(text, lib) or ""
+
+    # THE WAY IT MUST FIRE -- grammar is not a dispatch
+    check("a `when` clause mid-sentence names nothing",
+          named("Run the .py file this task names: FILE: t.py -- when "
+                "executed it should print 55") == "",
+          named("... when executed it should print 55"))
+    check("nor does one at the end",
+          named("write a script and report what it said when it ran") == "")
+
+    # AND THE WAYS IT MUST NOT -- the skill stays reachable
+    check("a question that OPENS with it is about time",
+          named("when this week") == "when")
+    check("a bare period question reaches it",
+          named("when") == "when")
+    check("a word wearing quotes is a word being named",
+          named("call `when` for me") == "when")
+    check("and its declared phrases reach it, which is the real door",
+          named("what ran yesterday") == "when"
+          and named("what did we do this week") == "when",
+          f"{named('what ran yesterday')} / {named('what did we do this week')}")
+
+    # a declared phrase is NEVER held to the rule -- it is already a naming
+    spec = lib.spec("when")
+    check("`when` declares its phrases in its own markdown",
+          bool(getattr(spec, "says", ()) or ()), str(spec and spec.says))
+
+    # CONTENT-WORD KEYWORDS ARE UNTOUCHED
+    check("a content word still dispatches from mid-sentence",
+          named("please inspect probe.py now") == "inspect",
+          named("please inspect probe.py now"))
+    check("and a multi-word keyword was never in question",
+          named("git commit the work") == "git_commit")
+
+
+def test_an_order_to_run_a_script_is_arithmetic(reg, lib, book):
+    """The Router was deciding not to run files it had been told to run.
+
+    EARNED 2026-09-12, twice on the coder flow's `verify` node, for two
+    different reasons:
+
+      - it wrote the file and then stopped, never running it;
+      - it answered "NO skill is needed -- the result 5050 has already been
+        provided via the steward record from this very session", where the
+        Steward's own words were "I will run the .py file ... The result is:
+        5050" over a script nothing had executed.
+
+    Both times a seat's judgement stood where arithmetic was available. The
+    objective says RUN, it names a `.py`, and whether that file is on disk is
+    a FACT -- so the engine decides the call and the Router reads the result,
+    the same shape `ground_read` and `ground_list` already use.
+    """
+    from manjuel import intent
+
+    # the verb has to mean EXECUTE, and the file has to be Python
+    check("an order to run a script is read as one",
+          intent.wants_running("run probe.py") == "probe.py")
+    check("and so is the flow's own wording",
+          intent.wants_running(
+              "Run the .py file this task names and report exactly what it "
+              "said: write calc.py, it should print 5050") == "calc.py")
+    check("execute is the same order", intent.wants_running("execute calc.py") == "calc.py")
+
+    # AND THE WAYS IT MUST NOT FIRE
+    check("no verb, no order", intent.wants_running("probe.py") == "")
+    check("a verb with no file names nothing",
+          intent.wants_running("run the tests") == "")
+    check("run_python runs PYTHON -- a .md is not this skill's business",
+          intent.wants_running("run notes.md") == "")
+    check("and reading a file is still a read",
+          intent.wants_running("read probe.py") == "")
+
+    # the branch order matters: names_a_file would make this a READ, and a
+    # seat handed source code and asked what it printed answers from the code
+    check("an order to RUN is not an order to read",
+          intent.names_a_file("run probe.py") == "probe.py"
+          and intent.wants_running("run probe.py") == "probe.py")
+
+
+def test_a_turn_that_wanted_hands_and_used_none_says_so(reg, lib, book):
+    """`missed` needs a NAMED tool to compare against; this is the gap.
+
+    When intent reads an objective as action-shaped it names no tool -- the
+    note says "Router decides the tool" -- so if the Router then decides on
+    none, BOTH sides of that comparison are empty and no guard fires. The
+    turn of 2026-09-12 delivered "The result is: 5050" for a script nothing
+    had run, and the flow's check could not tell the difference.
+    """
+    from manjuel.pipeline import recompose
+
+    def turn(why, calls, out="The result is: 5050"):
+        c = RunContext(objective="Run the .py file this task names.")
+        c.flags.add("needs_tool")
+        if why:
+            c.hands_wanted = why
+        # THE TOOL RESULT CARRIES THE NUMBER when a tool ran. The first draft
+        # of this fixture said "RAN: x.py" while the words said 5050, and the
+        # INVENTED-NUMBER guard fired on it -- correctly, and for a reason
+        # that had nothing to do with this stroke. A fixture has to be honest
+        # about the thing it is not testing.
+        c.steps.append(StepResult(agent="Steward", model="m", output=out,
+                                  tool_calls=list(calls),
+                                  tool_results=["RAN: x.py\n5050"] if calls else []))
+        return c
+
+    # THE WAY IT MUST FIRE
+    c = turn("action-shaped", [])
+    check("a turn that wanted hands and used none is recomposed",
+          recompose(c, report=lambda *a, **k: None) is True)
+    said = c.steps[-1].output
+    check("and the delivery says no tool ran", "NO TOOL RAN" in said, said[:120])
+    check("naming where the words came from instead",
+          "came from a seat, not from the estate" in said, said[-160:])
+
+    # AND THE WAYS IT MUST NOT
+    c = turn("action-shaped", ["run_python"])
+    check("a turn that DID call something is left alone",
+          recompose(c, report=lambda *a, **k: None) is False)
+    check("and its words are untouched",
+          "NO TOOL RAN" not in c.steps[-1].output)
+
+    c = turn("", [])
+    check("a conversation was never asked for hands",
+          recompose(c, report=lambda *a, **k: None) is False, c.steps[-1].output[:80])
+
+    # NEVER ON A REFUSAL -- when a gate refuses, no tool runs and the refusal
+    # IS the answer; crying about it there teaches the reader to skip the guard
+    c = turn("action-shaped", [])
+    c.notes.append("hard gate: an instruction to ignore instructions")
+    check("a refused turn is not accused of using no tool",
+          "NO TOOL RAN" not in (c.steps[-1].output
+                                if recompose(c, report=lambda *a, **k: None)
+                                else c.steps[-1].output))
+
+
+def test_the_tools_own_words_leave_the_turn(reg, lib, book):
+    """What the tools SAID, carried out beside what the seats said about it.
+
+    EARNED 2026-09-12. A flow's eval node checked a `run` node for `RAN:` over
+    a script that had worked perfectly, and failed -- because the closing seat
+    wrote "the run_python tool executed the file and reported that it produced
+    5050 to stdout" instead of the verdict. The check was scoring a PARAPHRASE.
+    No matching mode reaches that: whatever marker the check hunts, the seat is
+    free not to write it.
+
+    The verdict lines were being collected (StepResult.tool_results, since the
+    2026-09-08 review) and thrown away at the wire. LAW 5: the delivery is
+    testimony, `RAN: calc.py` is the run.
+    """
+    from manjuel.context import tool_verdicts
+
+    def step(calls, results):
+        return StepResult(agent="Router", model="m", output="words",
+                          tool_calls=list(calls), tool_results=list(results))
+
+    # the run that was measured, both halves of it
+    good = step(["write_file", "run_python"],
+                ["Saved to workspace: calc.py",
+                 "RAN: calc.py\n--- stdout ---\n5050"])
+    lines = tool_verdicts([good])
+    check("every executed call is named", len(lines) == 2, str(lines))
+    check("and the verdict line survives whole",
+          "run_python: RAN: calc.py" in lines, str(lines))
+    check("the FIRST line only -- the body is evidence the delivery carries",
+          all("5050" not in l for l in lines), str(lines))
+
+    bad = step(["run_python"], ["FAILED (exit 1): calc.py\n--- stderr ---\nSyntaxError"])
+    check("a failure leaves whole too",
+          tool_verdicts([bad]) == ["run_python: FAILED (exit 1): calc.py"],
+          str(tool_verdicts([bad])))
+
+    # THE POINT OF ALL OF IT: a check over these scores the RUN, not the words
+    paraphrase = ("The run_python tool executed the file and reported that it "
+                  "produced 5050 to stdout. The task is now complete.")
+    check("the seat's own words carry no verdict at all",
+          "RAN:" not in paraphrase and "FAILED" not in paraphrase)
+    check("and the machine's line does",
+          "RAN:" in "\n".join(tool_verdicts([good])))
+
+    # AND THE WAYS IT MUST NOT FIRE
+    check("a seat that called nothing says nothing", tool_verdicts([step([], [])]) == [])
+    check("no steps at all is not an error", tool_verdicts([]) == [])
+
+    # a call short of a result is reported WITHOUT one, never paired with
+    # somebody else's -- the alignment is the whole basis of the pairing
+    short = step(["write_file", "run_python"], ["Saved to workspace: calc.py"])
+    check("a call with no result is named bare",
+          tool_verdicts([short]) == ["write_file: Saved to workspace: calc.py",
+                                     "run_python:"],
+          str(tool_verdicts([short])))
+
+    # and a long first line is bounded rather than dragged out whole
+    long_line = step(["ground_read"], ["x" * 600])
+    out = tool_verdicts([long_line])[0]
+    check("a long verdict is capped and says so",
+          len(out) < 260 and out.endswith("..."), out[-40:])
+
+
+def test_a_write_refuses_python_that_will_not_parse(reg, lib, book):
+    """`write_file` checks before it writes, the way `edit_file` already did.
+
+    EARNED 2026-09-12 on the coder flow's third live run. The seat's own markup
+    leaked into the payload and calculate_sum.py was written as sound code
+    followed by `</parameter>` and a `<flags>` block. It was written happily;
+    `run_python` then died of a SyntaxError, and the flow spent a repair and a
+    recheck on a fault that was already on disk before the first run.
+
+    Two doors open on the same workspace and only one of them looked.
+    """
+    g = Path(tempfile.mkdtemp())
+    env = env_for(g, reg, Stub())
+    ws = g / "agent_workspace"
+
+    # THE WAY IT MUST FIRE -- the bytes actually written that day
+    leaked = ("sum_result = (100 * 101) // 2\nprint(sum_result)\n"
+              "</parameter>\n<flags>technical</flags>")
+    out = lib.execute("write_file", {"filepath": "calc.py", "content": leaked}, env)
+    check("markup that leaked into the code is refused",
+          out.startswith("Refused") and "NOTHING WAS WRITTEN" in out, out[:120])
+    check("and the refusal names the line it died on", "line" in out, out[:120])
+    check("a refused write leaves NO file behind",
+          not (ws / "calc.py").exists(), str(sorted(x.name for x in ws.iterdir())))
+
+    # AND THE WAYS IT MUST NOT
+    ok = lib.execute("write_file", {"filepath": "calc.py",
+                                    "content": "print(1 + 1)\n"}, env)
+    check("real Python is written", ok.startswith("Saved"), ok[:80])
+    check("and it is on disk", (ws / "calc.py").is_file())
+
+    md = lib.execute("write_file", {"filepath": "notes.md",
+                                    "content": "# hi\n</parameter>\n"}, env)
+    check("a non-.py file is nobody's syntax to judge", md.startswith("Saved"), md[:80])
+
+    empty = lib.execute("write_file", {"filepath": "blank.py", "content": ""}, env)
+    check("an empty .py parses and is allowed", empty.startswith("Saved"), empty[:80])
+
+    # the two doors now hold the same line
+    bad = lib.execute("edit_file", {"filepath": "calc.py",
+                                    "content": "@@ OLD\nprint(1 + 1)\n@@ NEW\nprint(1 +"}, env)
+    check("and edit_file still refuses the same way it always did",
+          bad.startswith("Refused"), bad[:80])
+    check("leaving the good file untouched",
+          (ws / "calc.py").read_text(encoding="utf-8").strip() == "print(1 + 1)",
+          (ws / "calc.py").read_text(encoding="utf-8"))
+
+
 def test_an_edit_refuses_an_anchor_that_does_not_say_which(reg, lib, book):
     """`edit_file`, built 2026-09-11 so the coder can change a file it cannot
     hold.
@@ -11918,6 +12263,7 @@ def main() -> int:
     test_rack(reg, lib)
     test_the_version_agrees_with_itself(reg, lib, book)
     test_the_dedup_covers_the_run(reg, lib, book)
+    test_the_refusal_a_later_write_answers(reg, lib, book)
     test_a_named_tool_that_did_not_run(reg, lib, book)
     test_a_number_no_tool_returned(reg, lib, book)
     test_an_uncited_claim_is_measured(reg, lib, book)
@@ -12045,6 +12391,11 @@ def main() -> int:
     test_the_citation_check(reg, lib, book)
     test_sitting48_no_router_for_greetings(reg, lib, book)
     test_path_gate(reg, lib, book)
+    test_a_keyword_that_is_grammar_must_be_named(reg, lib, book)
+    test_an_order_to_run_a_script_is_arithmetic(reg, lib, book)
+    test_a_turn_that_wanted_hands_and_used_none_says_so(reg, lib, book)
+    test_the_tools_own_words_leave_the_turn(reg, lib, book)
+    test_a_write_refuses_python_that_will_not_parse(reg, lib, book)
     test_an_edit_refuses_an_anchor_that_does_not_say_which(reg, lib, book)
     test_a_run_is_bounded_jailed_and_blind_to_the_keys(reg, lib, book)
     test_a_hook_watches_a_call_without_taking_it_over(reg, lib, book)

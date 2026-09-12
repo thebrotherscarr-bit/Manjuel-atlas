@@ -327,22 +327,40 @@ The Evaluator's `NEEDS:` is ONE pass back inside a single turn. For work that
 wants more than that, the shape below is a flow, gated, across turns:
 
 ```
-attempt ──always──→ verify ──always──→ check ──pass──→ land (gate)
-                                         │
-                                         └──fail──→ repair ──always──→ recheck ──always──→ land
+brief ──always──→ attempt ──always──→ verify ──always──→ check ──pass──→ land (gate)
+                                                           │
+                                                           └──fail──→ repair ──→ recheck ──→ land
 ```
 
-    attempt   run    write what the objective asks for into the workspace
-    verify    run    run it and report exactly what it said
+    brief     ask    turn the hand's one line into ONE concrete task: the
+                     exact .py filename, and what a run of it should print
+    attempt   run    write what that task asks for, at the filename it names
+    verify    run    run the file that task names, report exactly what it said
     check     eval   on `verify`, expecting RAN
-    repair    run    read what it said and EDIT the file to fix it
+    repair    run    read what it said and EDIT that file to fix it
     recheck   run    run it again
     land      gate   nothing has reached the estate; carry on, or stop here
 
-Six nodes, budget 1800s. THE RETRY IS UNROLLED, not looped: `Validate` refuses
-cycles, so the bound is structural rather than a counter somebody can raise.
-Every node runs inside the workspace jail and the flow ends at a GATE, because
-landing is the operator's act and nothing else (RULE 6).
+Seven nodes, budget 1800s. THE RETRY IS UNROLLED, not looped: `Validate`
+refuses cycles, so the bound is structural rather than a counter somebody can
+raise. Every node runs inside the workspace jail and the flow ends at a GATE,
+because landing is the operator's act and nothing else (RULE 6).
+
+THE HEAD IS AN `ask`, AND ITS ABSENCE IS WHY v1 WAS HOLLOW. v1 began at
+`attempt`, whose objective read "write the code THE OBJECTIVE ASKS FOR" --
+referring to an objective no node carried. Fired 2026-09-12 it traversed all
+six nodes in 646s and built nothing, because the seats were right to refuse:
+"there's no source material or specification about what code to write." The
+five `run` nodes now carry `{{out_brief}}`, and `brief` carries
+`{{objective}}`, which the hand supplies when firing. A var nothing supplies
+is REFUSED, never guessed -- `play.Render` answers "nothing is guessed" -- so
+an empty fire stops at the first node rather than spending the budget finding
+out it has nothing to build.
+
+ONE VOICE FOR THE HEAD, NOT THE COUNCIL. `ask` is a single model; `run` is the
+whole council, law gate and Router and tools. Turning one line into a task
+statement is the smallest thing that could do that job, which is SITTING LAW 3
+read as a question about a node.
 
 THE SHAPE IS WRITTEN HERE BECAUSE THE FLOW ITSELF IS NOT IN THE RECORD.
 `flows/` is the engine's runtime store and is gitignored -- specs, their folded
