@@ -321,3 +321,9 @@
 {"suite": "smoke", "at": 1789243275.7837474, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
 {"suite": "strokes", "at": 1789244658.071915, "state": "finished", "passed": 2318, "total": 2318, "green": true, "failed": []}
 {"suite": "smoke", "at": 1789244662.0172927, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789246999.8444743, "state": "finished", "passed": 2331, "total": 2333, "green": false, "failed": ["a `when` clause mid-sentence still names nothing", "no two strokes share a name, so a red names one thing"]}
+{"suite": "strokes", "at": 1789247074.1765926, "state": "finished", "passed": 2333, "total": 2333, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789247078.308768, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789247316.8578892, "state": "finished", "passed": 2333, "total": 2333, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789247320.7738316, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789247426.6707428, "state": "finished", "passed": 2333, "total": 2333, "green": true, "failed": []}

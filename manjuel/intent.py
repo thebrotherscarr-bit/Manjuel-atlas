@@ -412,19 +412,77 @@ _FUNCTION_WORDS = frozenset({
 _QUOTED = "`'\"*"
 
 
+# A KEYWORD WHOSE ARGUMENT IS A NUMBER WANTS A NUMBER BESIDE IT.
+#
+# `when` was fixed by asking whether a function word was NAMED or merely
+# spoken. `sitting` is the next collision and needs a different question,
+# because it is a CONTENT word: `skills/sitting.md` resolves a numbered
+# sitting -- "review sitting 63", "what ran in sitting 47" -- and this estate
+# says the bare word constantly. CLAUDE.md and `law/` alone carry it 58 times:
+# "while the operator's sitting is open", "mid-sitting", "the sitting laws".
+#
+# THE SKILL'S OWN DECLARATION IS THE TEST, not a list beside it. `sitting.md`
+# says its argument is "The sitting number alone, e.g. 63", so a naming has a
+# number next to it and a mention does not. Read off `param_notes` -- the
+# author's own words -- which is the same doctrine that put phrases in
+# `**Says:**` (sitting 66: markdown declares, Python only runs it).
+_NUMERIC_PARAM = re.compile(r"\bnumber\b", re.I)
+
+# How far after the keyword a digit may sit and still be its argument:
+# "sitting 63", "sitting number 63", "sitting #63" all count; "sitting is
+# open" does not.
+_NUMBER_WINDOW = 2
+
+
+def _wants_a_number(spec) -> bool:
+    """Does this skill's own markdown describe its argument as a number?"""
+    if spec is None:
+        return False
+    try:
+        notes = spec.param_notes or {}
+    except Exception:
+        return False
+    return any(_NUMERIC_PARAM.search(str(v or "")) for v in notes.values())
+
+
+def _number_follows(form: str, hay: str) -> bool:
+    """Is there a digit within `_NUMBER_WINDOW` words after this form in hay?
+
+    `hay` is normalised, so punctuation is already gone and "sitting 84's
+    toll" reads as "sitting 84 s toll" -- which is still a naming, and still
+    finds its number.
+    """
+    words = hay.split()
+    n = len(form.split())
+    for i in range(len(words) - n + 1):
+        if words[i:i + n] == form.split():
+            for w in words[i + n:i + n + _NUMBER_WINDOW]:
+                if any(ch.isdigit() for ch in w):
+                    return True
+    return False
+
+
+def _wears_quotes(form: str, raw: str) -> bool:
+    """A word wearing quotes is a word being NAMED rather than used."""
+    return any(f"{q}{form}{q}" in raw.lower() for q in _QUOTED)
+
+
 def _named_not_used(form: str, hay: str, raw: str) -> bool:
-    """Is this function-word form being NAMED here, rather than spoken?
+    """Is this FUNCTION-WORD form being NAMED here, rather than spoken?
 
     Two ways, both structural: it OPENS the objective ("when did we last
     commit" is a question about time; "...when executed" is a clause), or it
     wears quotes in the raw text ("call `when`").
+
+    THE OPENING CLAUSE IS FOR FUNCTION WORDS ONLY, and the numeric rule below
+    must not borrow it -- see `_wants_a_number`'s use. A WH-word at the front
+    of a sentence IS the question; a content word at the front is just a
+    sentence. `ALIASES` carries "the sitting", so "the sitting laws bind any
+    hand" opens with the form and means nothing of the kind.
     """
     if hay == form or hay.startswith(form + " "):
         return True
-    for q in _QUOTED:
-        if f"{q}{form}{q}" in raw.lower():
-            return True
-    return False
+    return _wears_quotes(form, raw)
 
 
 def names_a_tool(objective: str, keywords) -> str:
@@ -459,6 +517,7 @@ def names_a_tool(objective: str, keywords) -> str:
     hits: list[tuple[int, str]] = []
     for kw in kws:
         declared: tuple = ()
+        spec = None
         if lib is not None:
             spec = lib.spec(kw)
             declared = tuple(getattr(spec, "says", ()) or ()) if spec else ()
@@ -475,6 +534,13 @@ def names_a_tool(objective: str, keywords) -> str:
                 continue
             if (not is_phrase and f in _FUNCTION_WORDS
                     and not _named_not_used(f, hay, objective or "")):
+                continue
+            # A bare keyword whose declared argument is a NUMBER is only a
+            # naming with a number beside it. A declared PHRASE is exempt for
+            # the same reason it is exempt above: a phrase is already a naming.
+            if (not is_phrase and _wants_a_number(spec)
+                    and not _number_follows(f, hay)
+                    and not _wears_quotes(f, objective or "")):
                 continue
             hits.append((len(f), kw))
     if not hits:

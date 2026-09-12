@@ -42,6 +42,50 @@ files that hold the number both moved — `manjuel/__init__.py` and
 same by every file that holds it", and `RUNBOOK.md`'s pre-tag line moved
 with them because `release.py --check 0.1.11` names the tag being cut.
 
+### `sitting` was the next collision, and the root docs now match their own ruling
+
+Two of the review's open items, closed.
+
+**`sitting` NEEDED A DIFFERENT QUESTION FROM `when`'S.** `when` was fixed by
+asking whether a FUNCTION word was being named or merely spoken. `sitting` is a
+CONTENT word this estate says constantly -- CLAUDE.md and `law/` carry the bare
+word 58 times: "while the operator's sitting is open", "the sitting laws", "a
+sitting that closes without a toll". Every one of them would have woken a
+transcript reader.
+
+THE SKILL'S OWN DECLARATION IS THE TEST. `skills/sitting.md` says its argument
+is "The sitting number alone, e.g. 63", so a naming carries a number and a
+mention does not. Read off `param_notes` -- the author's own words -- which is
+the doctrine that put phrases in `**Says:**` (sitting 66: markdown declares,
+Python only runs it). Any future numeric skill arrives with the rule applied.
+
+AND IT MUST NOT BORROW `when`'S "OPENS THE OBJECTIVE" CLAUSE. That was the
+first draft and a stroke caught it: `ALIASES` carries "the sitting", so "the
+sitting laws bind any hand" OPENED with the form and read as a naming. A
+WH-word at the front of a sentence IS the question; a content word at the front
+is just a sentence. For a numeric keyword the NUMBER carries the naming and
+position means nothing -- so the two rules share only the quoted-word clause.
+
+Strokes 2318 -> 2333. A second red in the same run was the duplicate-name guard
+catching a check label reused from the `when` stroke, and a third was a test
+sentence of mine that said "run the file" -- which legitimately names
+`ground_read` by its own alias. Both were the test's fault, not the code's.
+
+**THE ROOT DOCS NOW MATCH `.gitattributes`.** Ten of twenty-three root `.md`
+files were LF in the working tree while `.gitattributes` declares
+`* text=auto eol=crlf` -- the operator's ruling, 2026-09-03: "this is a Windows
+estate and the record is CRLF."
+
+The review called it cosmetic because a fresh clone is normalised either way,
+and that part holds. The reason to fix it is the OTHER hazard: an LF file
+edited by a CRLF-writing tool becomes MIXED, which this ground forbids
+outright -- and it happened during this very session, when a `sed -i` on
+HANDOFF.md stripped every CRLF in the file and had to be undone.
+
+CONTENT IS UNCHANGED AND THAT WAS VERIFIED, not assumed: each of the ten was
+compared against `HEAD` with terminators normalised on both sides, and all ten
+are byte-identical. The diff is terminators only. No root doc is MIXED.
+
 ### The verdict lines carry the body, because prose cannot be scored
 
 `tool_verdicts` carried the FIRST LINE of each tool result and no more, on the

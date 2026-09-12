@@ -10266,6 +10266,77 @@ def test_the_mcp_skill_never_leaves_this_machine(reg, lib, book):
           "substring matching would call a tool nobody named")
 
 
+def test_a_keyword_whose_argument_is_a_number_wants_one(reg, lib, book):
+    """`sitting` was the next `names_a_tool` collision, and it needed a
+    different question from `when`'s.
+
+    NAMED IN THE REVIEW OF 2026-09-12 as the one most likely to bite: `when`
+    was fixed by asking whether a FUNCTION word was named or merely spoken,
+    and `sitting` is a CONTENT word this estate says constantly. CLAUDE.md and
+    `law/` carry the bare word 58 times -- "while the operator's sitting is
+    open", "the sitting laws", "a sitting that closes without a toll" -- and
+    every one of them would have woken a transcript reader.
+
+    THE SKILL'S OWN DECLARATION IS THE TEST. `skills/sitting.md` says its
+    argument is "The sitting number alone, e.g. 63", so a naming carries a
+    number and a mention does not. Read off `param_notes`, the author's own
+    words, which is the doctrine that put phrases in `**Says:**` (sitting 66:
+    markdown declares, Python only runs it). A future numeric skill arrives
+    with the rule already applied.
+
+    AND IT DOES NOT BORROW `when`'S "OPENS THE OBJECTIVE" CLAUSE. That was the
+    first draft and it was wrong: `ALIASES` carries "the sitting", so "the
+    sitting laws bind any hand" opened with the form and read as a naming. A
+    WH-word at the front of a sentence IS the question; a content word at the
+    front is just a sentence. For a numeric keyword the NUMBER carries the
+    naming and position means nothing.
+    """
+    from manjuel import intent
+
+    def named(text):
+        return intent.names_a_tool(text, lib) or ""
+
+    check("`sitting` declares a NUMBER as its argument, in its own markdown",
+          intent._wants_a_number(lib.spec("sitting")),
+          str(lib.spec("sitting").param_notes))
+
+    # THE WAY IT MUST FIRE -- a number beside it is a naming
+    for text in ("review sitting 63", "sitting 12", "what ran in sitting 47",
+                 "sitting number 84", "the sitting 63"):
+        check(f"a numbered sitting reaches the skill: {text!r}",
+              named(text) == "sitting", named(text))
+
+    # a word wearing quotes is still a naming, the one clause it does share
+    check("and a quoted keyword is a naming with no number at all",
+          named("call `sitting` for me") == "sitting",
+          named("call `sitting` for me"))
+
+    # AND THE WAYS IT MUST NOT -- the estate's own prose, verbatim shapes
+    for text in ("nothing is edited while the operator sitting is open",
+                 "the sitting laws bind any hand",
+                 "a sitting that closes without a toll gets an honest entry",
+                 "mid-sitting the ground moved under his hands"):
+        check(f"prose about a sitting dispatches nothing: {text[:44]!r}",
+              named(text) == "", named(text))
+
+    # `when`'S GUARD IS UNTOUCHED. Two rules over the same function, and the
+    # second must not have loosened the first.
+    # "run the file" legitimately names `ground_read` by its own alias, so the
+    # text has to isolate the clause in order to test the clause.
+    check("a `when` clause mid-sentence still names nothing",
+          named("it should print 55 when executed") == "",
+          named("it should print 55 when executed"))
+    check("and `when`'s own declared phrases still reach it",
+          named("what ran yesterday") == "when", named("what ran yesterday"))
+
+    # CONTENT-WORD KEYWORDS THAT DECLARE NO NUMBER ARE UNTOUCHED
+    check("a keyword with no numeric argument still dispatches from prose",
+          named("please inspect probe.py now") == "inspect",
+          named("please inspect probe.py now"))
+    check("and the numeric rule did not touch multi-word keywords either",
+          named("git commit the work") == "git_commit")
+
+
 def test_a_keyword_that_is_grammar_must_be_named(reg, lib, book):
     """A skill called `when`, and the word "when" in every third sentence.
 
@@ -12419,6 +12490,7 @@ def main() -> int:
     test_the_citation_check(reg, lib, book)
     test_sitting48_no_router_for_greetings(reg, lib, book)
     test_path_gate(reg, lib, book)
+    test_a_keyword_whose_argument_is_a_number_wants_one(reg, lib, book)
     test_a_keyword_that_is_grammar_must_be_named(reg, lib, book)
     test_an_order_to_run_a_script_is_arithmetic(reg, lib, book)
     test_a_turn_that_wanted_hands_and_used_none_says_so(reg, lib, book)

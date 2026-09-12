@@ -11,13 +11,39 @@ have your own personal digital assistant on your own home network with your
 files and your functionality … basically the software side of the NAS, you
 just add whatever hardware to it."*
 
-*Grounded in the disk as of today: `Desktop\Research` (Manjuel, 0.1.6
-unsealed, the headless door landed today), `Desktop\Archive\atlas` (the
-spine, THE LINE, the faces — an artifact, pulled in as needed),
-`worlds\TBC` (the business: four billed visits, one estimate, the
-templates, the hub prototypes, the estimate CLI, the plans), and
+*Grounded in the disk AS OF THE DRAFTING, 2026-09-08: `Desktop\Research`
+(Manjuel, 0.1.6 unsealed, the headless door landed that day),
+`Desktop\Archive\atlas` (the spine, THE LINE, the faces — an artifact,
+pulled in as needed), `worlds\TBC` (the business), and
 `SPEC_CONTROL_CENTER.md` (the glass). Nothing here is a work order until he
 names the piece. Placeholders stand where names were.*
+
+*Two of those have MOVED since and the line above is left as the record of
+what was true when it was written: Manjuel is 0.1.11, and atlas is a
+repository of its own inside the ground at `atlas/` — not an artifact
+pulled from the attic. Section 6 is still the build order.*
+
+**HOW TO READ A PATH IN THIS DOCUMENT.** Added 2026-09-12, after a doc-truth
+pass over this file reported eight “dead” references that were nothing of
+the kind. Three different things look identical here, and nothing said which
+was which:
+
+    `manjuel/intent.py`      IN THIS GROUND. It exists, and if it does not,
+                             that is a defect worth reporting.
+    `ROUTES.md` *(planned)*  A THING THIS DESIGN ASKS FOR. It does not exist
+                             yet and its absence is the POINT — §6 is the
+                             build order, and these are what it orders.
+    the business's own files  IN ANOTHER WORLD, described as INPUTS. They are
+                             not in this repository and never will be; a
+                             checker looking for them here is asking the wrong
+                             question of the wrong disk.
+
+The pass that found them checked every path-shaped token against
+`Desktop\Research` and called the second and third kinds dead. It was right
+about the disk and wrong about the question — which is the same fault, in a
+tool, that this document exists to avoid in a design. Planned artifacts carry
+*(planned)* from here on; anything belonging to another world is named as that
+world's rather than left looking like a missing file.
 
 ---
 
@@ -41,7 +67,7 @@ GPU; the software is what this estate already is, finished and joined.
 | # | Requirement | Where it comes from |
 |---|---|---|
 | F1 | **Hold the record.** Every document, photo, note, invoice, estimate, contract and log a household or business produces, on the box, in plain files, append-only, hashed on arrival. | Manjuel LAW 1 (fold, never delete); atlas `state = fold(record)`; TBC `Filed\{property}\{date}\` already does this by hand |
-| F2 | **Understand what the operator says, in context.** A typed or spoken line routes to the right world and pipeline by rules first, arithmetic second, a model last — and the seat that answers holds that world's standing, story and index. | Manjuel `intent.py`, `ROUTES.md` (spec §4.4), the story block, `semantic_search` |
+| F2 | **Understand what the operator says, in context.** A typed or spoken line routes to the right world and pipeline by rules first, arithmetic second, a model last — and the seat that answers holds that world's standing, story and index. | Manjuel `intent.py`, `ROUTES.md` *(planned)* (spec §4.4), the story block, `semantic_search` |
 | F3 | **Do the business's work as skills.** Intake → contract → scheduled visit → checklist + photos → report → estimate (50 % deposit) → invoice → payment → record → next visit. Each step a skill or a pipeline, each output a draft for his hand. | TBC `agents.md` §5, `TBC - ESTIMATE FORMAT.md`, `tbc_estimate` CLI |
 | F4 | **Never lie.** No claim reaches the operator, the delivery, the memory or the index without the engine having checked it against what ran; every failure travels with the answer. | Manjuel SPEC §3 invariants, `REFUSALS.md` §7–11, the recompose |
 | F5 | **The gate is final.** Money, legal commitments, sends, posts, landings: the system prepares, the operator's hand confirms. `can_approve:false` everywhere. | Manjuel RULE 6 / LAW 6; atlas law 5; TBC `SEAT.md` "MONEY AND LEGAL COMMITMENTS ARE THE OPERATOR'S" |
