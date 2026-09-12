@@ -34,6 +34,52 @@ hand that iterates without updating this file is out of line.
 
 ## Unreleased — since 0.1.9
 
+### Piece 3: the coder flow, and the pipeline block that turned out to be unnecessary
+
+The design said piece 3 was "a `coder` pipeline block and the flow spec.
+Neither is code." Reading the machinery before writing either, HALF OF IT WAS
+ALREADY BUILT and the other half needed to live somewhere a clone can see.
+
+**THE IN-TURN LOOP ALREADY CLOSES, and nothing new was needed for it.** The
+chain runs: a `technical` objective wakes the Expert Coder -> it emits a
+`<filepath>` and one fence and CALLS NOTHING (`agents/expert_coder.md` has no
+`May Call:` line at all) -> the harness parses before writing (`inspect_code`)
+-> lands it in the workspace and RAISES `review` (pipeline.py:2210) -> the
+Quality Evaluator wakes on that -> `NEEDS: <the one thing>` sends the run back
+through the Router ONCE, evidence carried rather than summarised
+(pipeline.py:2124).
+
+So the Router runs the tools and the coder writes. That separation is why
+`edit_file` and `run_python` needed no clearance work either: the Router is
+`May Call: all`, and the coder was never going to call them.
+
+**NO `coder` PIPELINE WAS ADDED, and the reason is the point.** A block listing
+`Router (when: needs_tool)` after the Expert Coder would mostly not fire -- the
+coder raises no flags; its landing raises `review`, not `needs_tool`. Shipping
+a seat order I had not watched fire would be furniture, and `default` already
+carries the whole loop. The parser still sees exactly five pipelines, checked
+after the edit rather than assumed.
+
+**THE FLOW IS THE PART THAT DID NOT EXIST**, because the Evaluator's send-back
+is ONE pass inside ONE turn:
+
+    attempt --always--> verify --always--> check --pass--> land (gate)
+                                             |
+                                             +--fail--> repair --always--> recheck --> land
+
+Six nodes, budget 1800s, saved as `coder` v1 and validated on save. THE RETRY
+IS UNROLLED RATHER THAN LOOPED: `Validate` refuses cycles, so the bound is
+structural and not a counter somebody raises at 2am. Every node runs in the
+workspace jail and it ends at a GATE, because landing is his act (RULE 6).
+
+**AND THE SHAPE IS IN `pipelines.md`, NOT ONLY IN `flows/`.** That directory is
+the engine's runtime store and is gitignored -- specs, folded history,
+runs.jsonl. A flow worth keeping is one a reader can REBUILD from the record;
+the instance on disk is state, and state does not travel. The commentary
+section was the right home: its own note says the parser stops at the heading
+above it, which was verified rather than trusted -- five pipelines before, five
+after.
+
 ### The coding loop gets an edit that is not a whole file, and a verdict it can steer on
 
 His order: pieces 1 and 2 of the coding design together, 3 after. The loop was

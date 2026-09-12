@@ -290,3 +290,61 @@ name a file's contents with no read this turn        (the claim-check refuses it
 invent an operator: / steward: dialogue              (class d; there is one
                                                       operator and he is typing)
 ```
+
+### The coding loop, and what closes it
+
+Written 2026-09-11, when the loop stopped being one pass.
+
+THE MOVES WERE ALREADY THERE. A `technical` objective wakes the Expert Coder;
+it emits a `<filepath>` and one fenced block and calls nothing itself; the
+harness parses that BEFORE writing it (`inspect_code`, REFUSALS 15), lands it
+in the workspace, and raises `review`; the Quality Evaluator wakes on that and
+may answer `NEEDS: <the one thing>`, which sends the run back through the
+Router ONCE with the evidence carried rather than a summary.
+
+WHAT WAS MISSING WAS A VERDICT AND AN EDIT. The only machine answer in that
+circuit was "does it parse", and a loop cannot steer on `compiles`. So:
+
+```
+run_python <file>   the verdict. RAN, or FAILED with the exit code, and both
+                    streams. One interpreter, one jailed path, never a command
+                    from a model. The child is bounded and cannot see .env.
+edit_file  <file>   the fix, as a fragment rather than a rewrite. The anchor
+                    must match EXACTLY ONCE or the edit is refused with the
+                    count -- at 8192 context a seat cannot hold a large file
+                    to rewrite it, and an anchor that matches twice does not
+                    say which.
+```
+
+THE ROUTER RUNS BOTH, not the coder. `agents/expert_coder.md` has no
+`May Call:` line at all, so it calls nothing: it writes, and the Router edits
+and runs. That is the same separation the estate has everywhere -- the seat
+with the most hands has the tightest law.
+
+### The `coder` flow — when one send-back is not enough
+
+The Evaluator's `NEEDS:` is ONE pass back inside a single turn. For work that
+wants more than that, the shape below is a flow, gated, across turns:
+
+```
+attempt ──always──→ verify ──always──→ check ──pass──→ land (gate)
+                                         │
+                                         └──fail──→ repair ──always──→ recheck ──always──→ land
+```
+
+    attempt   run    write what the objective asks for into the workspace
+    verify    run    run it and report exactly what it said
+    check     eval   on `verify`, expecting RAN
+    repair    run    read what it said and EDIT the file to fix it
+    recheck   run    run it again
+    land      gate   nothing has reached the estate; carry on, or stop here
+
+Six nodes, budget 1800s. THE RETRY IS UNROLLED, not looped: `Validate` refuses
+cycles, so the bound is structural rather than a counter somebody can raise.
+Every node runs inside the workspace jail and the flow ends at a GATE, because
+landing is the operator's act and nothing else (RULE 6).
+
+THE SHAPE IS WRITTEN HERE BECAUSE THE FLOW ITSELF IS NOT IN THE RECORD.
+`flows/` is the engine's runtime store and is gitignored -- specs, their folded
+history and runs.jsonl. A flow worth keeping is one a reader can rebuild from
+the record; the instance on disk is state, and state does not travel.
