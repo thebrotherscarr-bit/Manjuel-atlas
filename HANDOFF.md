@@ -672,7 +672,8 @@ dropped by operator ruling 2026-09-01 — see the fix log.
 
 ## HANDOFF FOR 2026-09-12 — read this before anything below it
 
-**Where the ground stands AT CLOSE.** core `main@e4cf663`, version
+**Where the ground stands AT CLOSE.** core `main@e4cf663` -- the last save
+carrying CODE, with the record's own saves after it -- version
 **0.1.11 THE CODING UPDATE**; atlas `main@572186d`, version **0.1.5 THE FLOW
 CONFIRMATION** — both names his. Both trees clean, both in step with GitHub,
 no sitting open. Strokes **2333/2333**, smoke **60/60**, live standup 9/9, law

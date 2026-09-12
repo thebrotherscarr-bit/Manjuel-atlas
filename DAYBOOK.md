@@ -1288,7 +1288,9 @@ strokes alone; today was the day it was FIRED, and firing it is the whole
 session. Manjuel moved 0.1.10 → **0.1.11 THE CODING UPDATE**; atlas 0.1.3 →
 0.1.4 THE DELIVERY PACKAGING → **0.1.5 THE FLOW CONFIRMATION**, both names his.
 
-**Version** — core `main@e4cf663`, `__version__` 0.1.11; atlas `main@572186d`,
+**Version** — core `main@e4cf663` (THE LAST SAVE CARRYING CODE; the record's
+own saves sit after it, so the tip is newer and that is not a drift),
+`__version__` 0.1.11; atlas `main@572186d`,
 VERSION 0.1.5. THE TAGS ARE NOT CUT: the core's gate passes 9 of 9 and the
 cutting is his (RULE 6).
 
@@ -1362,7 +1364,9 @@ And `version.ps1`'s first pin-rewrite CORRUPTED `core/src/version.rs` with
 mojibake and a BOM, reverted from HEAD and rewritten with .NET file APIs -- the
 same encoding trap as `release.ps1`'s, one layer down.
 
-**At close** — core `main@e4cf663`, atlas `main@572186d`, both trees clean and
+**At close** — core `main@e4cf663` and atlas `main@572186d` are the last saves
+CARRYING CODE; the record's own saves follow the former, because no entry can
+name the commit that contains it. Both trees clean and
 in step with GitHub, no sitting open. Strokes 2333/2333 (from 2254), smoke
 60/60, live standup 9/9, law chain whole at 4 links, BUILDMAP matching,
 manifest agrees with the disk, release gate 9 of 9. atlas: 22 held · 15 absent
