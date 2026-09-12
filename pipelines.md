@@ -327,9 +327,12 @@ The Evaluator's `NEEDS:` is ONE pass back inside a single turn. For work that
 wants more than that, the shape below is a flow, gated, across turns:
 
 ```
-brief ──always──→ attempt ──always──→ verify ──always──→ verdict ──pass──→ land (gate)
-                                                            │
-                                                            └──fail──→ repair ──→ recheck ──→ land
+brief ──→ attempt ──→ verify ──→ verdict ──pass──────────────────→ land (gate)
+                                    │
+                                    └──fail──→ repair ──→ recheck ──→ proof ──pass──→ land
+                                                                        │
+                                                                     (no fail edge:
+                                                                      the run FAILS)
 ```
 
     brief     ask    turn the hand's one line into ONE concrete task: the
@@ -342,9 +345,11 @@ brief ──always──→ attempt ──always──→ verify ──always─
                      named when it fired the flow
     repair    run    read what it said and EDIT that file to fix it
     recheck   run    run it again
+    proof     eval   on `recheck`, the SAME expectation -- the repaired work
+                     is judged too, and by the same standard
     land      gate   nothing has reached the estate; carry on, or stop here
 
-Seven nodes, budget 1800s. THE RETRY IS UNROLLED, not looped: `Validate`
+Eight nodes, budget 1800s. THE RETRY IS UNROLLED, not looped: `Validate`
 refuses cycles, so the bound is structural rather than a counter somebody can
 raise. Every node runs inside the workspace jail and the flow ends at a GATE,
 because landing is the operator's act and nothing else (RULE 6).
@@ -389,12 +394,19 @@ what it was told. The cure is a spec -- name the marker in the objective, match
 it in the expectation -- not fuzzy matching, which would put back the
 laundering this exists to stop.
 
-STILL OPEN, and named here rather than left to be re-found: `recheck ──→ land`
-is UNJUDGED. Only `verify` is scored, so a run that fails the verdict, repairs
-and rechecks reaches the gate with no correctness judgement of the repaired
-work -- the same fault as the original, one branch over. And a `verify` that
-calls no tool hands the verdict no evidence, which fails for want of proof
-rather than for wrong work; the record should not conflate the two.
+AND THE REPAIR PATH IS JUDGED TOO, which it was not until 2026-09-12.
+`recheck ──→ land always` meant a run that failed its requirement, repaired and
+rechecked arrived at the hand with NO judgement of the repaired work -- the same
+fault as the original green-on-wrong-code, moved one edge down. `proof` holds
+the repair to the SAME expectation.
+
+`proof` HAS NO FAIL EDGE, and that is deliberate. An eval that fails with no
+fail edge stops the run, and there is nothing to steer to anyway: the retry is
+unrolled, so there is no second repair. Work that still does not meet the
+requirement must not be OFFERED for landing. So the verdict now means
+something -- PAUSED is "it passed, your hand decides", FAIL is "it did not" --
+and nothing is thrown away either way: every attempt is still in the workspace
+with what each run said.
 
 THE SHAPE IS WRITTEN HERE BECAUSE THE FLOW ITSELF IS NOT IN THE RECORD.
 `flows/` is the engine's runtime store and is gitignored -- specs, their folded
