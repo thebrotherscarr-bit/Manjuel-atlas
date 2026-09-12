@@ -327,16 +327,19 @@ The Evaluator's `NEEDS:` is ONE pass back inside a single turn. For work that
 wants more than that, the shape below is a flow, gated, across turns:
 
 ```
-brief ──always──→ attempt ──always──→ verify ──always──→ check ──pass──→ land (gate)
-                                                           │
-                                                           └──fail──→ repair ──→ recheck ──→ land
+brief ──always──→ attempt ──always──→ verify ──always──→ verdict ──pass──→ land (gate)
+                                                            │
+                                                            └──fail──→ repair ──→ recheck ──→ land
 ```
 
     brief     ask    turn the hand's one line into ONE concrete task: the
-                     exact .py filename, and what a run of it should print
+                     exact .py filename, what a run should print, and that the
+                     file is run with NO ARGUMENTS so it must exercise its own
+                     cases
     attempt   run    write what that task asks for, at the filename it names
     verify    run    run the file that task names, report exactly what it said
-    check     eval   on `verify`, expecting RAN
+    verdict   eval   on `verify`, expecting `{{expect}}` -- the marker the HAND
+                     named when it fired the flow
     repair    run    read what it said and EDIT that file to fix it
     recheck   run    run it again
     land      gate   nothing has reached the estate; carry on, or stop here
@@ -346,21 +349,42 @@ refuses cycles, so the bound is structural rather than a counter somebody can
 raise. Every node runs inside the workspace jail and the flow ends at a GATE,
 because landing is the operator's act and nothing else (RULE 6).
 
-THE HEAD IS AN `ask`, AND ITS ABSENCE IS WHY v1 WAS HOLLOW. v1 began at
-`attempt`, whose objective read "write the code THE OBJECTIVE ASKS FOR" --
-referring to an objective no node carried. Fired 2026-09-12 it traversed all
-six nodes in 646s and built nothing, because the seats were right to refuse:
-"there's no source material or specification about what code to write." The
-five `run` nodes now carry `{{out_brief}}`, and `brief` carries
-`{{objective}}`, which the hand supplies when firing. A var nothing supplies
-is REFUSED, never guessed -- `play.Render` answers "nothing is guessed" -- so
-an empty fire stops at the first node rather than spending the budget finding
-out it has nothing to build.
+THE ONE EVAL ASKS ABOUT THE REQUIREMENT, NOT ABOUT EXECUTION, and that is the
+whole correction of 2026-09-12. It used to be `check`, expecting `RAN:` -- and
+a flow fired at a real task went GREEN over code that did the opposite of what
+the objective said, because `run_python` had exited 0 and nothing asked whether
+the work was right. A green on wrong code is worse than a red: the green is
+what a reader trusts.
 
-ONE VOICE FOR THE HEAD, NOT THE COUNCIL. `ask` is a single model; `run` is the
-whole council, law gate and Router and tools. Turning one line into a task
-statement is the smallest thing that could do that job, which is SITTING LAW 3
-read as a question about a node.
+Three wirings were tried and two were wrong, each corrected by an actual run:
+
+    liveness gating correctness   a task whose correct behaviour is a NON-ZERO
+                                  EXIT fails a `RAN:` gate. A correct refusal
+                                  exits 1.
+    two evals as recorders        an eval is a GATE, never a passive recorder.
+                                  `run.go`: `if !hasFailEdge(...) { return
+                                  VerdictFail }` -- an eval that fails with no
+                                  fail edge stops the whole run, so a
+                                  "recording" eval killed the run before the
+                                  judging one could fire.
+
+So: ONE eval, on the requirement. Liveness is not a second gate -- it is
+evidence, and `--- WHAT THE TOOLS SAID ---` already puts it in front of any
+reader at the gate.
+
+AND THE EXPECTATION IS ONLY AS GOOD AS THE OBSERVABLE THE OBJECTIVE NAMES. A
+run whose code was CORRECT still failed, because the hand wrote `Refused` and
+the program printed `Refusing`; `contains` is exact and case-sensitive and did
+what it was told. The cure is a spec -- name the marker in the objective, match
+it in the expectation -- not fuzzy matching, which would put back the
+laundering this exists to stop.
+
+STILL OPEN, and named here rather than left to be re-found: `recheck ──→ land`
+is UNJUDGED. Only `verify` is scored, so a run that fails the verdict, repairs
+and rechecks reaches the gate with no correctness judgement of the repaired
+work -- the same fault as the original, one branch over. And a `verify` that
+calls no tool hands the verdict no evidence, which fails for want of proof
+rather than for wrong work; the record should not conflate the two.
 
 THE SHAPE IS WRITTEN HERE BECAUSE THE FLOW ITSELF IS NOT IN THE RECORD.
 `flows/` is the engine's runtime store and is gitignored -- specs, their folded
