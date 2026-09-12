@@ -92,7 +92,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `main` | 1901-1991 |  |
 | def | `_loop` | 1994-2142 | The typed turn loop. main() wraps it so any escape still closes. |
 
-### manjuel/context.py — 416 lines
+### manjuel/context.py — 448 lines
 
 *Run context: the accumulating state that flows through a pipeline.*
 
@@ -100,21 +100,21 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 |---|---|---|---|
 | class | `StepResult` | 17-41 |  |
 | def | `StepResult.ok` | 40-41 |  |
-| def | `tool_verdicts` | 44-78 | What each tool SAID, one line each: `<tool>: <its own first line>`. |
-| def | `_entry` | 81-85 | (who, what, ts) from either the old 2-shape or the new 3-shape. |
-| def | `now_block` | 88-114 | The present moment, stated as fact. |
-| def | `_age` | 117-129 | How long ago, in the units a person thinks in. '' when unknown. |
-| def | `detect_shift` | 139-172 | Has the operator changed the subject without saying so? |
-| def | `select_dialogue` | 175-246 | Choose what the seats actually see: RELEVANCE plus a recency tail. |
-| class | `RunContext` | 250-416 |  |
-| def | `RunContext.last_output` | 341-346 | Most recent successful output, or the feed if nothing ran yet. |
-| def | `RunContext.output_of` | 348-353 |  |
-| def | `RunContext.completed` | 355-356 |  |
-| def | `RunContext.elapsed` | 359-360 |  |
-| def | `RunContext.dialogue_block` | 364-386 | The conversation so far, newest turns kept when over budget. |
-| def | `RunContext.source_block` | 388-400 | Objective + feed. Injected into EVERY stage so it is never lost. |
-| def | `RunContext.history_block` | 402-411 | Prior stage outputs, oldest first. |
-| def | `RunContext.slug` | 413-416 |  |
+| def | `tool_verdicts` | 44-110 | What each tool SAID, one line each: `<tool>: <its own first line>`. |
+| def | `_entry` | 113-117 | (who, what, ts) from either the old 2-shape or the new 3-shape. |
+| def | `now_block` | 120-146 | The present moment, stated as fact. |
+| def | `_age` | 149-161 | How long ago, in the units a person thinks in. '' when unknown. |
+| def | `detect_shift` | 171-204 | Has the operator changed the subject without saying so? |
+| def | `select_dialogue` | 207-278 | Choose what the seats actually see: RELEVANCE plus a recency tail. |
+| class | `RunContext` | 282-448 |  |
+| def | `RunContext.last_output` | 373-378 | Most recent successful output, or the feed if nothing ran yet. |
+| def | `RunContext.output_of` | 380-385 |  |
+| def | `RunContext.completed` | 387-388 |  |
+| def | `RunContext.elapsed` | 391-392 |  |
+| def | `RunContext.dialogue_block` | 396-418 | The conversation so far, newest turns kept when over budget. |
+| def | `RunContext.source_block` | 420-432 | Objective + feed. Injected into EVERY stage so it is never lost. |
+| def | `RunContext.history_block` | 434-443 | Prior stage outputs, oldest first. |
+| def | `RunContext.slug` | 445-448 |  |
 
 ### manjuel/doctrine.py — 636 lines
 
@@ -794,7 +794,7 @@ this file (where each thing is) -> REFUSALS.md (what each guard refuses)
 | def | `GroundWatch.start` | 109-134 |  |
 | def | `GroundWatch.stop` | 136-142 |  |
 
-manjuel/: 29 files, 18477 lines.
+manjuel/: 29 files, 18509 lines.
 
 ## GUARDS — by the failure that earned them
 
@@ -851,13 +851,13 @@ number in SEAT_LOG.md for the toll; the transcript is named there.
 | 25 | `StepResult` | review of 2026-09-08). The standup's number check reads these: a |
 | 29 | `StepResult` | Sitting 79, the operator's ruling: a thinking seat's chain of thought |
 | 32 | `StepResult` | into a later seat's prompt, the thread, or the delivery (sitting 47). |
-| 94 | `now_block` | training-data sense of the present, which is how sitting 26 narrated a |
-| 202 | `select_dialogue` | 2026-09-09: every shift, every time; the 1-2 turn ceiling. |
-| 258 | `RunContext` | naming it did the choosing. Sitting 81: one run logged both |
-| 267 | `RunContext` | arguments (sitting 77). It lives on the run, not on the seat's tool |
-| 274 | `RunContext` | (sitting 88, the operator: "a step that checks to see if it's even |
-| 303 | `RunContext` | not sixty words about it (2026-09-07, the CLAUDE.md system). |
-| 321 | `RunContext` | THE TURN DEADLINE (the operator, 2026-09-08: "600 max for the whole |
+| 126 | `now_block` | training-data sense of the present, which is how sitting 26 narrated a |
+| 234 | `select_dialogue` | 2026-09-09: every shift, every time; the 1-2 turn ceiling. |
+| 290 | `RunContext` | naming it did the choosing. Sitting 81: one run logged both |
+| 299 | `RunContext` | arguments (sitting 77). It lives on the run, not on the seat's tool |
+| 306 | `RunContext` | (sitting 88, the operator: "a step that checks to see if it's even |
+| 335 | `RunContext` | not sixty words about it (2026-09-07, the CLAUDE.md system). |
+| 353 | `RunContext` | THE TURN DEADLINE (the operator, 2026-09-08: "600 max for the whole |
 
 ### manjuel/doctrine.py
 
@@ -1349,26 +1349,26 @@ its line range. The suites are the memory (HANDOFF: test discipline).
 | `test_a_keyword_that_is_grammar_must_be_named` | 10269-10322 | `intent`, `intent.names_a_tool` |
 | `test_an_order_to_run_a_script_is_arithmetic` | 10325-10366 | `intent`, `intent.names_a_file`, `intent.wants_running` |
 | `test_a_turn_that_wanted_hands_and_used_none_says_so` | 10369-10422 | `RunContext`, `StepResult`, `recompose` |
-| `test_the_tools_own_words_leave_the_turn` | 10425-10485 | `StepResult`, `tool_verdicts` |
-| `test_a_write_refuses_python_that_will_not_parse` | 10488-10533 | — |
-| `test_an_edit_refuses_an_anchor_that_does_not_say_which` | 10536-10624 | — |
-| `test_a_run_is_bounded_jailed_and_blind_to_the_keys` | 10627-10722 | `_sk`, `_sk.RUN_TIMEOUT` |
-| `test_a_hook_watches_a_call_without_taking_it_over` | 10725-10829 | `_sk`, `_sk.SkillSpec`, `_sk._HANDLERS`, `_sk.hook_faults`, `_sk.parse_hooks`, `_sk.pop` |
-| `test_a_run_in_flight_can_be_interrupted` | 10832-10904 | `SV`, `SV.ASKING`, `SV.COMMANDS`, `SV.IDLE`, `SV.Inbox`, `SV.RUNNING`, `SV.TERMINAL`, `SV.Wire`, `SV._thread`, `_cli`, `_cli._loop`, `_in` |
-| `test_a_skill_cannot_hang_the_repl` | 10907-10949 | `_sk`, `_sk.SKILL_TIMEOUT`, `_sk._HANDLERS`, `_sk._run_bounded`, `_sk.pop` |
-| `test_native_tool_calling` | 10952-11075 | `REVIEW_ONLY`, `calls_to_action_xml`, `declares`, `extract_tool_call` |
-| `test_the_router_is_told_how_not_just_what` | 11078-11145 | `RunContext`, `_router_prompt`, `_steward_prompt` |
-| `test_a_thinking_router_is_never_silent` | 11148-11207 | `OllamaRuntime`, `_salvage`, `thinking_of` |
-| `test_write_read_and_speak_about_it` | 11210-11300 | `REVIEW_ONLY_SKILLS`, `RunContext`, `intent`, `intent.names_a_tool`, `run_pipeline` |
-| `test_model_override` | 11303-11341 | `AgentRegistry`, `AgentRegistry.load`, `_cli`, `_cli.COMMANDS` |
-| `test_path_gate` | 11344-11461 | `RunContext`, `SkillSpec`, `gate_paths`, `parse_path_args`, `run_pipeline` |
-| `test_flags_are_not_speech` | 11464-11504 | `RunContext`, `build_prompt`, `read_flags`, `run_pipeline`, `strip_control` |
-| `test_ink` | 11507-11555 | `ink`, `ink.RESET`, `ink.Spinner`, `ink._STATE`, `ink.bad`, `ink.body`, `ink.dim`, `ink.enabled`, `ink.good`, `ink.seat`, `ink.seat_color`, `ink.warn` |
-| `test_math` | 11558-11581 | `M`, `M.MathError`, `M.cosine`, `M.linear_regression`, `M.matmul`, `M.parse_numbers`, `M.stdev`, `M.transpose`, `M.variance` |
-| `test_a_commit_is_not_a_tag` | 11584-11625 | `_HANDLERS` |
-| `test_says_is_a_phrase_list_not_a_paragraph` | 11628-11693 | `SkillLibrary`, `SkillLibrary.load`, `parse_says` |
-| `test_the_stamp_is_not_an_edit` | 11696-11804 | `_BOOT_STAMPS`, `_H`, `_sf`, `suite_tally` |
-| `test_doctrine` | 11807-11981 | `D`, `D.dead_paths`, `D.doc_pass_report`, `D.doctrine_report`, `D.living`, `D.open_tasks`, `D.sittings`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_SL` |
-| `test_the_core_sees_its_own_repository` | 11984-12102 | `gitstate`, `gitstate.GitRefused`, `gitstate._bad_branch_name`, `gitstate._host_of`, `gitstate._jailed`, `gitstate.branches`, `gitstate.close_branch`, `gitstate.commit`, `gitstate.diff`, `gitstate.read`, `gitstate.remotes`, `gitstate.switch` |
-| `test_record_and_git` | 12105-12209 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
+| `test_the_tools_own_words_leave_the_turn` | 10425-10513 | `StepResult`, `tool_verdicts` |
+| `test_a_write_refuses_python_that_will_not_parse` | 10516-10561 | — |
+| `test_an_edit_refuses_an_anchor_that_does_not_say_which` | 10564-10652 | — |
+| `test_a_run_is_bounded_jailed_and_blind_to_the_keys` | 10655-10750 | `_sk`, `_sk.RUN_TIMEOUT` |
+| `test_a_hook_watches_a_call_without_taking_it_over` | 10753-10857 | `_sk`, `_sk.SkillSpec`, `_sk._HANDLERS`, `_sk.hook_faults`, `_sk.parse_hooks`, `_sk.pop` |
+| `test_a_run_in_flight_can_be_interrupted` | 10860-10932 | `SV`, `SV.ASKING`, `SV.COMMANDS`, `SV.IDLE`, `SV.Inbox`, `SV.RUNNING`, `SV.TERMINAL`, `SV.Wire`, `SV._thread`, `_cli`, `_cli._loop`, `_in` |
+| `test_a_skill_cannot_hang_the_repl` | 10935-10977 | `_sk`, `_sk.SKILL_TIMEOUT`, `_sk._HANDLERS`, `_sk._run_bounded`, `_sk.pop` |
+| `test_native_tool_calling` | 10980-11103 | `REVIEW_ONLY`, `calls_to_action_xml`, `declares`, `extract_tool_call` |
+| `test_the_router_is_told_how_not_just_what` | 11106-11173 | `RunContext`, `_router_prompt`, `_steward_prompt` |
+| `test_a_thinking_router_is_never_silent` | 11176-11235 | `OllamaRuntime`, `_salvage`, `thinking_of` |
+| `test_write_read_and_speak_about_it` | 11238-11328 | `REVIEW_ONLY_SKILLS`, `RunContext`, `intent`, `intent.names_a_tool`, `run_pipeline` |
+| `test_model_override` | 11331-11369 | `AgentRegistry`, `AgentRegistry.load`, `_cli`, `_cli.COMMANDS` |
+| `test_path_gate` | 11372-11489 | `RunContext`, `SkillSpec`, `gate_paths`, `parse_path_args`, `run_pipeline` |
+| `test_flags_are_not_speech` | 11492-11532 | `RunContext`, `build_prompt`, `read_flags`, `run_pipeline`, `strip_control` |
+| `test_ink` | 11535-11583 | `ink`, `ink.RESET`, `ink.Spinner`, `ink._STATE`, `ink.bad`, `ink.body`, `ink.dim`, `ink.enabled`, `ink.good`, `ink.seat`, `ink.seat_color`, `ink.warn` |
+| `test_math` | 11586-11609 | `M`, `M.MathError`, `M.cosine`, `M.linear_regression`, `M.matmul`, `M.parse_numbers`, `M.stdev`, `M.transpose`, `M.variance` |
+| `test_a_commit_is_not_a_tag` | 11612-11653 | `_HANDLERS` |
+| `test_says_is_a_phrase_list_not_a_paragraph` | 11656-11721 | `SkillLibrary`, `SkillLibrary.load`, `parse_says` |
+| `test_the_stamp_is_not_an_edit` | 11724-11832 | `_BOOT_STAMPS`, `_H`, `_sf`, `suite_tally` |
+| `test_doctrine` | 11835-12009 | `D`, `D.dead_paths`, `D.doc_pass_report`, `D.doctrine_report`, `D.living`, `D.open_tasks`, `D.sittings`, `D.skills_axis`, `D.stale_tallies`, `D.versions`, `_H`, `_SL` |
+| `test_the_core_sees_its_own_repository` | 12012-12130 | `gitstate`, `gitstate.GitRefused`, `gitstate._bad_branch_name`, `gitstate._host_of`, `gitstate._jailed`, `gitstate.branches`, `gitstate.close_branch`, `gitstate.commit`, `gitstate.diff`, `gitstate.read`, `gitstate.remotes`, `gitstate.switch` |
+| `test_record_and_git` | 12133-12237 | `RunContext`, `_cli`, `_cli._toll_answer`, `gitstate`, `gitstate.GitRefused`, `gitstate.REMOTE_ENV`, `gitstate.commit`, `gitstate.pull`, `gitstate.push`, `gitstate.read`, `seatlog`, `seatlog.RunNote` |
 

@@ -53,28 +53,60 @@ def tool_verdicts(steps, cap: int = 200) -> list[str]:
     Every marker that check could have hunted was at the mercy of a seat's
     choice of words; this is the machine's own line, carried out whole.
 
-    FIRST LINE ONLY, and bounded. Every skill in this ground leads with its
-    verdict -- `RAN:`, `FAILED (exit 1):`, `Refused:`, `Saved to workspace:`,
-    `Edited x.py at line 8:` -- so the first line IS the answer and the body is
-    evidence the delivery already carries. A call whose result says nothing is
-    named with nothing after it rather than dropped: that it ran is itself a
-    fact.
+    THE VERDICT LINE AND THE BODY UNDER IT, bounded. This carried the FIRST
+    LINE ONLY until 2026-09-12, on the reasoning that the body was "evidence
+    the delivery already carries" -- and the ruling reversed the same day,
+    twice over, because the delivery turned out to be the one place evidence
+    may not be read from:
 
-    `tool_calls` and `tool_results` are appended together, once per executed
-    call, so they are index-aligned; a call short of a result is reported
-    without one rather than paired with somebody else's.
+      the marker travelled   an objective naming `FIB6: 8` put that string in
+                             the brief, the brief put it in the next node's
+                             objective, and a check for it passed on a node
+                             that had run nothing.
+      the marker was negated `run_python` printed `FIB6: 0` and the seat
+                             reported it correctly -- "which is not the
+                             expected output of `FIB6: 8`" -- and a substring
+                             check found the marker INSIDE the clause saying
+                             it did not match.
+
+    Prose quotes requirements and prose negates them, so prose cannot be
+    scored at all. What a check needs is what the tool PRINTED, and only the
+    body carries that. So the body comes out too, indented under its verdict,
+    and the eval scores this and nothing else.
+
+    BOUNDED PER CALL, because a `ground_read` of a long file is a legitimate
+    tool result and the gate must stay readable. `cap` is the whole entry, not
+    the head: a verdict line always survives, and a body is cut with a mark
+    that says it was cut.
+
+    A call whose result says nothing is named with nothing after it rather than
+    dropped: that it ran is itself a fact. `tool_calls` and `tool_results` are
+    appended together, once per executed call, so they are index-aligned; a
+    call short of a result is reported without one rather than paired with
+    somebody else's.
     """
     out: list[str] = []
     for s in steps:
         calls = list(getattr(s, "tool_calls", ()) or [])
         results = list(getattr(s, "tool_results", ()) or [])
         for i, name in enumerate(calls):
-            head = ""
-            if i < len(results):
-                head = str(results[i] or "").strip().split("\n", 1)[0].strip()
-            if len(head) > cap:
-                head = head[:cap].rstrip() + " ..."
-            out.append(f"{name}: {head}" if head else f"{name}:")
+            raw = str(results[i] or "").strip() if i < len(results) else ""
+            if not raw:
+                out.append(f"{name}:")
+                continue
+            head, _, body = raw.partition("\n")
+            head = head.strip()
+            entry = f"{name}: {head}"
+            body = body.strip("\n")
+            if body:
+                room = cap - len(entry)
+                if room > 0:
+                    kept = body[:room]
+                    if len(body) > room:
+                        kept = kept.rstrip() + " ..."
+                    entry += "\n" + "\n".join(
+                        "    " + ln for ln in kept.split("\n"))
+            out.append(entry)
     return out
 
 

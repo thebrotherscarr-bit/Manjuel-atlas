@@ -42,6 +42,49 @@ files that hold the number both moved — `manjuel/__init__.py` and
 same by every file that holds it", and `RUNBOOK.md`'s pre-tag line moved
 with them because `release.py --check 0.1.11` names the tag being cut.
 
+### The verdict lines carry the body, because prose cannot be scored
+
+`tool_verdicts` carried the FIRST LINE of each tool result and no more, on the
+reasoning that the body was "evidence the delivery already carries". That
+ruling reversed the same day it was written, and the delivery turned out to be
+the one place evidence may NOT be read from. Twice over:
+
+    the marker travelled    an objective naming `FIB6: 8` put that string in
+                            the brief, the brief put it in the next node's
+                            objective, and the seat quoted it back -- so a
+                            check for it passed on a node whose script had
+                            printed something else.
+    the marker was negated   run_python printed `FIB6: 0` and the seat reported
+                            it ACCURATELY -- "which is not the expected output
+                            of `FIB6: 8`" -- and a substring check found the
+                            marker INSIDE the clause saying it did not match.
+                            The verdict passed on a sentence reporting the
+                            failure.
+
+Prose quotes requirements and prose negates them. What a check needs is what
+the tool PRINTED, and only the body carries that. So the body comes out too,
+indented under its verdict, and the flow engine scores that and nothing else.
+
+BOUNDED PER ENTRY, because a `ground_read` of a long file is a legitimate
+result and the gate has to stay readable. The cap is the whole entry: a
+verdict line always survives, and a body is cut with a mark that says it was
+cut.
+
+Strokes 2316 -> 2318. `test_the_tools_own_words_leave_the_turn` was REWRITTEN,
+not replaced -- it is the same guard, the machine's own words rather than a
+seat's account of them, and it now has to include the output. Its two
+superseded assertions ("the FIRST line only", and a failure being exactly one
+line) carry the reason they moved, the way
+`test_the_chain_writes_declared_newlines` does.
+
+Measured live, on the exact run that had falsely passed:
+
+    prose     contains "FIB6: 8"   True     (the requirement, quoted back)
+    evidence  contains "FIB6: 8"   False
+    evidence  run_python: RAN: fibonacci.py / --- stdout --- / FIB6: 5
+    verdict   fail -> repair
+
+
 WHAT THE NAME IS FOR. Everything under this heading is the coding loop
 becoming real: `edit_file` and `run_python` as declared skills, the
 `coder` flow around them, the verdict lines that let a check score a RUN

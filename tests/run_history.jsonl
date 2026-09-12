@@ -313,3 +313,7 @@
 {"suite": "standup", "at": 1789233286.7615626, "state": "finished", "passed": 9, "total": 9, "green": true, "failed": [], "report": "logs/standup_2026-09-12_101446.md"}
 {"suite": "strokes", "at": 1789236415.5996485, "state": "finished", "passed": 2316, "total": 2316, "green": true, "failed": []}
 {"suite": "smoke", "at": 1789236419.457272, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789241160.8483515, "state": "finished", "passed": 2312, "total": 2316, "green": false, "failed": ["and the verdict line survives whole", "the FIRST line only -- the body is evidence the delivery carries", "a failure leaves whole too", "a long verdict is capped and says so"]}
+{"suite": "strokes", "at": 1789241213.7121408, "state": "finished", "passed": 2318, "total": 2318, "green": true, "failed": []}
+{"suite": "smoke", "at": 1789241224.034599, "state": "finished", "passed": 60, "total": 60, "green": true, "failed": []}
+{"suite": "strokes", "at": 1789241702.2307732, "state": "finished", "passed": 2318, "total": 2318, "green": true, "failed": []}

@@ -372,6 +372,16 @@ So: ONE eval, on the requirement. Liveness is not a second gate -- it is
 evidence, and `--- WHAT THE TOOLS SAID ---` already puts it in front of any
 reader at the gate.
 
+AND THE CHECK READS THE EVIDENCE, NEVER THE PROSE. A `run` node's answer
+is two things: what the seats said, and `--- WHAT THE TOOLS SAID ---`,
+the machine's own verdict lines with each tool's output under them. The
+eval scores the second and not the first, because prose QUOTES
+requirements and prose NEGATES them -- on 2026-09-12 a check for
+`FIB6: 8` passed on the sentence "printed FIB6: 0, which is not the
+expected output of FIB6: 8", and passed again on a node that had merely
+echoed its own objective. The answer is still what a person reads at the
+gate; it is simply not what decides.
+
 AND THE EXPECTATION IS ONLY AS GOOD AS THE OBSERVABLE THE OBJECTIVE NAMES. A
 run whose code was CORRECT still failed, because the hand wrote `Refused` and
 the program printed `Refusing`; `contains` is exact and case-sensitive and did

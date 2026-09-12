@@ -10449,14 +10449,37 @@ def test_the_tools_own_words_leave_the_turn(reg, lib, book):
     lines = tool_verdicts([good])
     check("every executed call is named", len(lines) == 2, str(lines))
     check("and the verdict line survives whole",
-          "run_python: RAN: calc.py" in lines, str(lines))
-    check("the FIRST line only -- the body is evidence the delivery carries",
-          all("5050" not in l for l in lines), str(lines))
+          any(l.startswith("run_python: RAN: calc.py") for l in lines), str(lines))
+
+    # THIS STROKE MOVED THE SAME DAY IT WAS WRITTEN, and the reason is the
+    # whole point. It asserted "the FIRST line only -- the body is evidence
+    # the delivery carries", because the body looked like duplication.
+    #
+    # The delivery turned out to be the one place evidence may NOT be read
+    # from. Twice over: an objective naming `FIB6: 8` put that string in the
+    # brief and the brief put it in the next node's prose, so a check for it
+    # passed on a node that had run nothing; and a seat reported a failure
+    # ACCURATELY -- "printed FIB6: 0, which is not the expected output of
+    # FIB6: 8" -- so a substring check found the marker inside the clause
+    # saying it did not match. Prose quotes requirements and prose negates
+    # them, so prose cannot be scored at all.
+    #
+    # What a check needs is what the tool PRINTED, and only the body carries
+    # that. The guard is the same guard -- the machine's own words, not a
+    # seat's account of them -- and it now has to include the output.
+    check("the BODY comes out too, because it is the only place the "
+          "program's own output lives",
+          any("5050" in l for l in lines), str(lines))
+    check("indented under its verdict, so the two are never confused",
+          any("\n    " in l for l in lines), str(lines))
 
     bad = step(["run_python"], ["FAILED (exit 1): calc.py\n--- stderr ---\nSyntaxError"])
-    check("a failure leaves whole too",
-          tool_verdicts([bad]) == ["run_python: FAILED (exit 1): calc.py"],
-          str(tool_verdicts([bad])))
+    out_bad = tool_verdicts([bad])
+    check("a failure leaves whole too, verdict and reason both",
+          len(out_bad) == 1
+          and out_bad[0].startswith("run_python: FAILED (exit 1): calc.py")
+          and "SyntaxError" in out_bad[0],
+          str(out_bad))
 
     # THE POINT OF ALL OF IT: a check over these scores the RUN, not the words
     paraphrase = ("The run_python tool executed the file and reported that it "
@@ -10479,10 +10502,15 @@ def test_the_tools_own_words_leave_the_turn(reg, lib, book):
           str(tool_verdicts([short])))
 
     # and a long first line is bounded rather than dragged out whole
-    long_line = step(["ground_read"], ["x" * 600])
+    # BOUNDED PER ENTRY, because a `ground_read` of a long file is a
+    # legitimate result and the gate must stay readable. The verdict line
+    # always survives; the body is what gets cut, with a mark saying so.
+    long_line = step(["ground_read"], ["inspected: 900 bytes\n" + "x" * 900])
     out = tool_verdicts([long_line])[0]
-    check("a long verdict is capped and says so",
-          len(out) < 260 and out.endswith("..."), out[-40:])
+    check("a long body is capped and says it was cut",
+          len(out) < 320 and out.rstrip().endswith("..."), out[-40:])
+    check("and the verdict line is never the part that gets cut",
+          out.startswith("ground_read: inspected: 900 bytes"), out[:60])
 
 
 def test_a_write_refuses_python_that_will_not_parse(reg, lib, book):
