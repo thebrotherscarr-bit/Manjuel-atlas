@@ -14,7 +14,7 @@ RUN THE SMOKE SUITE, not just the strokes. It was RED at 34/50 from 14e2711
 to 2026-09-02 because its StubRuntime had not been moved with pipeline.py,
 and nothing noticed: the strokes were green the whole time.
 
-**START AT `## HANDOFF FOR 2026-09-09`** (search for it — the day blocks
+**START AT `## HANDOFF FOR 2026-09-12`** (search for it — the day blocks
 stack newest first above `## Open`). CHANGELOG.md carries the versions;
 DAYBOOK.md Session 5 carries the day's intent. Everything between here and
 there is standing reference that has not moved.
@@ -669,6 +669,117 @@ dropped by operator ruling 2026-09-01 — see the fix log.
     5. CHECK THE DISK BEFORE THE TRANSCRIPT. A seat's account of what it did
        is testimony (LAW 5). `WHAT RAN (observed)` and the file itself are
        the facts.
+
+## HANDOFF FOR 2026-09-12 — read this before anything below it
+
+**Where the ground stands.** `main` at `d53a160`, version **0.1.11**; atlas
+`main` at `467e94c`, version **0.1.4**. Both pushed, both CI green — core 4/4
+legs (Windows and Ubuntu, 3.10 and 3.13), atlas 2/2. Strokes **2316/2316**,
+smoke **60/60**, law chain whole at 4 links, manifest agrees with the disk,
+BUILDMAP idempotent. The atlas battery: 22 held · 15 absent · 0 broke, every
+absent one naming the private oracle ground.
+
+**THE DAY WAS THE CODING LOOP MEETING THE LIVE RACK.** Piece 3 landed green
+the night before on strokes alone. Firing it found four faults in a row, each
+hidden behind the last, and none of them was findable by reading:
+
+    the flow had no head        `attempt` said "write the code THE OBJECTIVE
+                                ASKS FOR" and no node carried an objective.
+                                Six nodes, 646s, nothing built. The seats were
+                                right to refuse. -> an `ask` node, and the
+                                builder now offers a box for every {{var}} no
+                                node fills, because API.fireFlow had always
+                                sent '{}'
+    a refusal nobody answered   run_python was refused for a missing file, the
+                                Router wrote the file, and stopped -- 332 of
+                                646 seconds went into its own confusion. Now
+                                the WRITE carries the news, read off the disk
+    the check could not pass    play.Score is exact match and also scores
+                                prompt-eval datasets, so it could not be
+                                loosened. An eval node now declares `match`
+                                (equals | contains), and `contains` is CASE-
+                                SENSITIVE -- the first version was case-blind
+                                and passed a FAILED run, because the delivery
+                                said "the tools that actually ran this turn"
+    the eval scored prose       a check over a `run` node was reading the
+                                closing seat's paraphrase. A node now carries
+                                `--- WHAT THE TOOLS SAID ---`: the machine's
+                                own verdict lines, appended, never substituted
+
+**AND A TRAP WORTH MORE THAN THE FIXES.** Between v7 and v8 the `coder` flow
+gave `verify` the objective `{{out_attempt}}`, so it would know which file was
+written. It PASSED a run where verify called `list_directory` and ran nothing
+— attempt's verdict block travelled into verify's objective and `contains
+RAN:` found a marker that had been pasted rather than earned. Reverted. The
+invariant is now a property of the design: **a node's verdict block describes
+that node's run only, and that holds exactly as long as no objective carries a
+prior `run` node's output.** An `ask` node is safe to carry; it never gets a
+block. Anything that scores prose can be fooled by prose that moved.
+
+**THE ARCHIVE RODE IN, TWICE, AND IS NOW REFUSED.** Relaunching THE LINE with
+`CurrentDirectory` set to the ground root made `ground.Detect` resolve
+`research`, and the SEE THE TOWN walk then read the DESKTOP and adopted every
+neighbour holding an AGENTS.md. `Desktop\Archive` is one: the dashboard read
+its git state and the owed badge said **83,302**. The same thing happened
+2026-09-11 at 83,303 — that day it was caught and the boot line was changed to
+NAME what it carries, so the next one would be visible. It was visible. Being
+visible is not being refused.
+
+    ground.Barred      every path segment, case-blind, checked at Detect AND
+                       Siblings AND tenant.Add -- a rule with one door is a
+                       rule with a way around it
+    insideNamed        and the walk no longer leaves the estate at all: a
+                       neighbour is carried only if it sits inside a tenant
+                       the command line actually NAMED. `manjuel` and
+                       `neiro_recovery` were desktop folders too
+
+The boot line now reads `left outside the estate (2): manjuel, neiro_recovery`
+and `carrying 2: atlas, research`. The badge went 83,302 -> 13, and the 13 is
+this estate's own two repositories. **A hand reached into Archive during that
+diagnosis** — a loop that ran `git` over whatever `muster` returned, before
+reading the list. RULE 3: checking is reaching. It is in the record because it
+happened, not because it was caught.
+
+**0.1.4 IS CALLED THE DELIVERY PACKAGING FOR A REASON.** `VERSION` was the
+declared single authority and two commands were outside it: `atlas-vc` printed
+a literal and had no VERSION file at all, and `atlas-tui` had one beside it and
+did not read it — it asked the Rust spine and fell back to a hardcoded string
+when the spine was absent, which is exactly the fresh clone `prove.py` keeps an
+ABSENT branch for. The one place the staleness could not be noticed was the one
+place it lived. The glass said `0.1.3` by hand in two unrelated functions, one
+of them the Prometheus gauge a monitoring system scrapes. All eight files and
+all five binaries now answer from disk, measured.
+
+**What the release gate still refuses, and it is not code.** `strokes` and
+`smoke` are green on a MIRROR and the ground's `tests/last_run.json` is the
+one his terminal writes; `standup` wants a live run after the newest edit.
+Those three are a terminal away. Everything else in the gate passes.
+
+**Open, named, not fixed** — none of these is a claim about now, they are the
+next hand's list:
+
+    SYSTEM_DESIGN.md   8 path references that exist NOWHERE in this ground
+                       (ROUTES.md, SEAT.md, clients.json, history.jsonl,
+                       tbc_system_core.py, and three client-shaped paths not
+                       named here per SITTING LAW 2). It describes an older
+                       architecture; it wants a rewrite, not a sweep.
+    webapp tests       one test function in the whole module. ADR-006 measured
+                       the same thing about the protocol and tenant layers and
+                       both got first strokes 2026-09-11; the glass has not.
+    no release flow    a `v*` tag publishes nothing. `release.ps1` is local and
+                       a person runs it. DELIVERABLE.md said `ci.yml` and
+                       `release.yml` existed for weeks; neither ever has.
+    names_a_tool       `intent: objective names 'when'` was fixed by requiring
+                       a function-word keyword to be NAMED. Seven other one-
+                       word keywords are content words and were left alone --
+                       `sitting` is the one most likely to bite next, because
+                       this estate says the word constantly.
+    root doc endings   10 of 23 root .md files are LF in the working tree while
+                       `.gitattributes` declares CRLF. Git reports them
+                       unmodified, so `eol=crlf` normalizes and a FRESH CLONE
+                       GETS CRLF — the deviation is local to this tree and does
+                       not ship. Cosmetic; recorded so it is not re-found.
+
 
 ## HANDOFF FOR 2026-09-10 — read this before anything below it
 
