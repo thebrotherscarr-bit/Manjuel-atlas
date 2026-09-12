@@ -92,8 +92,9 @@ call)", which today ENACTED his 2026-09-03 ruling rather than making a new one.
 Neither is ticked. That list is his, and the 2026-09-08 order was about exactly
 this: "you are picking shit to add to your task list from an arbitrary source."
 
-The release gate reads 9 of 9 after the pass, with the standup re-run live so
-it post-dates the newest edit.
+The release gate reads 9 of 9 after the pass -- strokes and smoke re-run AFTER
+the newest edit, which the gate checks and says in its own words, and the live
+standup fired at the close of the pass.
 
 ### `sitting` was the next collision, and the root docs now match their own ruling
 
